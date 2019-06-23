@@ -1,0 +1,87 @@
+# Types definitions
+types:
+
+    # Can be a PHP type or an arbitrary name, in most case it will be a PHP
+    # class name, especially if you let the system lookup for native types
+    # by itself. If the PHP type does not exist anymore, this name will
+    # looked up within the "type_aliases" map in order to find the corresponding
+    # PHP type.
+    App\Example\Article:
+        # Normalized name can be anything, using any chars
+        normalized_name: example.app.article
+        # Properties definitions
+        properties:
+            id:
+                # For scalar types and terminal types, implementations for
+                # normalization and denormalization must be provided to the
+                # system at initialization.
+                type: int
+            title:
+                type: string
+            author:
+                type: int
+                collection: true
+            tags:
+                # Normalized name refers to the name that will be written
+                # in the normalized ouput, it may differ from the real property
+                # name.
+                normalized_name: tag_collection
+                type: example.app.tag
+                optional: true
+                collection: true
+                aliases: [labels]
+                groups: [editorial, triage]
+                # Collection type will determine how to hydrate the instance,
+                # an array is an easy one, an iterable without anymore typing
+                # will be an array too, but custom lists could be implemented
+                # as well, but they need to be registered within the global
+                # system as collections types to allow hydration.
+                collection_type: array
+            content:
+                type: string
+                optional: false
+            date:
+                type: date
+
+    DateTimeImmutable: {}
+
+    ConflictingType:
+        properties:
+            foo:
+                type: int
+
+    App\Example\Tag:
+        aliases: [tag, label]
+        properties:
+            name:
+                type: string
+                aliases: [label, value]
+                optional: false
+            color:
+                type: string
+                optional: true
+
+# System wide type aliases. This could be written the other way arround, such
+# as: "existing_type (string): aliases (string[])" it does not really matter,
+# flattened list is eaiser to maintain and faster to lookup. 
+type_aliases:
+
+    # Let's say, for some reason, your code evolved by you
+    # are working on a bus with external applications, you
+    # might receive instances wrongly identified:
+    App\\LegacyName\\Article: App\Example\Article
+    legacy_name.app.article: App\LegacyName\Article
+    tag: App\Example\Tag
+    article: App\Example\Article
+
+    # Will raise an error
+    wrong_alias: non_existing_type
+
+    # Hides a native type and replace it with another
+    ConflictingType: App\Example\Tag
+
+    # Fetch a hidden native type
+    conflicting_type: ConflictingType
+
+    # You may also alias PHP native types:
+    date: DateTimeImmutable

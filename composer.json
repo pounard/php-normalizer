@@ -1,0 +1,50 @@
+{
+    "name": "pounard/playing-with-normalization",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Pierre Rineau",
+            "email": "pierre.rineau@makina-corpus.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "classmap": [
+            "src/Context.php",
+            "src/CustomNormalizer.php",
+            "src/DefaultNormalizer.php",
+            "src/Error.php",
+            "src/Normalizer.php",
+            "src/Options.php",
+            "src/TypeDefinition.php"
+        ],
+        "psr-4": {
+            "MakinaCorpus\\Normalizer\\": "src/",
+            "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "benchmarks/Definitions.php"
+        ],
+        "psr-4": {
+            "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
+            "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "makinacorpus/generated-hydrator": "dev-master",
+        "makinacorpus/goat-hydrator": "^1.0.0-alpha6",
+        "symfony/property-info": "^4.3@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7",
+        "symfony/serializer": "^4.3@dev",
+        "symfony/cache": "^4.3@dev",
+        "ramsey/uuid": "^4.0@dev",
+        "symfony/yaml": "^4",
+        "phpbench/phpbench": "^1.0@dev",
+        "symfony/property-access": "^4",
+        "fzaninotto/faker": "^1.9@dev"
+    }
+}

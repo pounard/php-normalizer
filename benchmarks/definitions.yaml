@@ -1,0 +1,65 @@
+types:
+
+    MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage:
+        properties:
+            orderId:
+                type: int
+                optional: true
+            productId:
+                type: int
+                optional: true
+            amount:
+                type: int
+                optional: true
+
+    MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat:
+        properties:
+            text:
+                normalized_name: value
+                type: string
+                optional: true
+            format:
+                type: string
+                optional: true
+
+    MakinaCorpus\Normalizer\Benchmarks\MockWithText:
+        properties:
+            title:
+                type: string
+                optional: true
+            text:
+                normalized_name: markup
+                type: text_with_format
+                optional: true
+
+    MakinaCorpus\Normalizer\Benchmarks\MockArticle:
+        properties:
+            id:
+                type: uuid
+                optional: true
+            createdAt:
+                type: date
+                optional: true
+            updatedAt:
+                type: date
+                optional: true
+            authors:
+                type: string
+                collection: true
+                optional: true
+            title:
+                type: string
+                optional: true
+            text:
+                type: text_with_format
+                optional: true
+
+    # Find a way to make this implicit.
+    Ramsey\Uuid\UuidInterface:
+        terminal: true
+
+type_aliases:
+    app.article: MakinaCorpus\Normalizer\Benchmarks\MockArticle
+    date: DateTimeImmutable
+    text_with_format: MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat
+    uuid: Ramsey\Uuid\UuidInterface

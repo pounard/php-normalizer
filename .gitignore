@@ -1,0 +1,16 @@
+# IDE files
+.buildpath
+.project
+.settings
+# Profiling traces
+cachegrind*
+# Coverage
+coverage
+# Composer and phpunit
+composer.lock
+phpunit.xml
+vendor
+# Cruft (to be removed)
+lib
+symfony-tests
+
