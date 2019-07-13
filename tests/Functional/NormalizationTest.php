@@ -127,6 +127,9 @@ class MockTextWithFormat
     /** @var string */
     private $text;
 
+    /**
+     * @return null|string
+     */
     public function getText(): ?string
     {
         return $this->text;
@@ -135,6 +138,9 @@ class MockTextWithFormat
     /** @var string */
     private $format;
 
+    /**
+     * @return null|string
+     */
     public function getFormat(): ?string
     {
         return $this->format;
@@ -146,7 +152,7 @@ class MockTextWithFormat
  */
 class MockWithText
 {
-    /** @var string */
+    /** @var ?string */
     private $title;
 
     public function getTitle(): ?string
@@ -154,7 +160,7 @@ class MockWithText
         return $this->title;
     }
 
-    /**@var MockTextWithFormat */
+    /**@var ?MockTextWithFormat */
     private $text;
 
     public function getMarkup(): ?MockTextWithFormat

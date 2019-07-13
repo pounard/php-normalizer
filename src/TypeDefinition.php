@@ -291,15 +291,32 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
 {
     private $aliases;
     private $cache = [];
-    private $types;
+    private $data;
 
     /**
      * Default constructor
      */
-    public function __construct(array $types, array $aliases = [])
+    public function __construct(array $data, array $aliases = [])
     {
         $this->aliases = $aliases;
-        $this->types = $types;
+        $this->data = $data;
+    }
+
+    /**
+     * Add type definition
+     */
+    public function addTypeDefinition(string $type, array $data): void
+    {
+        // This will override any previous definition.
+        $this->data[$type] = $data;
+    }
+
+    /**
+     * Merge user configuration with existing definitions
+     */
+    public function mergeUserConfiguration(array $data): void
+    {
+        throw new NotImplementedError();
     }
 
     /**
@@ -321,7 +338,7 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
      */
     public function exists(string $name): bool
     {
-        return isset($this->types[$name]) || isset($this->aliases[$name]);
+        return isset($this->data[$name]) || isset($this->aliases[$name]);
     }
 
     /**
@@ -335,7 +352,7 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
         return $this->cache[$key] ?? (
             $this->cache[$key] = new ArrayTypeDefinition(
                 $key,
-                $this->types[$key] ?? $this->typeNotFoundError($key, $name)
+                $this->data[$key] ?? $this->typeNotFoundError($key, $name)
             )
         );
     }

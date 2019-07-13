@@ -10,6 +10,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "classmap": [
+            "src/Cache.php",
             "src/Context.php",
             "src/CustomNormalizer.php",
             "src/DefaultNormalizer.php",

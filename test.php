@@ -7,9 +7,9 @@ use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
-use MakinaCorpus\Normalizer\TypeDefinitionMapChain;
 use MakinaCorpus\Normalizer\UuidNormalizer;
 use MakinaCorpus\Normalizer\Benchmarks\MockArticle;
 use Ramsey\Uuid\Uuid;
@@ -39,23 +39,11 @@ $classMetadataFactory = new ClassMetadataFactory(
 $serializerExtracor = new SerializerExtractor($classMetadataFactory);
 $reflectionExtractor = new ReflectionExtractor();
 $propertyTypeExtractor = new PropertyInfoExtractor(
-    [
-        $serializerExtracor
-    ],
-    [
-        new PhpDocExtractor(),
-        $reflectionExtractor
-    ],
-    [
-        new PhpDocExtractor(),
-        $reflectionExtractor
-    ], 
-    [
-        $reflectionExtractor
-    ], 
-    [
-        $reflectionExtractor
-    ]
+    [$serializerExtracor],
+    [new PhpDocExtractor(), $reflectionExtractor],
+    [new PhpDocExtractor(), $reflectionExtractor],
+    [$reflectionExtractor],
+    [$reflectionExtractor]
 );
 
 $symfonyNormalizer = new Serializer([
@@ -97,7 +85,7 @@ $reflectionTypeDefinition = new ReflectionTypeDefinitionMap();
 $reflectionTypeDefinition->setTypeInfoExtractor($propertyTypeExtractor);
 
 $dynamicContext = new Context(
-    new TypeDefinitionMapChain([
+    new MemoryTypeDefinitionMapCache([
         // new ArrayTypeDefinitionMap($config['types'], $config['type_aliases']),
         $reflectionTypeDefinition,
     ])

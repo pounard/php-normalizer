@@ -16,6 +16,12 @@ interface DataTransformationError extends NormalizerError
 {
 }
 
+final class NotImplementedError
+    extends \BadMethodCallException
+    implements NormalizerError
+{
+}
+
 final class CircularDependencyDetectedError
     extends \InvalidArgumentException
     implements DataTransformationError
