@@ -25,6 +25,7 @@
     },
     "autoload-dev": {
         "classmap": [
+            "benchmarks/CommonTrait.php",
             "benchmarks/Definitions.php"
         ],
         "psr-4": {

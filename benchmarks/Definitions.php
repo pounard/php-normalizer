@@ -1,4 +1,17 @@
 <?php
+/**
+ * Defines mock types for benchmarking.
+ *
+ * So far, you have to take into account that:
+ *
+ *  - Symfony normalizer requires to have setters or constructor arguments
+ *    for hydrating objects, this is due to symfony/property-access usage,
+ *    hence we defined all in those classes, even though in real life use
+ *    case you might want to have immutable objects instead.
+ *
+ *  - As of now, we require to have all our types to have their complete
+ *    description in the YAML file.
+ */
 
 declare(strict_types=1);
 
@@ -157,7 +170,7 @@ final class MockArticle extends MockWithText
 {
     use LotsOfProperties;
 
-    /** @var UuidInterface */
+    /** @var \Ramsey\Uuid\UuidInterface */
     private $id;
 
     public function getId(): UuidInterface

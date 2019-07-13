@@ -9,15 +9,9 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-class DenormalizeArticleBench extends AbstractNormalizerBenchmark
+class DenormalizeArticleBench
 {
-    public function setUp() : void
-    {
-        $this->createTypeDefinitionMap();
-        $this->createDefaultNormalizer();
-        $this->createContext();
-        $this->createArticleData();
-    }
+    use NormalizerBenchmarkTrait;
 
     /**
      * @Revs(100)

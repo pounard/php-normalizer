@@ -26,26 +26,17 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Default base class for hydration benchmarks
+ * Handles mockup data creation.
  */
-abstract class AbstractNormalizerBenchmark
+trait BenchmarkDataTrait
 {
-    /** @var \MakinaCorpus\Normalizer\Context */
-    protected $context;
-
-    /** @var \MakinaCorpus\Normalizer\DefaultNormalizer */
-    protected $defaultNormalizer;
-
-    /** @var \Symfony\Component\Serializer\Serializer */
-    protected $symfonyNormalizer;
-
-    /** @var \MakinaCorpus\Normalizer\TypeDefinitionMap */
-    protected $typeDefinitionMap;
-
     /** @var mixed[] */
-    protected $data;
+    private $data;
 
-    private function generateNameArray(\Faker\Generator $faker, ?int $size = null)
+    /**
+     * Generate a name array
+     */
+    private function generateNameArray(\Faker\Generator $faker, ?int $size = null): array
     {
         $ret = [];
         $size = $size ?? \rand(0,5);
@@ -58,12 +49,10 @@ abstract class AbstractNormalizerBenchmark
     /**
      * Create arbitrary data
      */
-    protected function createArticleData(int $count = 5)
+    private function createArticleData(int $count = 5)
     {
         $this->data = [];
-
         $faker = \Faker\Factory::create();
-
         for ($i = 0; $i < $count; ++$i) {
             $this->data[] = [
                 'id' => (string)Uuid::uuid4(),
@@ -86,12 +75,10 @@ abstract class AbstractNormalizerBenchmark
     /**
      * Create arbitrary data
      */
-    protected function createMessageData(int $count = 5)
+    private function createMessageData(int $count = 5)
     {
         $this->data = [];
-
         $faker = \Faker\Factory::create();
-
         for ($i = 0; $i < $count; ++$i) {
             $this->data[] = [
                 'orderId' => $faker->randomDigitNotNull,
@@ -100,11 +87,39 @@ abstract class AbstractNormalizerBenchmark
             ];
         }
     }
+}
+
+/**
+ * This benchmark initialization methods.
+ */
+trait NormalizerBenchmarkTrait
+{
+    use BenchmarkDataTrait;
+
+    /** @var \MakinaCorpus\Normalizer\Context */
+    private $context;
+
+    /** @var \MakinaCorpus\Normalizer\DefaultNormalizer */
+    private $defaultNormalizer;
+
+    /** @var \MakinaCorpus\Normalizer\TypeDefinitionMap */
+    private $typeDefinitionMap;
+
+    /**
+     * Use this method for benchmark setup
+     */
+    public function setUp() : void
+    {
+        $this->createTypeDefinitionMap();
+        $this->createDefaultNormalizer();
+        $this->createContext();
+        $this->createArticleData();
+    }
 
     /**
      * Create type definitions
      */
-    protected function createTypeDefinitionMap(): TypeDefinitionMap
+    private function createTypeDefinitionMap(): TypeDefinitionMap
     {
         $data = Yaml::parseFile(__DIR__.'/definitions.yaml');
 
@@ -114,7 +129,7 @@ abstract class AbstractNormalizerBenchmark
     /**
      * Create default normalizer
      */
-    protected function createDefaultNormalizer(): DefaultNormalizer
+    private function createDefaultNormalizer(): DefaultNormalizer
     {
         return $this->defaultNormalizer = new DefaultNormalizer([
             new ScalarNormalizer(),
@@ -126,41 +141,55 @@ abstract class AbstractNormalizerBenchmark
     /**
      * Create context
      */
-    protected function createContext(array $options = []): Context
+    private function createContext(array $options = []): Context
     {
         return $this->context = new Context($this->typeDefinitionMap, $options);
+    }
+}
+
+/**
+ * Symfony benchmark initialization methods.
+ */
+trait SymfonyBenchmarkTrait
+{
+    use BenchmarkDataTrait;
+
+    /** @var \Symfony\Component\Serializer\Serializer */
+    private $symfonyNormalizer;
+
+    /**
+     * Use this method for benchmark setup
+     */
+    public function setUp() : void
+    {
+        $this->createSymfonyNormalizer();
+        $this->createMessageData();
     }
 
     /**
      * Create Symfony serializer
      */
-    protected function createSymfonyNormalizer(): Serializer
+    private function createSymfonyNormalizer(): Serializer
     {
+        // We do not test using a the CacheClassMetadataFactory implementation
+        // because its impact is invisible in the bench result. Symfony
+        // normalizer spend most of its time in setAttributeValue(), because it
+        // uses the property-access component, which is terribly slow. Nobody
+        // should ever use this on a production environment.
         $classMetadataFactory = new ClassMetadataFactory(
             new LoaderChain([
                 new AnnotationLoader(new AnnotationReader()),
             ])
         );
+
         $serializerExtracor = new SerializerExtractor($classMetadataFactory);
         $reflectionExtractor = new ReflectionExtractor();
         $propertyTypeExtractor = new PropertyInfoExtractor(
-            [
-                $serializerExtracor
-            ],
-            [
-                new PhpDocExtractor(),
-                $reflectionExtractor
-            ],
-            [
-                new PhpDocExtractor(),
-                $reflectionExtractor
-            ], 
-            [
-                $reflectionExtractor
-            ], 
-            [
-                $reflectionExtractor
-            ]
+            [$serializerExtracor],
+            [new PhpDocExtractor(), $reflectionExtractor],
+            [new PhpDocExtractor(), $reflectionExtractor], 
+            [$reflectionExtractor], 
+            [$reflectionExtractor]
         );
 
         return $this->symfonyNormalizer = new Serializer([
@@ -174,13 +203,5 @@ abstract class AbstractNormalizerBenchmark
             ),
             new \MakinaCorpus\Normalizer\Bridge\Symfony\UuidNormalizer(),
         ]);
-    }
-
-    /**
-     * Create Symfony serializer
-     */
-    protected function createSymfonyCachedNormalizer(): Serializer
-    {
-        
     }
 }

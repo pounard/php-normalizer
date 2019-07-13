@@ -9,13 +9,9 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-class DenormalizeSmallSymfonyBench extends AbstractNormalizerBenchmark
+class DenormalizeSmallSymfonyBench
 {
-    public function setUp() : void
-    {
-        $this->createSymfonyNormalizer();
-        $this->createMessageData();
-    }
+    use SymfonyBenchmarkTrait;
 
     /**
      * @Revs(100)
