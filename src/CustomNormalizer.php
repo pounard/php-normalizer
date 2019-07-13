@@ -128,7 +128,7 @@ final class DateNormalizer implements Normalizer, Denormalizer
             throw new InvalidValueTypeError(\sprintf(
                 "Could not parse date '%s' with format '%s'",
                 $data, $format
-            ), null, $e);
+            ), $e->getCode(), $e);
         }
     }
 

@@ -102,33 +102,12 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
      */
     private function extract(string $type, $object)
     {
-        return $this->hydratorMap->get($type)->extractValues($object);
+        return $this->hydratorMap->getRealHydrator($type)->extractValues($object);
     }
 
-    private function normalizeArbitraryCollection($collection, Context $context)
-    {
-        $context->enter();
-
-        try {
-            // @todo Going throught this means the object in memory is wrong
-            //    but it's still preferable to be resilient than strict
-            if (!\is_iterable($collection)) {
-                return [$this->normalize($collection, $context)];
-            }
-
-            $ret = [];
-
-            foreach ($collection as $key => $object) {
-                $ret[$key] = $this->normalize($object, $context);
-            }
-
-            return $ret;
-
-        } finally {
-            $context->leave();
-        }
-    }
-
+    /**
+     * Handle collection normalization
+     */
     private function normalizeCollection(string $type, $collection, Context $context)
     {
         $context->enter();
@@ -143,7 +122,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
             $ret = [];
 
             foreach ($collection as $key => $object) {
-                $ret[$key] = $this->normalize($object, $context, $type);
+                $ret[$key] = $this->normalize($type, $object, $context);
             }
 
             return $ret;
@@ -154,22 +133,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
     }
 
     /**
-     * Normalize arbitrary data
-     *
-     * @param mixed $data
-     *   The data.
-     * @param Context $context
-     *   Context and configuration.
-     * @param ?string $type
-     *   Data type, can be a class name, a builtin type name, or any type alias
-     *   registered in the configuration. If you omit this parameter, it will be
-     *   automatically guessed, in most cases, you actually don't really need to
-     *   pass anything here.
-     *
-     * @return mixed
-     *   If data is an object or a collection, it's likely to return an array
-     *   but it might also return scalar types, depending on what you've passed
-     *   in the $data parameter.
+     * {@inheritdoc}
      */
     public function normalize(string $type, $object, Context $context)
     {
@@ -217,9 +181,12 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
      */
     private function hydrate(string $type, array $data)
     {
-        return $this->hydratorMap->get($type)->createAndHydrateInstance($data, HydratorInterface::CONSTRUCTOR_SKIP);
+        return $this->hydratorMap->getRealHydrator($type)->createAndHydrateInstance($data, HydratorInterface::CONSTRUCTOR_SKIP);
     }
 
+    /**
+     * Handle collection denormalization
+     */
     private function denormalizeCollection(string $type, $data, Context $context)
     {
         $context->enter();
@@ -245,6 +212,9 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
         }
     }
 
+    /**
+     * Find and extract the property value within the given data array
+     */
     private function extractPropertyFromNormalizedData(PropertyDefinition $property, $data)
     {
         if (\is_array($data)) {
@@ -258,19 +228,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
     }
 
     /**
-     * Denormalize arbitrary data
-     *
-     * @param string $type
-     *   Data type, can be a class name, a builtin type name, or any type alias
-     *   registered in the configuration.
-     * @param mixed $data
-     *   The data.
-     * @param Context $context
-     *   Context and configuration.
-     *
-     * @return mixed
-     *   If data is the normalized representation of an object, you'll get this
-     *   object, otherwise the result will depend upon what you gave here.
+     * {@inheritdoc}
      */
     public function denormalize(string $type, $data, Context $context)
     {

@@ -54,6 +54,10 @@ final class Context
                 NormalizeOption::CIRCULAR_REFERENCE_HANDLER
             ));
         }
+
+        if (isset($options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT])) {
+            $this->circularReferenceLimit = (int)$options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT];
+        }
     }
 
     /**
@@ -99,7 +103,7 @@ final class Context
             );
         }
 
-        throw new InvalidValueTypeError(\sprintf("Circular dependency detected."));
+        throw new CircularDependencyDetectedError("Circular dependency detected.");
     }
 
     /**

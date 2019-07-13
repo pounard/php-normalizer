@@ -16,6 +16,12 @@ interface DataTransformationError extends NormalizerError
 {
 }
 
+final class CircularDependencyDetectedError
+    extends \InvalidArgumentException
+    implements DataTransformationError
+{
+}
+
 final class InvalidValueTypeError
     extends \InvalidArgumentException
     implements DataTransformationError
@@ -25,6 +31,12 @@ final class InvalidValueTypeError
 final class UnupportedTypeError
     extends \InvalidArgumentException
     implements DataTransformationError
+{
+}
+
+final class CouldNotFindTypeInfo
+    extends \InvalidArgumentException
+    implements ConfigurationError
 {
 }
 

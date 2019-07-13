@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit;
 
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
+use MakinaCorpus\Normalizer\CircularDependencyDetectedError;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\NormalizeOption;
 use MakinaCorpus\Normalizer\Option;
@@ -63,6 +64,28 @@ final class ContextTest extends TestCase
         $this->assertTrue($context->isCircularReference($object2));
 
         $this->assertFalse($context->isCircularReference('booh'));
+    }
+
+    public function testCircularReferenceHandlingWithNoLimit()
+    {
+        $context = new Context(new ArrayTypeDefinitionMap([]), [
+            NormalizeOption::CIRCULAR_REFERENCE_LIMIT => 0,
+        ]);
+
+        $object1 = new \DateTimeImmutable();
+
+        $this->assertFalse($context->isCircularReference($object1));
+        $this->assertFalse($context->isCircularReference($object1));
+        $this->assertFalse($context->isCircularReference($object1));
+    }
+
+    public function testHandleCircularReferenceWithNoCallbackRaiseError()
+    {
+        $object = new \DateTimeImmutable();
+        $context = new Context(new ArrayTypeDefinitionMap([]));
+
+        $this->expectException(CircularDependencyDetectedError::class);
+        $context->handleCircularReference('some_type', $object);
     }
 
     public function testHandleCircularReference()

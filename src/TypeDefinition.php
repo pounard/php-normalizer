@@ -92,6 +92,11 @@ interface TypeDefinition
 interface TypeDefinitionMap
 {
     /**
+     * Does type exist
+     */
+    public function exists(string $name): bool;
+
+    /**
      * Get type definition
      *
      * User given type aliases overrides native defined types with
@@ -106,6 +111,9 @@ interface TypeDefinitionMap
     public function getNativeType(string $name): string;
 }
 
+/**
+ * Array based property definition
+ */
 final class ArrayPropertyDefinition implements PropertyDefinition
 {
     private $candidateNames;
@@ -306,6 +314,14 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
             ));
         }
         throw new TypeDoesNotExistError(\sprintf("Type '%s' does not exist", $name));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function exists(string $name): bool
+    {
+        return isset($this->types[$name]) || isset($this->aliases[$name]);
     }
 
     /**
