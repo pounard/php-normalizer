@@ -97,4 +97,19 @@ traversal.
 
 ## (De)Normalizer
 
+@todo
 
+# Benchmarks
+
+In order to run benchmarks:
+
+```sh
+vendor/bin/phpbench run --report 'generator: "table"'
+```
+
+Run them with XDebug profiler enable (warning this will create a huge lot of
+profiling files):
+
+```sh
+XDEBUG_CONFIG="remote_enable=0 profiler_enable=1" vendor/bin/phpbench run --report 'generator: "table"' --revs 5
+```
