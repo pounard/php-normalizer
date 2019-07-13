@@ -45,7 +45,7 @@ class MockTextWithFormat
 /**
  * Test hydration for internal arbitrary class
  */
-class MockWithText
+class MockWithTitle
 {
     /** @var string */
     private $title;
@@ -59,7 +59,13 @@ class MockWithText
     {
         $this->title = $value;
     }
+}
 
+/**
+ * Test hydration for internal arbitrary class
+ */
+class MockWithText extends MockWithTitle
+{
     /**@var MockTextWithFormat */
     private $text;
 
