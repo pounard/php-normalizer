@@ -41,19 +41,9 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
     {
         if ($instance instanceof Denormalizer) {
             $this->denormalizers[] = $instance;
-            if ($instance instanceof DeclarativeDenormalizer) {
-                foreach ($instance->getDenormalizedTypes() as $type) {
-                    $this->denormalizersCache[$type] = $instance;
-                }
-            }
         }
         if ($instance instanceof Normalizer) {
             $this->normalizers[] = $instance;
-            if ($instance instanceof DeclarativeNormalizer) {
-                foreach ($instance->getNormalizedTypes() as $type) {
-                    $this->normalizersCache[$type] = $instance;
-                }
-            }
         }
     }
 

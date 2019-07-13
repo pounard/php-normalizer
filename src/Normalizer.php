@@ -39,28 +39,9 @@ interface Denormalizer
 }
 
 /**
- * Normalizers implementing this allow performance implementation during
- * normalizer lookup at runtime.
+ * Helper for writing shorter custom normalizer and denormalizer
  */
-interface DeclarativeNormalizer extends Normalizer
-{
-    public function getNormalizedTypes(): array;
-}
-
-/**
- * Denormalizers implementing this allow performance implementation during
- * denormalizer lookup at runtime.
- */
-interface DeclarativeDenormalizer extends Denormalizer
-{
-    public function getDenormalizedTypes(): array;
-}
-
-/**
- * Base implementation for instances that implement both DeclarativeNormalizer
- * and DeclarativeDenormalizer at the same time.
- */
-trait BothDeclarativeNormalizer
+trait CustomNormalizerTrait
 {
     /**
      * Declare normalized and denormalized types
@@ -70,27 +51,22 @@ trait BothDeclarativeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function getNormalizedTypes(): array
-    {
-        return $this->getHandledTypes();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(string $type): bool
     {
         return \in_array($type, $this->getHandledTypes());
     }
+}
 
+/**
+ * Helper for writing shorter custom normalizer and denormalizer
+ */
+trait CustomDenormalizerTrait
+{
     /**
-     * {@inheritdoc}
+     * Declare normalized and denormalized types
      */
-    public function getDenormalizedTypes(): array
-    {
-        return $this->getHandledTypes();
-    }
-
+    abstract protected function getHandledTypes(): string;
+    
     /**
      * {@inheritdoc}
      */

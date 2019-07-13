@@ -10,9 +10,9 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Scalar types normalizer and denormalizer
  */
-final class ScalarNormalizer implements DeclarativeNormalizer, DeclarativeDenormalizer
+final class ScalarNormalizer implements Normalizer, Denormalizer
 {
-    use BothDeclarativeNormalizer;
+    use CustomNormalizerTrait, CustomDenormalizerTrait;
 
     /**
      * {@inheritdoc}
@@ -82,7 +82,7 @@ final class ScalarNormalizer implements DeclarativeNormalizer, DeclarativeDenorm
  */
 final class DateNormalizer implements Normalizer, Denormalizer
 {
-    use BothDeclarativeNormalizer;
+    use CustomNormalizerTrait, CustomDenormalizerTrait;
 
     /**
      * {@inheritdoc}
@@ -187,9 +187,9 @@ final class DateNormalizer implements Normalizer, Denormalizer
 /**
  * Scalar types normalizer and denormalizer
  */
-final class UuidNormalizer implements DeclarativeNormalizer, DeclarativeDenormalizer
+final class UuidNormalizer implements Normalizer, Denormalizer
 {
-    use BothDeclarativeNormalizer;
+    use CustomNormalizerTrait, CustomDenormalizerTrait;
 
     /**
      * {@inheritdoc}
