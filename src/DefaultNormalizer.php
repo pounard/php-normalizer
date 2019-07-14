@@ -52,7 +52,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
      */
     private function findDenormalizer(string $type): ?Normalizer
     {
-        if (isset($this->denormalizersCache[$type])) {
+        if (\array_key_exists($type, $this->denormalizersCache)) {
             return $this->denormalizersCache[$type];
         }
         /** @var \MakinaCorpus\Normalizer\Denormalizer $instance */
@@ -61,7 +61,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
                 return $this->denormalizersCache[$type] = $instance;
             }
         }
-        return null;
+        return $this->denormalizersCache[$type] = null;
     }
 
     /**
@@ -69,7 +69,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
      */
     private function findNormalizer(string $type): ?Normalizer
     {
-        if (isset($this->normalizersCache[$type])) {
+        if (\array_key_exists($type, $this->normalizersCache)) {
             return $this->normalizersCache[$type];
         }
         /** @var \MakinaCorpus\Normalizer\Normalizer $instance */
@@ -78,7 +78,7 @@ final class DefaultNormalizer implements Normalizer, Denormalizer
                 return $this->normalizersCache[$type] = $instance;
             }
         }
-        return null;
+        return $this->normalizersCache[$type] = null;
     }
 
     /**
