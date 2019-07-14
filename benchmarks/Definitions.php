@@ -40,6 +40,12 @@ class MockTextWithFormat
     {
         return $this->format;
     }
+
+    public function __construct(?string $text = null, ?string $format = null)
+    {
+        $this->text = $text;
+        $this->format = $format;
+    }
 }
 
 /**

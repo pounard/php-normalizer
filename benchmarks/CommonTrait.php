@@ -32,7 +32,7 @@ final class ObjectGenerator
     /**
      * Generate a name array
      */
-    private static function generateNameArray(\Faker\Generator $faker, ?int $size = null): array
+    public static function generateNameArray(\Faker\Generator $faker, ?int $size = null): array
     {
         $ret = [];
         $size = $size ?? \rand(0,5);
@@ -48,7 +48,9 @@ final class ObjectGenerator
     public static function createArticles(int $count = 5, bool $withId = true)
     {
         $ret = [];
+
         $faker = \Faker\Factory::create();
+
         for ($i = 0; $i < $count; ++$i) {
             $ret[] = [
                 'id' => $withId ? (string)Uuid::uuid4() : null,
@@ -57,7 +59,7 @@ final class ObjectGenerator
                 'authors' => self::generateNameArray($faker),
                 'title' => $faker->sentence,
                 'text' => [
-                    'value' => $faker->text,
+                    'text' => $faker->text,
                     'format' => 'application/text+html',
                 ],
                 'foo' => $faker->jobTitle,
@@ -66,6 +68,38 @@ final class ObjectGenerator
                 'filename' => $faker->freeEmail,
             ];
         }
+
+        return $ret;
+    }
+
+    /**
+     * Create arbitrary data
+     */
+    public static function createAndHydrateArticles(int $count = 5, bool $withId = true)
+    {
+        $ret = [];
+
+        $faker = \Faker\Factory::create();
+
+        $hydrator = \Closure::bind(static function () use ($faker) {
+            $object = new MockArticle();
+            $object->id = Uuid::uuid4();
+            $object->createdAt = $faker->dateTimeThisCentury;
+            $object->updatedAt = $faker->dateTimeThisCentury;
+            $object->authors = ObjectGenerator::generateNameArray($faker);
+            $object->title = $faker->sentence;
+            $object->text = new MockTextWithFormat($faker->text, 'application/text+html');
+            $object->foo = $faker->jobTitle;
+            $object->bar = $faker->randomDigitNotNull;
+            $object->baz = $faker->company;
+            $object->filename = $faker->freeEmail;
+            return $object;
+        }, null, MockArticle::class);
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = call_user_func($hydrator);
+        }
+
         return $ret;
     }
 
@@ -75,7 +109,9 @@ final class ObjectGenerator
     public static function createMessages(int $count = 5)
     {
         $ret = [];
+
         $faker = \Faker\Factory::create();
+
         for ($i = 0; $i < $count; ++$i) {
             $ret[] = [
                 'orderId' => $faker->randomDigitNotNull,
@@ -83,6 +119,23 @@ final class ObjectGenerator
                 'amount' => $faker->randomDigit,
             ];
         }
+
+        return $ret;
+    }
+
+    /**
+     * Create arbitrary data
+     */
+    public static function createAndHydrateMessages(int $count = 5, bool $withId = true)
+    {
+        $ret = [];
+
+        $faker = \Faker\Factory::create();
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = new AddToCartMessage($faker->randomDigitNotNull, $faker->randomDigitNotNull, $faker->randomDigit);
+        }
+
         return $ret;
     }
 }
@@ -192,6 +245,7 @@ trait NormalizerBenchmarkTrait
 
         return $this->symfonyNormalizer = new Serializer([
             new DateTimeNormalizer(),
+            new \MakinaCorpus\Normalizer\Bridge\Symfony\UuidNormalizer(),
             new ObjectNormalizer(
                 $classMetadataFactory,
                 /* NameConverterInterface $nameConverter = */ null,
@@ -199,7 +253,6 @@ trait NormalizerBenchmarkTrait
                 $propertyTypeExtractor,
                 /* ClassDiscriminatorResolverInterface $classDiscriminatorResolver = */ null
             ),
-            new \MakinaCorpus\Normalizer\Bridge\Symfony\UuidNormalizer(),
         ]);
     }
 }

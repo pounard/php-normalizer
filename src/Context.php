@@ -185,4 +185,16 @@ final class Context
     {
         $this->depth--;
     }
+
+    /**
+     * Creates a new instance without state
+     */
+    public function fresh()
+    {
+        $instance = clone $this;
+        $instance->visitedObjectMap = [];
+        $instance->depth = 0;
+
+        return $instance;
+    }
 }
