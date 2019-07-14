@@ -47,7 +47,7 @@ final class ContextTest extends TestCase
         $this->assertTrue($context->shouldAlwaysGuessTypes());
         $this->assertIsArray($context->toSymfonyContext());
         $this->assertSame('application/stupid-format', $context->getFormat());
-        $this->assertTrue($context->isStrict());
+        $this->assertFalse($context->isStrict());
     }
 
     public function testCircularReferenceHandling()

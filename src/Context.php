@@ -21,7 +21,7 @@ final class Context
     private $depth = 0;
     private $groups = [];
     private $options = [];
-    private $strict = true;
+    private $strict = false;
     private $symfonyCompatibility = false;
     private $visitedObjectMap = [];
 
