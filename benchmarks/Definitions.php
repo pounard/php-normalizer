@@ -63,14 +63,18 @@ class MockWithTitle
 
 /**
  * Test hydration for internal arbitrary class
+ *
+ * Strict typing is temporarily disabled because Symfony property info component
+ * is missing properties from parent classes, it is unable to find the dockblock
+ * for the "text" property, hence it is unable to correcly guess the type.
  */
 class MockWithText extends MockWithTitle
 {
-    /**@var MockTextWithFormat */
+    /** @var MockTextWithFormat */
     private $text;
 
-    /** @return MockTextWithFormat|NULL */
-    public function getMarkup(): ?MockTextWithFormat
+    /** @return null|MockTextWithFormat */
+    public function getMarkup()/*: ?MockTextWithFormat */
     {
         return $this->text;
     }

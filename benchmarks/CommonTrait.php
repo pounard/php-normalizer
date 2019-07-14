@@ -25,18 +25,12 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * Handles mockup data creation.
- */
-trait BenchmarkDataTrait
+final class ObjectGenerator
 {
-    /** @var mixed[] */
-    private $data;
-
     /**
      * Generate a name array
      */
-    private function generateNameArray(\Faker\Generator $faker, ?int $size = null): array
+    private static function generateNameArray(\Faker\Generator $faker, ?int $size = null): array
     {
         $ret = [];
         $size = $size ?? \rand(0,5);
@@ -49,16 +43,16 @@ trait BenchmarkDataTrait
     /**
      * Create arbitrary data
      */
-    private function createArticleData(int $count = 5)
+    public static function createArticles(int $count = 5, bool $withId = true)
     {
-        $this->data = [];
+        $ret = [];
         $faker = \Faker\Factory::create();
         for ($i = 0; $i < $count; ++$i) {
-            $this->data[] = [
-                'id' => (string)Uuid::uuid4(),
+            $ret[] = [
+                'id' => $withId ? (string)Uuid::uuid4() : null,
                 'createdAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
                 'updatedAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
-                'authors' => $this->generateNameArray($faker),
+                'authors' => self::generateNameArray($faker),
                 'title' => $faker->sentence,
                 'text' => [
                     'value' => $faker->text,
@@ -70,6 +64,41 @@ trait BenchmarkDataTrait
                 'filename' => $faker->freeEmail,
             ];
         }
+        return $ret;
+    }
+
+    /**
+     * Create arbitrary data
+     */
+    public static function createMessages(int $count = 5)
+    {
+        $ret = [];
+        $faker = \Faker\Factory::create();
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = [
+                'orderId' => $faker->randomDigitNotNull,
+                'productId' => $faker->randomDigitNotNull,
+                'amount' => $faker->randomDigit,
+            ];
+        }
+        return $ret;
+    }
+}
+
+/**
+ * Handles mockup data creation.
+ */
+trait BenchmarkDataTrait
+{
+    /** @var mixed[] */
+    private $data;
+
+    /**
+     * Create arbitrary data
+     */
+    private function createArticleData(int $count = 5)
+    {
+        $this->data = ObjectGenerator::createArticles($count);
     }
 
     /**
@@ -77,15 +106,7 @@ trait BenchmarkDataTrait
      */
     private function createMessageData(int $count = 5)
     {
-        $this->data = [];
-        $faker = \Faker\Factory::create();
-        for ($i = 0; $i < $count; ++$i) {
-            $this->data[] = [
-                'orderId' => $faker->randomDigitNotNull,
-                'productId' => $faker->randomDigitNotNull,
-                'amount' => $faker->randomDigit,
-            ];
-        }
+        $this->data = ObjectGenerator::createMessages($count);
     }
 }
 
