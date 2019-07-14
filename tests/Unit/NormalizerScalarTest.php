@@ -30,7 +30,7 @@ final class NormalizerScalarTest extends TestCase
             ['bool', 0, false],
             ['float', 12, 12.0],
             ['float', "48.2", 48.2],
-            ['null', "anything", null],
+            ['null', "anything", "anything"],
             ['string', "anything", "anything"],
             ['string', null, null],
         ];

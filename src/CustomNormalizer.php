@@ -31,7 +31,7 @@ final class ScalarNormalizer implements Normalizer, Denormalizer
             return $object;
         }
 
-        if (!\is_scalar($object)) {
+        if (!\is_scalar($object) && 'null' !== $type) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for '%s', got '%s'",
                 $type, \gettype($object)
@@ -50,7 +50,9 @@ final class ScalarNormalizer implements Normalizer, Denormalizer
                 return (int)$object;
 
             case 'null':
-                return null;
+                // Null type can also mean that type could not be determined
+                // allow value passthrough.
+                return $object;
 
             case 'string':
                 return (string)$object;
