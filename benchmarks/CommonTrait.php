@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Yaml\Yaml;
+use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
+use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 
 final class ObjectGenerator
 {
@@ -86,36 +88,12 @@ final class ObjectGenerator
 }
 
 /**
- * Handles mockup data creation.
- */
-trait BenchmarkDataTrait
-{
-    /** @var mixed[] */
-    private $data;
-
-    /**
-     * Create arbitrary data
-     */
-    private function createArticleData(int $count = 5)
-    {
-        $this->data = ObjectGenerator::createArticles($count);
-    }
-
-    /**
-     * Create arbitrary data
-     */
-    private function createMessageData(int $count = 5)
-    {
-        $this->data = ObjectGenerator::createMessages($count);
-    }
-}
-
-/**
  * This benchmark initialization methods.
  */
 trait NormalizerBenchmarkTrait
 {
-    use BenchmarkDataTrait;
+    /** @var \MakinaCorpus\Normalizer\Context */
+    private $cachedContext;
 
     /** @var \MakinaCorpus\Normalizer\Context */
     private $context;
@@ -123,18 +101,29 @@ trait NormalizerBenchmarkTrait
     /** @var \MakinaCorpus\Normalizer\DefaultNormalizer */
     private $defaultNormalizer;
 
-    /** @var \MakinaCorpus\Normalizer\TypeDefinitionMap */
-    private $typeDefinitionMap;
+    /** @var \Symfony\Component\Serializer\Serializer */
+    private $symfonyNormalizer;
 
     /**
      * Use this method for benchmark setup
      */
-    public function setUp() : void
+    private function initializeComponents(): void
     {
         $this->createTypeDefinitionMap();
         $this->createDefaultNormalizer();
+        $this->createCachedContext();
         $this->createContext();
-        $this->createArticleData();
+        $this->createSymfonyNormalizer();
+    }
+
+    /**
+     * Create cached type definitions
+     */
+    private function createCachedTypeDefinitionMap(): TypeDefinitionMap
+    {
+        return new MemoryTypeDefinitionMapCache([
+            new ReflectionTypeDefinitionMap()
+        ]);
     }
 
     /**
@@ -144,7 +133,7 @@ trait NormalizerBenchmarkTrait
     {
         $data = Yaml::parseFile(__DIR__.'/definitions.yaml');
 
-        return $this->typeDefinitionMap = new ArrayTypeDefinitionMap($data['types'], $data['type_aliases']);
+        return new ArrayTypeDefinitionMap($data['types'], $data['type_aliases']);
     }
 
     /**
@@ -162,29 +151,17 @@ trait NormalizerBenchmarkTrait
     /**
      * Create context
      */
-    private function createContext(array $options = []): Context
+    private function createCachedContext(array $options = []): Context
     {
-        return $this->context = new Context($this->typeDefinitionMap, $options);
+        return $this->cachedContext = new Context($this->createCachedTypeDefinitionMap(), $options);
     }
-}
-
-/**
- * Symfony benchmark initialization methods.
- */
-trait SymfonyBenchmarkTrait
-{
-    use BenchmarkDataTrait;
-
-    /** @var \Symfony\Component\Serializer\Serializer */
-    private $symfonyNormalizer;
 
     /**
-     * Use this method for benchmark setup
+     * Create context
      */
-    public function setUp() : void
+    private function createContext(array $options = []): Context
     {
-        $this->createSymfonyNormalizer();
-        $this->createMessageData();
+        return $this->context = new Context($this->createTypeDefinitionMap(), $options);
     }
 
     /**

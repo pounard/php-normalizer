@@ -14,13 +14,44 @@ class DenormalizeSmallBench
     use NormalizerBenchmarkTrait;
 
     /**
+     * Use this method for benchmark setup
+     */
+    public function setUp(): void
+    {
+        $this->initializeComponents();
+        $this->data = ObjectGenerator::createMessages(10);
+    }
+
+    /**
      * @Revs(100)
      * @Iterations(30)
      */
-    public function benchConsume() : void
+    public function benchMap() : void
     {
         foreach ($this->data as $data) {
             $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->context);
+        }
+    }
+
+    /**
+     * @Revs(100)
+     * @Iterations(30)
+     */
+    public function benchReflection() : void
+    {
+        foreach ($this->data as $data) {
+            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->cachedContext);
+        }
+    }
+
+    /**
+     * @Revs(100)
+     * @Iterations(30)
+     */
+    public function benchSymfony() : void
+    {
+        foreach ($this->data as $data) {
+            $this->symfonyNormalizer->denormalize($data, AddToCartMessage::class);
         }
     }
 }
