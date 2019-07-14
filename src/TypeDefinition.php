@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer;
 
 /**
- * Property definition
+ * Property definition, it must be serializable.
  */
 interface PropertyDefinition
 {
@@ -87,7 +87,7 @@ interface TypeDefinition
 }
 
 /**
- * Type definition map
+ * Type definition map, it must be serializable.
  */
 interface TypeDefinitionMap
 {
@@ -116,19 +116,50 @@ interface TypeDefinitionMap
  */
 final class ArrayPropertyDefinition implements PropertyDefinition
 {
+    /** @var string[] */
+    private $aliases;
+
+    /** @var string[] */
     private $candidateNames;
-    private $data;
+
+    /** @var bool */
+    private $collection = false;
+
+    /** @var ?string */
+    private $collectionType;
+
+    /** @var string[] */
+    private $groups;
+
+    /** @var string[] */
     private $name;
+
+    /** @var string */
+    private $normalizedName;
+
+    /** @var bool */
+    private $optional;
+
+    /** @var string */
     private $owner;
+
+    /** @var string */
+    private $type;
 
     /**
      * Default constructor
      */
-    public function __construct(string $owner, string $name, array $data)
+    public function __construct(string $owner, string $name, array $definition)
     {
-        $this->data = $data;
+        $this->aliases = $definition['aliases'] ?? [];
+        $this->collection = (bool)($definition['collection'] ?? false);
+        $this->collectionType = $definition['collection_type'] ?? null;
+        $this->groups = $definition['groups'] ?? [];
         $this->name = $name;
+        $this->normalizedName = $definition['normalized_name'] ?? $this->name;
+        $this->optional = (bool)($definition['optional'] ?? false);
         $this->owner = $owner;
+        $this->type = $definition['type'] ?? 'null';
     }
 
     /**
@@ -141,7 +172,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
 
     public function getNormalizedName(): string
     {
-        return $this->data['normalized_name'] ?? $this->name;
+        return $this->normalizedName;
     }
 
     /**
@@ -149,7 +180,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function getAliases(): array
     {
-        return $this->data['aliases'] ?? [];
+        return $this->aliases;
     }
 
     /**
@@ -170,7 +201,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function isOptional(): bool
     {
-        return (bool)($this->data['optional'] ?? false);
+        return $this->optional;
     }
 
     /**
@@ -178,7 +209,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function isCollection(): bool
     {
-        return (bool)($this->data['collection'] ?? false);
+        return $this->collection;
     }
 
     /**
@@ -186,7 +217,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function getTypeName(): string
     {
-        return $this->data['type'] ?? 'null';
+        return $this->type;
     }
 
     /**
@@ -202,7 +233,7 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function getGroups(): array
     {
-        return $this->data['groups'] ?? [];
+        return $this->groups;
     }
 
     /**
@@ -210,10 +241,10 @@ final class ArrayPropertyDefinition implements PropertyDefinition
      */
     public function getCollectionType(): ?string
     {
-        if (!$this->isCollection()) {
+        if (!$this->collection) {
             return null;
         }
-        return $this->data['collection_type'] ?? 'array';
+        return $this->collectionType ?? 'array';
     }
 }
 
@@ -222,17 +253,21 @@ final class ArrayPropertyDefinition implements PropertyDefinition
  */
 final class ArrayTypeDefinition implements TypeDefinition
 {
-    private $data;
     private $name;
-    private $properties;
+    private $normalizedName;
+    private $properties = [];
 
     /**
      * Default constructor
      */
     public function __construct(string $name, array $data)
     {
-        $this->data = $data;
         $this->name = $name;
+        $this->normalizedName = $data['normalized_name'] ?? $name;
+
+        foreach ($data['properties'] ?? [] as $key => $value) {
+            $this->properties[$key] = new ArrayPropertyDefinition($this->name, $key, $value);
+        }
     }
 
     /**
@@ -248,23 +283,7 @@ final class ArrayTypeDefinition implements TypeDefinition
      */
     public function getNormalizedName(): string
     {
-        return $this->data['normalized_name'] ?? $this->name;
-    }
-
-    /**
-     * Create property array
-     */
-    private function createPropertyArray(): array
-    {
-        $ret = [];
-
-        // We cannot use \array_map() because we need key to propagate
-        // to the instance we create in there.
-        foreach ($this->data['properties'] ?? [] as $key => $value) {
-            $ret[$key] = new ArrayPropertyDefinition($this->name, $key, $value);
-        }
-
-        return $ret;
+        return $this->normalizedName;
     }
 
     /**
@@ -272,7 +291,7 @@ final class ArrayTypeDefinition implements TypeDefinition
      */
     public function getProperties(): array
     {
-        return $this->properties ?? ($this->properties = $this->createPropertyArray());
+        return $this->properties;
     }
 
     /**
@@ -280,7 +299,7 @@ final class ArrayTypeDefinition implements TypeDefinition
      */
     public function isTerminal(): bool
     {
-        return empty($this->data['properties']);
+        return empty($this->properties);
     }
 }
 
@@ -290,8 +309,7 @@ final class ArrayTypeDefinition implements TypeDefinition
 final class ArrayTypeDefinitionMap implements TypeDefinitionMap
 {
     private $aliases;
-    private $cache = [];
-    private $data;
+    private $types = [];
 
     /**
      * Default constructor
@@ -299,16 +317,19 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
     public function __construct(array $data, array $aliases = [])
     {
         $this->aliases = $aliases;
-        $this->data = $data;
+
+        foreach ($data as $type => $definition) {
+            $this->types[$type] = new ArrayTypeDefinition($type, $definition);
+        }
     }
 
     /**
      * Add type definition
      */
-    public function addTypeDefinition(string $type, array $data): void
+    public function addTypeDefinition(string $name, TypeDefinition $type): void
     {
         // This will override any previous definition.
-        $this->data[$type] = $data;
+        $this->types[$name] = $type;
     }
 
     /**
@@ -338,7 +359,7 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
      */
     public function exists(string $name): bool
     {
-        return isset($this->data[$name]) || isset($this->aliases[$name]);
+        return isset($this->types[$name]) || isset($this->types[$name]);
     }
 
     /**
@@ -346,15 +367,9 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
      */
     public function get(string $name): TypeDefinition
     {
-        // Aliases override definitions
         $key = $this->aliases[$name] ?? $name;
 
-        return $this->cache[$key] ?? (
-            $this->cache[$key] = new ArrayTypeDefinition(
-                $key,
-                $this->data[$key] ?? $this->typeNotFoundError($key, $name)
-            )
-        );
+        return $this->types[$key] ?? $this->typeNotFoundError($key, $name);
     }
 
     /**
@@ -365,4 +380,3 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
         return $this->aliases[$name] ?? $name;
     }
 }
-
