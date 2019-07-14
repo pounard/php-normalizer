@@ -12,7 +12,7 @@ use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\UuidNormalizer;
 use MakinaCorpus\Normalizer\Benchmarks\MockArticle;
-use Ramsey\Uuid\Uuid;
+use MakinaCorpus\Normalizer\Benchmarks\ObjectGenerator;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -97,18 +97,57 @@ $dynamicContext = new Context(
  *
  ***************************************************************************** */
 
-$data = [
-    'id' => (string)Uuid::uuid4(),
-    'createdAt' => (string)(new \DateTimeImmutable())->format(\DateTime::ISO8601),
-    //'authors' => ["John Doe <john@example.com>"],
-    'title' => "Another test",
-    'authors' => ["Jean", "Paul"],
-    'text' => [
-        'text' => "<p>Hello, John!</p>",
-        'format' => 'application/text+html',
-    ],
-];
+function separator(string $text, $rawData = null): void {
+    echo "\n\n--\n-- ", $text, "\n--\n\n";
+    if ($rawData) {
+        // print_r($rawData);
+    }
+}
 
-print_r($symfonyNormalizer->denormalize($data, MockArticle::class));
-print_r($defaultNormalizer->denormalize('app.article', $data, $context));
-print_r($defaultNormalizer->denormalize(MockArticle::class, $data, $dynamicContext));
+function timer_start(): float {
+    return microtime(true);
+}
+
+function timer_stop(float $start, string $message = "Duration"): string {
+    return $message . ": " . round((microtime(true) - $start) * 1000) . "ms";
+}
+
+$originalData = ObjectGenerator::createArticles(200, false);
+
+separator("Original data", $originalData);
+
+// Custom
+$objects = [];
+$timer = timer_start();
+foreach ($originalData as $data) {
+    $objects[] = $defaultNormalizer->denormalize(MockArticle::class, $data, $dynamicContext);
+}
+separator(timer_stop($timer, "Custom denormalized"), $objects);
+$data = [];
+$timer = timer_start();
+foreach ($objects as $object) {
+    $data[] = $defaultNormalizer->normalize(MockArticle::class, $object, $dynamicContext);
+}
+separator(timer_stop($timer, "Custom normalized"), $data);
+
+/*
+// Symfony
+$objects = [];
+$timer = timer_start();
+foreach ($originalData as $data) {
+    $objects[] = $symfonyNormalizer->denormalize($data, MockArticle::class);
+}
+separator(timer_stop($timer, "Symfony denormalized"), $objects);
+/*
+$data = [];
+$timer = timer_start();
+foreach ($objects as $object) {
+    $data[] = $symfonyNormalizer->normalize($object);
+}
+separator(timer_stop($timer, "Symfony normalized"), $data);
+ */
+
+
+//print_r();
+//print_r($defaultNormalizer->denormalize('app.article', $data, $context));
+//print_r($defaultNormalizer->denormalize(MockArticle::class, $data, $dynamicContext));
