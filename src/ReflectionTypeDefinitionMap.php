@@ -68,6 +68,25 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
+     * Recursion to find all parent and traits included properties.
+     */
+    private function findAllProperties(?\ReflectionClass $class)
+    {
+        if (null === $class) {
+            return [];
+        }
+        return \array_values(\array_merge(
+            $this->findAllProperties($class->getParentClass() ?: null),
+            \array_values(\array_filter(
+                $class->getProperties(),
+                function (\ReflectionProperty $property) : bool {
+                    return !$property->isStatic();
+                }
+            ))
+        ));
+    }
+
+    /**
      * Parse class definition
      */
     private function findClassDefinition(string $class): TypeDefinition
@@ -76,10 +95,8 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
         $data = [];
 
         /** @var \ReflectionProperty $propDef */
-        foreach ($ref->getProperties() as $propDef) {
-            if (!$propDef->isStatic()) {
-                $data['properties'][$propDef->getName()] = $this->findPropertyDefinition($class, $propDef);
-            }
+        foreach ($this->findAllProperties($ref) as $propDef) {
+            $data['properties'][$propDef->getName()] = $this->findPropertyDefinition($class, $propDef);
         }
 
         return new ArrayTypeDefinition($class, $data);
