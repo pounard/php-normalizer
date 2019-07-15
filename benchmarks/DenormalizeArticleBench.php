@@ -25,7 +25,7 @@ class DenormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchMap() : void
@@ -36,7 +36,7 @@ class DenormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchReflection() : void
@@ -47,13 +47,24 @@ class DenormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchSymfony() : void
     {
         foreach ($this->data as $data) {
             $this->symfonyNormalizer->denormalize($data, MockArticle::class);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchSymfonyProxy() : void
+    {
+        foreach ($this->data as $data) {
+            $this->symfonyNormalizerProxy->denormalize($data, MockArticle::class);
         }
     }
 }

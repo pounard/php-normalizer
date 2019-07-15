@@ -7,11 +7,15 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
 use Doctrine\Common\Annotations\AnnotationReader;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
+use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\UuidNormalizer;
+use MakinaCorpus\Normalizer\Bridge\Symfony\NormalizerProxy;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -24,8 +28,6 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Yaml\Yaml;
-use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
-use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 
 final class ObjectGenerator
 {
@@ -157,6 +159,9 @@ trait NormalizerBenchmarkTrait
     /** @var \Symfony\Component\Serializer\Serializer */
     private $symfonyNormalizer;
 
+    /** @var \Symfony\Component\Serializer\Serializer */
+    private $symfonyNormalizerProxy;
+
     /**
      * Use this method for benchmark setup
      */
@@ -167,6 +172,7 @@ trait NormalizerBenchmarkTrait
         $this->createCachedContext();
         $this->createContext();
         $this->createSymfonyNormalizer();
+        $this->createSymfonyProxy();
     }
 
     /**
@@ -218,9 +224,9 @@ trait NormalizerBenchmarkTrait
     }
 
     /**
-     * Create Symfony serializer
+     * Prepare some Symfony stuff
      */
-    private function createSymfonyNormalizer(): Serializer
+    private function prepareSymfonyInternals(): array
     {
         // We do not test using a the CacheClassMetadataFactory implementation
         // because its impact is invisible in the bench result. Symfony
@@ -243,6 +249,16 @@ trait NormalizerBenchmarkTrait
             [$reflectionExtractor]
         );
 
+        return [$classMetadataFactory, $propertyTypeExtractor];
+    }
+
+    /**
+     * Create Symfony serializer
+     */
+    private function createSymfonyNormalizer(): Serializer
+    {
+        list($classMetadataFactory, $propertyTypeExtractor) = $this->prepareSymfonyInternals();
+
         return $this->symfonyNormalizer = new Serializer([
             new DateTimeNormalizer(),
             new \MakinaCorpus\Normalizer\Bridge\Symfony\UuidNormalizer(),
@@ -252,6 +268,18 @@ trait NormalizerBenchmarkTrait
                 /* $propertyTypeExtractor */ null,
                 $propertyTypeExtractor,
                 /* ClassDiscriminatorResolverInterface $classDiscriminatorResolver = */ null
+            ),
+        ]);
+    }
+
+    private function createSymfonyProxy()
+    {
+        return $this->symfonyNormalizerProxy = new Serializer([
+            new NormalizerProxy(
+                new ContextFactory(
+                    $this->createCachedTypeDefinitionMap()
+                ),
+                $this->defaultNormalizer
             ),
         ]);
     }

@@ -25,7 +25,7 @@ class NormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchMap() : void
@@ -37,7 +37,7 @@ class NormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchReflection() : void
@@ -49,13 +49,24 @@ class NormalizeArticleBench
     }
 
     /**
-     * @Revs(100)
+     * @Revs(50)
      * @Iterations(30)
      */
     public function benchSymfony() : void
     {
         foreach ($this->data as $data) {
             $this->symfonyNormalizer->normalize($data, MockArticle::class);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchSymfonyProxy() : void
+    {
+        foreach ($this->data as $data) {
+            $this->symfonyNormalizerProxy->normalize($data, MockArticle::class);
         }
     }
 }
