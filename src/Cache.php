@@ -39,6 +39,14 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
     }
 
     /**
+     * Set type aliases
+     */
+    public function setUserAliases(array $aliases): void
+    {
+        throw new NotImplementedError();
+    }
+
+    /**
      * exists() implementation
      */
     private function doExists(string $name): bool

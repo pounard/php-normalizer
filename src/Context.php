@@ -5,6 +5,30 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer;
 
 /**
+ * Front access point for the API
+ */
+final class ContextFactory
+{
+    private $typeMap;
+
+    /**
+     * Default constructor
+     */
+    public function __construct(TypeDefinitionMap $typeMap)
+    {
+        $this->typeMap = $typeMap;
+    }
+
+    /**
+     * Create context instance
+     */
+    public function createContext(array $options = [], bool $symfonyCompatibility = false): Context
+    {
+        return new Context($this->typeMap, $options, $symfonyCompatibility);
+    }
+}
+
+/**
  * (De)normalization and (de)serialization context.
  *
  * It carries configuration, classes and types definitions and it handles

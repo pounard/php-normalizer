@@ -99,7 +99,7 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
             $data['properties'][$propDef->getName()] = $this->findPropertyDefinition($class, $propDef);
         }
 
-        return new ArrayTypeDefinition($class, $data);
+        return DefaultTypeDefinition::fromArray($class, $data);
     }
 
     /**

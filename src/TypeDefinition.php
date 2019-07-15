@@ -114,7 +114,7 @@ interface TypeDefinitionMap
 /**
  * Array based property definition
  */
-final class ArrayPropertyDefinition implements PropertyDefinition
+final class DefaultPropertyDefinition implements PropertyDefinition
 {
     /** @var string[] */
     private $aliases;
@@ -149,17 +149,20 @@ final class ArrayPropertyDefinition implements PropertyDefinition
     /**
      * Default constructor
      */
-    public function __construct(string $owner, string $name, array $definition)
+    public static function fromArray(string $owner, string $name, array $definition)
     {
-        $this->aliases = $definition['aliases'] ?? [];
-        $this->collection = (bool)($definition['collection'] ?? false);
-        $this->collectionType = $definition['collection_type'] ?? null;
-        $this->groups = $definition['groups'] ?? [];
-        $this->name = $name;
-        $this->normalizedName = $definition['normalized_name'] ?? $this->name;
-        $this->optional = (bool)($definition['optional'] ?? false);
-        $this->owner = $owner;
-        $this->type = $definition['type'] ?? 'null';
+        $ret = new self;
+        $ret->aliases = $definition['aliases'] ?? [];
+        $ret->collection = (bool)($definition['collection'] ?? false);
+        $ret->collectionType = $definition['collection_type'] ?? null;
+        $ret->groups = $definition['groups'] ?? [];
+        $ret->name = $name;
+        $ret->normalizedName = $definition['normalized_name'] ?? $ret->name;
+        $ret->optional = (bool)($definition['optional'] ?? false);
+        $ret->owner = $owner;
+        $ret->type = $definition['type'] ?? 'null';
+
+        return $ret;
     }
 
     /**
@@ -251,23 +254,31 @@ final class ArrayPropertyDefinition implements PropertyDefinition
 /**
  * Array based type definition
  */
-final class ArrayTypeDefinition implements TypeDefinition
+final class DefaultTypeDefinition implements TypeDefinition
 {
+    /** @var string */
     private $name;
+
+    /** @var string */
     private $normalizedName;
+
+    /** @var PropertyDefinition[] */
     private $properties = [];
 
     /**
      * Default constructor
      */
-    public function __construct(string $name, array $data)
+    public static function fromArray(string $name, array $data)
     {
-        $this->name = $name;
-        $this->normalizedName = $data['normalized_name'] ?? $name;
+        $ret = new self;
+        $ret->name = $name;
+        $ret->normalizedName = $data['normalized_name'] ?? $name;
 
         foreach ($data['properties'] ?? [] as $key => $value) {
-            $this->properties[$key] = new ArrayPropertyDefinition($this->name, $key, $value);
+            $ret->properties[$key] = DefaultPropertyDefinition::fromArray($name, $key, $value);
         }
+
+        return $ret;
     }
 
     /**
@@ -308,7 +319,10 @@ final class ArrayTypeDefinition implements TypeDefinition
  */
 final class ArrayTypeDefinitionMap implements TypeDefinitionMap
 {
+    /** @var string[] */
     private $aliases;
+
+    /** @var TypeDefinition[] */
     private $types = [];
 
     /**
@@ -319,12 +333,12 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
         $this->aliases = $aliases;
 
         foreach ($data as $type => $definition) {
-            $this->types[$type] = new ArrayTypeDefinition($type, $definition);
+            $this->types[$type] = DefaultTypeDefinition::fromArray($type, $definition);
         }
     }
 
     /**
-     * Add type definition
+     * Add type definition, overrides any existing one
      */
     public function addTypeDefinition(string $name, TypeDefinition $type): void
     {
@@ -347,7 +361,7 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
     {
         if ($alias && $alias !== $name) {
             throw new TypeDoesNotExistError(\sprintf(
-                "Type '%s' maps to non existing type '%s'",
+                "Alias '%s' maps to non existing type '%s'",
                 $alias, $name
             ));
         }
