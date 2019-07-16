@@ -52,7 +52,7 @@ final class Context
     /**
      * Default constructor.
      *
-     * @param TypeDefinitionMap $typeMap
+     * @param ?TypeDefinitionMap $typeMap
      *   Type definition map, preferably a cached/preloaded
      *   implementation for performances
      * @param array $options
@@ -62,12 +62,12 @@ final class Context
      * @param bool $symfonyCompatibility
      *   Set this to true to activate symfony/serializer component compability.
      */
-    public function __construct(TypeDefinitionMap $typeMap, array $options = [], bool $symfonyCompatibility = false)
+    public function __construct(?TypeDefinitionMap $typeMap = null, array $options = [], bool $symfonyCompatibility = false)
     {
         $this->alwaysGuessType = (bool)($options[NormalizeOption::ALWAYS_GUESS_TYPE] ?? false);
         $this->options = $options;
         $this->symfonyCompatibility = $symfonyCompatibility;
-        $this->typeMap = $typeMap;
+        $this->typeMap = $typeMap ?? self::createDefaultTypeDefinitionMap();
 
         // Do some validation.
         if (isset($options[NormalizeOption::CIRCULAR_REFERENCE_HANDLER]) &&
@@ -82,6 +82,15 @@ final class Context
         if (isset($options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT])) {
             $this->circularReferenceLimit = (int)$options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT];
         }
+    }
+
+    /**
+     * Will attempt to create a type definition map depending upon the
+     * environment capabilities, using sensible defaults.
+     */
+    public static function createDefaultTypeDefinitionMap(): TypeDefinitionMap
+    {
+        return new MemoryTypeDefinitionMapCache([new ReflectionTypeDefinitionMap()]);
     }
 
     /**
@@ -166,15 +175,6 @@ final class Context
     public function getNativeType(string $name): string
     {
         return $this->typeMap->getNativeType($name);
-    }
-
-    /**
-     * Should normalization process attempt to guess all types at runtime
-     * instead of 
-     */
-    public function shouldAlwaysGuessTypes(): bool
-    {
-        return $this->alwaysGuessType;
     }
 
     /**

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 
 /**
  * This implementation does not support aliases, it should only be used
@@ -14,12 +17,34 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 {
     private $typeInfoExtractor;
+    private $typeInfoExtractorLoaded = false;
+
+    /**
+     * Attempt to create a type info extractor if Symfony component is enabled
+     */
+    public static function createDefaultTypeInfoExtractor(): ?PropertyTypeExtractorInterface
+    {
+        if (\interface_exists(PropertyTypeExtractorInterface::class)) {
+            $reflectionExtractor = new ReflectionExtractor();
+            $phpDocExtractor = new PhpDocExtractor();
+
+            return new PropertyInfoExtractor(
+                [],
+                [$phpDocExtractor, $reflectionExtractor],
+                [$phpDocExtractor, $reflectionExtractor],
+                [$reflectionExtractor],
+                [$reflectionExtractor]
+            );
+        }
+        return null;
+    }
 
     /**
      * Set type info extractor
      */
     public function setTypeInfoExtractor(PropertyTypeExtractorInterface $typeInfoExtractor): void
     {
+        $this->typeInfoExtractorLoaded = true;
         $this->typeInfoExtractor = $typeInfoExtractor;
     }
 
@@ -35,6 +60,11 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      */
     private function findPropertyDefinition(string $class, \ReflectionProperty $property): array
     {
+        if (!$this->typeInfoExtractorLoaded && !$this->typeInfoExtractor) {
+            $this->typeInfoExtractorLoaded = true;
+            $this->typeInfoExtractor = self::createDefaultTypeInfoExtractor();
+        }
+
         if ($this->typeInfoExtractor) {
             $types = $this->typeInfoExtractor->getTypes($class, $property->getName());
 

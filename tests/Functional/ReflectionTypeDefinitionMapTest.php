@@ -17,10 +17,12 @@ final class ReflectionTypeDefinitionMapTest extends TestCase
     private function createTypeDefinitionMap(): TypeDefinitionMap
     {
         $reflectionExtractor = new ReflectionExtractor();
+        $phpDocExtractor = new PhpDocExtractor();
+
         $propertyTypeExtractor = new PropertyInfoExtractor(
             [],
-            [new PhpDocExtractor(), $reflectionExtractor],
-            [new PhpDocExtractor(), $reflectionExtractor],
+            [$phpDocExtractor, $reflectionExtractor],
+            [$phpDocExtractor, $reflectionExtractor],
             [$reflectionExtractor],
             [$reflectionExtractor]
         );

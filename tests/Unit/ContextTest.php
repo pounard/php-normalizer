@@ -44,7 +44,6 @@ final class ContextTest extends TestCase
             Option::SERIALIATION_FORMAT => 'application/stupid-format',
         ]);
 
-        $this->assertTrue($context->shouldAlwaysGuessTypes());
         $this->assertIsArray($context->toSymfonyContext());
         $this->assertSame('application/stupid-format', $context->getFormat());
         $this->assertFalse($context->isStrict());
