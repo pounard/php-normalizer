@@ -146,7 +146,7 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     public function get(string $name): TypeDefinition
     {
         if (!\class_exists($name)) {
-            throw new TypeDoesNotExistError(\sprintf("Class '%s' does not exist", $name));
+            throw new ClassDoesNotExistError($name);
         }
 
         return $this->findClassDefinition($name);

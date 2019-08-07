@@ -97,7 +97,7 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
                 }
             }
         }
-        throw new TypeDoesNotExistError(\sprintf("Could not find type '%s'", $name));
+        throw new TypeDoesNotExistError($name);
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
     public function get(string $name): TypeDefinition
     {
         if (!$this->exists($name)) {
-            throw new TypeDoesNotExistError(\sprintf("Could not find type '%s'", $name));
+            throw new TypeDoesNotExistError($name);
         }
 
         if ($this->static->exists($name)) {

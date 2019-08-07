@@ -38,7 +38,7 @@ final class ReflectionTypeDefinitionMapTest extends TestCase
         $map = $this->createTypeDefinitionMap();
 
         $this->expectException(TypeDoesNotExistError::class);
-        $this->expectExceptionMessageRegExp("/'non_existing'.*not exist/");
+        $this->expectExceptionMessageRegExp("/Class does.*'non_existing'/");
         $map->get('non_existing');
     }
 
