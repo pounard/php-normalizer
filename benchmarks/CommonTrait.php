@@ -15,7 +15,8 @@ use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\UuidNormalizer;
-use MakinaCorpus\Normalizer\Bridge\Symfony\NormalizerProxy;
+use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
+use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer as SymfonyUuidNormalizer;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -261,7 +262,7 @@ trait NormalizerBenchmarkTrait
 
         return $this->symfonyNormalizer = new Serializer([
             new DateTimeNormalizer(),
-            new \MakinaCorpus\Normalizer\Bridge\Symfony\UuidNormalizer(),
+            new SymfonyUuidNormalizer(),
             new ObjectNormalizer(
                 $classMetadataFactory,
                 /* NameConverterInterface $nameConverter = */ null,

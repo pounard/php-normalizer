@@ -1,6 +1,6 @@
 <?php
 
-namespace MakinaCorpus\Normalizer\Bridge\Symfony;
+namespace MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer;
 
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DefaultNormalizer;

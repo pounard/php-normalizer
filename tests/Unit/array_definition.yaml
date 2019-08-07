@@ -51,7 +51,6 @@ types:
                 type: int
 
     App\Example\Tag:
-        aliases: [tag, label]
         properties:
             name:
                 type: string
