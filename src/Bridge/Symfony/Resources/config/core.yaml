@@ -1,0 +1,23 @@
+services:
+
+    php_normalizer.type_definition_map:
+        public: false
+        class: MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache
+        arguments: [[]]
+
+    php_normalizer.normalizer:
+        public: false
+        class: MakinaCorpus\Normalizer\DefaultNormalizer
+        arguments: [[]]
+
+    php_normalizer.context_factory:
+        public: false
+        class: MakinaCorpus\Normalizer\ContextFactory
+        arguments: ['@php_normalizer.type_definition_map']
+
+    php_normalizer.symfony_normalizer_proxy:
+        public: false
+        class: MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer
+        arguments: ['@php_normalizer.context_factory', '@php_normalizer.normalizer']
+        # Before core one, but leave user's with no priority override us.
+        tags: [{name: 'serializer.normalizer', priority: -10}]

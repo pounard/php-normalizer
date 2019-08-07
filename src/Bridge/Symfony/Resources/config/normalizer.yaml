@@ -1,0 +1,17 @@
+# Holds custom normalizers
+services:
+
+    php_normalizer.normalizer.scalar:
+        public: false
+        class: MakinaCorpus\Normalizer\ScalarNormalizer
+        tags: [{name: php_normalizer.normalizer, priority: 100}]
+
+    php_normalizer.normalizer.date:
+        public: false
+        class: MakinaCorpus\Normalizer\DateNormalizer
+        tags: [{name: php_normalizer.normalizer, priority: -100}]
+
+    php_normalizer.normalizer.uuid:
+        public: false
+        class: MakinaCorpus\Normalizer\UuidNormalizer
+        tags: [{name: php_normalizer.normalizer, priority: -1000}]

@@ -15,6 +15,9 @@
         <testsuite name="Tests">
             <directory>tests</directory>
         </testsuite>
+        <testsuite name="Symfony integration tests">
+            <directory>src/Bridge/Symfony/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <filter>

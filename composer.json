@@ -54,9 +54,12 @@
         "phpunit/phpunit": "^7",
         "ramsey/uuid": "^4.0",
         "symfony/cache": "^4.3",
+        "symfony/dependency-injection": "^4.3",
         "symfony/property-access": "^4",
         "symfony/serializer": "^4.3",
-        "symfony/yaml": "^4"
+        "symfony/yaml": "^4",
+        "symfony/config": "^4.3",
+        "symfony/http-kernel": "^4.3"
     },
     "suggest": {
         "ramsey/uuid": "For UUID database column type support",
