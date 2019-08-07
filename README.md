@@ -46,7 +46,7 @@ Is remain an experimental project until the following features are reached:
 
  - [ ] symfony context options support for transparent compatibility,
 
- - [ ] symfony bundle for autoconfiguration,
+ - [x] symfony bundle for autoconfiguration,
 
  - [ ] implement a few more custom normalizers (SPL files, ...),
 
