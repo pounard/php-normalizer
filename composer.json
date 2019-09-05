@@ -46,8 +46,10 @@
             "benchmarks/Definitions.php"
         ],
         "psr-4": {
-            "Generated\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated/MakinaCorpus/Normalizer/Tests/Functional/",
+            "Generated2\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated2/MakinaCorpus/Normalizer/Benchmarks/",
+            "Generated2\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated2/MakinaCorpus/Normalizer/Tests/Functional/",
+            "Generated4\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated4/MakinaCorpus/Normalizer/Benchmarks/",
+            "Generated4\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated4/MakinaCorpus/Normalizer/Tests/Functional/",
             "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
         }

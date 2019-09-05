@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Generated2\MakinaCorpus\Normalizer\Tests\Functional;
+namespace Generated4\MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
+
+use MakinaCorpus\Normalizer as Helper;
 
 final class MockWithTextNormalizer
 {
@@ -32,45 +34,18 @@ final class MockWithTextNormalizer
         $ret = (new \ReflectionClass(MockWithText::class))->newInstanceWithoutConstructor();
 
         // Denormalize 'title' property
-        $value = self::find('title', $input, ['title'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'string') {
-            $value = null;
-        }
+        $value = Helper\find_value($input, ['title'], $context);
+        $value = Helper\to_string($value, $context);
         \call_user_func(self::$accessor, $ret, 'title', $value);
 
         // Denormalize 'text' property
-        $value = self::find('text', $input, ['text', 'markup'], $context);
+        $value = Helper\find_value($input, ['text', 'markup'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('text_with_format', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'text_with_format') {
-            $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
 
         return $ret;
-    }
-
-    /**
-     * Find value matching in array
-     */
-    private static function find(string $propName, array $input, array $names, Context $context)
-    {
-        $found = $value = null;
-        foreach ($names as $name) {
-            if (\array_key_exists($name, $input)) {
-                if ($found) {
-                    $context->addError(\sprintf("Property '%s' found in '%s' but was already found in '%s'", $propName, $found, $name));
-                } else {
-                    $found = $name;
-                    $value = $input[$name];
-                }
-            }
-        }
-        return $value;
     }
 }
 

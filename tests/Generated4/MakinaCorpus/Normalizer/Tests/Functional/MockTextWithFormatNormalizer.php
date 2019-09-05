@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Generated2\MakinaCorpus\Normalizer\Tests\Functional;
+namespace Generated4\MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
+
+use MakinaCorpus\Normalizer as Helper;
 
 final class MockTextWithFormatNormalizer
 {
@@ -32,51 +34,16 @@ final class MockTextWithFormatNormalizer
         $ret = (new \ReflectionClass(MockTextWithFormat::class))->newInstanceWithoutConstructor();
 
         // Denormalize 'text' property
-        $value = self::find('text', $input, ['text', 'value'], $context);
-        if (null === $value) {
-            $context->addError("Property 'text' cannot be null");
-        }
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!\gettype($value) === 'string') {
-            $value = null;
-        }
+        $value = Helper\find_value($input, ['text', 'value'], $context);
+        $value = Helper\to_string($value, $context);
         \call_user_func(self::$accessor, $ret, 'text', $value);
 
         // Denormalize 'format' property
-        $value = self::find('format', $input, ['format'], $context);
-        if (null === $value) {
-            $context->addError("Property 'format' cannot be null");
-        }
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!\gettype($value) === 'string') {
-            $value = null;
-        }
+        $value = Helper\find_value($input, ['format'], $context);
+        $value = Helper\to_string($value, $context);
         \call_user_func(self::$accessor, $ret, 'format', $value);
 
         return $ret;
-    }
-
-    /**
-     * Find value matching in array
-     */
-    private static function find(string $propName, array $input, array $names, Context $context)
-    {
-        $found = $value = null;
-        foreach ($names as $name) {
-            if (\array_key_exists($name, $input)) {
-                if ($found) {
-                    $context->addError(\sprintf("Property '%s' found in '%s' but was already found in '%s'", $propName, $found, $name));
-                } else {
-                    $found = $name;
-                    $value = $input[$name];
-                }
-            }
-        }
-        return $value;
     }
 }
 

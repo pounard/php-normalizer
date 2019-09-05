@@ -108,9 +108,8 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
         foreach ($this->reflectors as $instance) {
             if ($instance->exists($name)) {
                 try {
-                    if (false && $type) {
-                        $type = $type->with($instance->get($name));
-                        break;
+                    if ($type) {
+                        $type = $type->with($instance->get($name)->toArray());
                     } else {
                         $type = $instance->get($name);
                     }

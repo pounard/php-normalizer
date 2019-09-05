@@ -31,26 +31,6 @@ final class MockArticleNormalizer
     {
         $ret = (new \ReflectionClass(MockArticle::class))->newInstanceWithoutConstructor();
 
-        // Denormalize 'title' property
-        $value = self::find('title', $input, ['title'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'string') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'title', $value);
-
-        // Denormalize 'text' property
-        $value = self::find('text', $input, ['text'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('null', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'null') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'text', $value);
-
         // Denormalize 'id' property
         $value = self::find('id', $input, ['id'], $context);
         if (null === $value) {
@@ -111,6 +91,26 @@ final class MockArticleNormalizer
             }
         }
         \call_user_func(self::$accessor, $ret, 'authors', $propValue);
+
+        // Denormalize 'title' property
+        $value = self::find('title', $input, ['title'], $context);
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('string', $value, $context);
+        }
+        if (!null === $value || \gettype($value) === 'string') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'title', $value);
+
+        // Denormalize 'text' property
+        $value = self::find('text', $input, ['text'], $context);
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('text_with_format', $value, $context);
+        }
+        if (!null === $value || \gettype($value) === 'text_with_format') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'text', $value);
 
         // Denormalize 'foo' property
         $value = self::find('foo', $input, ['foo'], $context);

@@ -25,7 +25,7 @@ final class ArrayTypeDefinitionTest extends TestCase
         $map = $this->createTypeDefinitionMap();
 
         $this->expectException(TypeDoesNotExistError::class);
-        $this->expectExceptionMessageRegExp("/'non_existing'.*not exist/");
+        $this->expectExceptionMessageRegExp("/not find.*'non_existing'/");
         $map->get('non_existing');
     }
 

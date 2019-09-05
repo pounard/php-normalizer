@@ -14,43 +14,14 @@ final class PhpNormalizerConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('php_normalizer');
-        /** @var \Symfony\Component\Config\Definition\Builder\NodeBuilder $rootNode  */
-        $rootNode = $treeBuilder->getRootNode();
-
-        /*
-        $rootNode
+        ($treeBuilder = new TreeBuilder('php_normalizer'))
+            ->getRootNode()
             ->children()
-                ->arrayNode('runner')
-                    ->children()
-                        ->enumNode('driver')
-                            ->values(['doctrine'])
-                            ->defaultNull()
-                        ->end()
-                        ->enumNode('metadata_cache')
-                            ->values(['array', 'apcu'])
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('metadata_cache_prefix')
-                            ->defaultNull()
-                        ->end()
-                    ->end()
-                ->end()
-                ->arrayNode('query')
-                    ->children()
-                        ->booleanNode('enabled')->defaultTrue()->end()
-                    ->end()
-                ->end()
-                ->arrayNode('domain')
-                    ->children()
-                        ->booleanNode('enabled')->defaultTrue()->end()
-                        ->booleanNode('event_store')->defaultFalse()->end()
-                        ->booleanNode('lock_service')->defaultFalse()->end()
-                    ->end()
+                ->arrayNode('definition_files')
+                    ->prototype('scalar')->end()
                 ->end()
             ->end()
         ;
-         */
 
         return $treeBuilder;
     }

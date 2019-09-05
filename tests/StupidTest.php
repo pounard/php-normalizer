@@ -107,6 +107,8 @@ final class StupidTest extends TestCase
      */
     public function testNormalizerGeneration2(string $className, string $basedir)
     {
+        $this->expectNotToPerformAssertions();
+
         $filename = $basedir.'/'.\str_replace('\\', '/', \ltrim($className, '\\')).'Normalizer.php';
         $directory = \dirname($filename);
 
@@ -127,6 +129,8 @@ final class StupidTest extends TestCase
      */
     public function testNormalizerGeneration4(string $className, string $basedir)
     {
+        $this->expectNotToPerformAssertions();
+
         $filename = $basedir.'/'.\str_replace('\\', '/', \ltrim($className, '\\')).'Normalizer.php';
         $directory = \dirname($filename);
 

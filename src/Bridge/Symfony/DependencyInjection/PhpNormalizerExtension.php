@@ -6,6 +6,7 @@ namespace MakinaCorpus\Normalizer\Bridge\Symfony\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
@@ -28,6 +29,26 @@ final class PhpNormalizerExtension extends Extension
             $loader->load('profiler.yml');
         }
          */
+
+        $this->registerDefinitionFiles($container, $config);
+    }
+
+    /**
+     * Register custom application-defined type configuration files.
+     */
+    private function registerDefinitionFiles(ContainerBuilder $container, array $config)
+    {
+        if (empty($config['definition_files'])) {
+            return;
+        }
+
+        foreach ($config['definition_files'] as $filename) {
+            $filename = $container->resolveEnvPlaceholders($filename, true);
+
+            if (!\file_exists($filename)) {
+                throw new InvalidArgumentException(\sprintf('File "%s" does not exist', $filename));
+            }
+        }
     }
 
     /**

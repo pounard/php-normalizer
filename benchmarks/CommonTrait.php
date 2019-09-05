@@ -161,6 +161,16 @@ trait NormalizerBenchmarkTrait
     /** @var \Symfony\Component\Serializer\Serializer */
     private $symfonyNormalizerProxy;
 
+    private function getContextWithCache(): Context
+    {
+        return $this->cachedContext = $this->cachedContext->fresh();
+    }
+
+    private function getContextWithConfig(): Context
+    {
+        return $this->context = $this->context->fresh();
+    }
+
     /**
      * Use this method for benchmark setup
      */

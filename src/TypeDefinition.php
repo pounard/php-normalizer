@@ -75,6 +75,11 @@ interface PropertyDefinition
      * new values to existing, it will not remove already set ones.
      */
     public function with(array $overrides): PropertyDefinition;
+
+    /**
+     * Get array definition, compatible with with() method.
+     */
+    public function toArray(): array;
 }
 
 /**
@@ -116,6 +121,11 @@ interface TypeDefinition
      *   For 'properties' values definition documentation.
      */
     public function with(array $overrides): TypeDefinition;
+
+    /**
+     * Get array definition, compatible with with() method.
+     */
+    public function toArray(): array;
 }
 
 /**
@@ -184,12 +194,12 @@ final class DefaultPropertyDefinition implements PropertyDefinition
     public static function fromArray(string $owner, string $name, array $definition)
     {
         $ret = new self;
-        $ret->aliases = $definition['aliases'] ?? [];
+        $ret->aliases = $definition['aliases'] ?? null;
         $ret->collection = (bool)($definition['collection'] ?? false);
         $ret->collectionType = $definition['collection_type'] ?? null;
         $ret->groups = $definition['groups'] ?? [];
         $ret->name = $name;
-        $ret->normalizedName = $definition['normalized_name'] ?? $ret->name;
+        $ret->normalizedName = $definition['normalized_name'] ?? null;
         $ret->optional = (bool)($definition['optional'] ?? false);
         $ret->owner = $owner;
         $ret->type = $definition['type'] ?? 'null';
@@ -207,7 +217,7 @@ final class DefaultPropertyDefinition implements PropertyDefinition
 
     public function getNormalizedName(): string
     {
-        return $this->normalizedName;
+        return $this->normalizedName ?? $this->name;
     }
 
     /**
@@ -215,7 +225,7 @@ final class DefaultPropertyDefinition implements PropertyDefinition
      */
     public function getAliases(): array
     {
-        return $this->aliases;
+        return $this->aliases ?? [];
     }
 
     /**
@@ -292,7 +302,7 @@ final class DefaultPropertyDefinition implements PropertyDefinition
         $ret = clone $this;
 
         if (isset($overrides['aliases'])) {
-            $ret->aliases = \array_unique(\array_merge($ret->aliases, $overrides['aliases']));
+            $ret->aliases = \array_unique(\array_merge($ret->aliases ?? [], $overrides['aliases']));
         }
         if (isset($overrides['collection'])) {
             $ret->collection = (bool)$overrides['collection'];
@@ -309,11 +319,27 @@ final class DefaultPropertyDefinition implements PropertyDefinition
         if (isset($overrides['optional'])) {
             $ret->optional = (bool)$overrides['optional'];
         }
-        if (isset($overrides['type'])) {
+        if (isset($overrides['type']) && 'null' !== $overrides['type']) {
             $ret->type = $overrides['type'];
         }
 
         return $ret;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return [
+            'aliases' => $this->aliases,
+            'collection' => $this->collection,
+            'collection_type' => $this->collectionType,
+            'groups' => $this->groups,
+            'normalized_name' => $this->normalizedName,
+            'optional' => $this->optional,
+            'type' => $this->type !== 'null' ? $this->type : null,
+        ];
     }
 }
 
@@ -392,8 +418,10 @@ final class DefaultTypeDefinition implements TypeDefinition
         }
 
         // Override (and deep clone) properties at the same time
-        foreach ($this->properties as $name) {
-            $ret->properties[$name] = $this->properties[$name]->with($properties[$name] ?? []);
+        foreach (\array_keys($this->properties) as $name) {
+            if (isset($ret->properties[$name])) {
+                $ret->properties[$name] = $this->properties[$name]->with($properties[$name]);
+            }
         }
 
         // Add potentially missing (newly added) properties
@@ -404,6 +432,22 @@ final class DefaultTypeDefinition implements TypeDefinition
         }
 
         return $ret;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return [
+            'properties' => \array_map(
+                static function (PropertyDefinition $property) {
+                    return $property->toArray();
+                },
+                $this->properties
+            ),
+            'normalized_name' => $this->normalizedName,
+        ];
     }
 }
 

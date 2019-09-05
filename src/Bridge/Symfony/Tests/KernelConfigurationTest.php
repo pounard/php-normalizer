@@ -23,10 +23,20 @@ class KernelConfigurationTest extends TestCase
         return new ContainerBuilder(new ParameterBag([
             'kernel.debug'=> false,
             'kernel.bundles' => [],
-            'kernel.cache_dir' => sys_get_temp_dir(),
+            'kernel.cache_dir' => \sys_get_temp_dir(),
             'kernel.environment' => 'test',
-            'kernel.root_dir' => __DIR__ . '/../../',
+            'kernel.root_dir' => \dirname(__DIR__),
         ]));
+    }
+
+    private function getMinimalConfig(): array
+    {
+        return [
+            'definition_files' => [
+                __DIR__.'/Fixtures/definitions1.yaml',
+                '%kernel.root_dir%/Tests/Fixtures/definitions2.yaml',
+            ],
+        ];
     }
 
     /**
@@ -35,8 +45,7 @@ class KernelConfigurationTest extends TestCase
     public function testTaggedServicesConfigLoad()
     {
         $extension = new PhpNormalizerExtension();
-        // $config = $this->parseYaml($this->getMinimalYamlConfig());
-        $config = [];
+        $config = $this->getMinimalConfig();
         $extension->load([$config], $container = $this->getContainer());
 
         $this->assertCount(3, $container->findTaggedServiceIds('php_normalizer.normalizer'));
@@ -50,8 +59,7 @@ class KernelConfigurationTest extends TestCase
     public function testNormalizerPass()
     {
         $extension = new PhpNormalizerExtension();
-        // $config = $this->parseYaml($this->getMinimalYamlConfig());
-        $config = [];
+        $config = $this->getMinimalConfig();
         $extension->load([$config], $container = $this->getContainer());
 
         $container->getDefinition('php_normalizer.normalizer')->setPublic(true);

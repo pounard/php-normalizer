@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
+if (!\function_exists('display_or_not')) {
+    function display_or_not($values)
+    {
+        // print_r($values);
+    }
+}
+
 /**
  * Benchmark stream denormalization
  *
@@ -29,7 +36,7 @@ final class DenormalizeSmallBench
     public function benchIteration1WithCache() : void
     {
         foreach ($this->data as $data) {
-            \hydrator1(AddToCartMessage::class, $data, $this->cachedContext);
+            \hydrator1(AddToCartMessage::class, $data, $this->getContextWithCache());
         }
     }
 
@@ -40,7 +47,7 @@ final class DenormalizeSmallBench
     public function benchIteration1() : void
     {
         foreach ($this->data as $data) {
-            \hydrator1(AddToCartMessage::class, $data, $this->context);
+            \hydrator1(AddToCartMessage::class, $data, $this->getContextWithConfig());
         }
     }
 
@@ -51,7 +58,7 @@ final class DenormalizeSmallBench
     public function benchIteration2WithCache() : void
     {
         foreach ($this->data as $data) {
-            \hydrator2(AddToCartMessage::class, $data, $this->cachedContext);
+            \hydrator2(AddToCartMessage::class, $data, $this->getContextWithCache());
         }
     }
 
@@ -62,7 +69,7 @@ final class DenormalizeSmallBench
     public function benchIteration2() : void
     {
         foreach ($this->data as $data) {
-            \hydrator2(AddToCartMessage::class, $data, $this->context);
+            \hydrator2(AddToCartMessage::class, $data, $this->getContextWithConfig());
         }
     }
 
@@ -73,7 +80,7 @@ final class DenormalizeSmallBench
     public function benchIteration3WithCache() : void
     {
         foreach ($this->data as $data) {
-            \hydrator3(AddToCartMessage::class, $data, $this->cachedContext);
+            \hydrator3(AddToCartMessage::class, $data, $this->getContextWithCache());
         }
     }
 
@@ -84,7 +91,29 @@ final class DenormalizeSmallBench
     public function benchIteration3() : void
     {
         foreach ($this->data as $data) {
-            \hydrator3(AddToCartMessage::class, $data, $this->context);
+            \hydrator3(AddToCartMessage::class, $data, $this->getContextWithConfig());
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration4WithCache() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator4(AddToCartMessage::class, $data, $this->getContextWithCache());
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration4() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator4(AddToCartMessage::class, $data, $this->getContextWithConfig());
         }
     }
 
@@ -95,7 +124,7 @@ final class DenormalizeSmallBench
     public function benchCustomWithConfig() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->context);
+            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfig());
         }
     }
 
@@ -106,7 +135,7 @@ final class DenormalizeSmallBench
     public function benchCustomWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->cachedContext);
+            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithCache());
         }
     }
 

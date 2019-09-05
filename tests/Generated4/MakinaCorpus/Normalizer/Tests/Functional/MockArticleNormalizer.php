@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Generated2\MakinaCorpus\Normalizer\Tests\Functional;
+namespace Generated4\MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
+
+use MakinaCorpus\Normalizer as Helper;
 
 final class MockArticleNormalizer
 {
@@ -32,106 +34,58 @@ final class MockArticleNormalizer
         $ret = (new \ReflectionClass(MockArticle::class))->newInstanceWithoutConstructor();
 
         // Denormalize 'id' property
-        $value = self::find('id', $input, ['id'], $context);
-        if (null === $value) {
-            $context->addError("Property 'id' cannot be null");
-        }
+        $value = Helper\find_value($input, ['id'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
-        }
-        if (!$value instanceof \Ramsey\Uuid\UuidInterface) {
-            $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'id', $value);
 
         // Denormalize 'createdAt' property
-        $value = self::find('createdAt', $input, ['createdAt'], $context);
-        if (null === $value) {
-            $context->addError("Property 'createdAt' cannot be null");
-        }
+        $value = Helper\find_value($input, ['createdAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
-        }
-        if (!$value instanceof \DateTimeInterface) {
-            $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'createdAt', $value);
 
         // Denormalize 'updatedAt' property
-        $value = self::find('updatedAt', $input, ['updatedAt'], $context);
-        if (null === $value) {
-            $context->addError("Property 'updatedAt' cannot be null");
-        }
+        $value = Helper\find_value($input, ['updatedAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
-        }
-        if (!$value instanceof \DateTimeInterface) {
-            $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'updatedAt', $value);
 
         // Denormalize 'authors' collection property
-        $values = self::find('authors', $input, ['authors'], $context);
-        if (null === $values) {
-            $propValue = [];
+        $propValue = [];
+        $values = Helper\find_value($input, ['authors'], $context);
+        if (!\is_iterable($values)) {
+            $values = Helper\to_string($value, $context);
+            $propValue[] = $values;
         } else {
-            if (!\is_iterable($values)) {
-                $values = [$values];
-            }
-            $propValue = [];
             foreach ($values as $index => $value) {
-                if (null !== $value && $normalizer) {
-                    $value = $normalizer('string', $value, $context);
-                }
-                if (\gettype($value) === 'string') {
-                    $propValue[$index] = $value;
-                } else {
-                    $propValue[$index] = null;
+                try {
+                    $context->enter((string)$index);
+                    $value = Helper\to_string($value, $context);
+                    $propValue[$index] = $value; 
+                } finally {
+                    $context->leave();
                 }
             }
         }
         \call_user_func(self::$accessor, $ret, 'authors', $propValue);
 
         // Denormalize 'title' property
-        $value = self::find('title', $input, ['title'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'string') {
-            $value = null;
-        }
+        $value = Helper\find_value($input, ['title'], $context);
+        $value = Helper\to_string($value, $context);
         \call_user_func(self::$accessor, $ret, 'title', $value);
 
         // Denormalize 'text' property
-        $value = self::find('text', $input, ['text'], $context);
+        $value = Helper\find_value($input, ['text'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('text_with_format', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'text_with_format') {
-            $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
 
         return $ret;
-    }
-
-    /**
-     * Find value matching in array
-     */
-    private static function find(string $propName, array $input, array $names, Context $context)
-    {
-        $found = $value = null;
-        foreach ($names as $name) {
-            if (\array_key_exists($name, $input)) {
-                if ($found) {
-                    $context->addError(\sprintf("Property '%s' found in '%s' but was already found in '%s'", $propName, $found, $name));
-                } else {
-                    $found = $name;
-                    $value = $input[$name];
-                }
-            }
-        }
-        return $value;
     }
 }
 
