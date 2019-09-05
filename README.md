@@ -147,7 +147,7 @@ has been taken:
 
 More iterations will come, a few things are still missing in generated code:
 
- - normalization has not been implemented, only denomormalization,
+ - normalization has not been implemented, only denormalization,
  - direct calls to other existing generated denormalizers,
  - ability to plug custom arbitrary (de)normalizers for when a type is
    unknown,
@@ -162,7 +162,7 @@ iterations verions.
 In order to run benchmarks:
 
 ```sh
-vendor/bin/phpbench run --report 'generator: "table"'
+vendor/bin/phpbench run --report 'generator: "table", sort: {benchmark: "asc", mean: "asc"}'
 ```
 
 Run them with XDebug profiler enable (warning this will create a huge lot of
@@ -175,7 +175,7 @@ XDEBUG_CONFIG="remote_enable=0 profiler_enable=1" vendor/bin/phpbench run --repo
 Compare only denormalization:
 
 ```sh
-vendor/bin/phpbench run --report 'generator: "table"' --iterations=10 --revs=10 --filter=Denorm
+vendor/bin/phpbench run --report 'generator: "table", sort: {benchmark: "asc", mean: "asc"}' --iterations=10 --revs=10 --filter=Denorm
 ```
 
 Arbitrary recent benchmark run result on php 7.3:
