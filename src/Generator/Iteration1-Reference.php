@@ -30,6 +30,8 @@
  *    upon which both validation and code generation can be plugged.
  */
 
+declare(strict_types=1);
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use Ramsey\Uuid\Uuid;

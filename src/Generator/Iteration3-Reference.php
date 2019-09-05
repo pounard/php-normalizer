@@ -5,6 +5,8 @@
  * Rework of iteration 1, using helpers for scalar types.
  */
 
+declare(strict_types=1);
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use function MakinaCorpus\Normalizer\find_value;

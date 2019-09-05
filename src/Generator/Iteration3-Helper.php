@@ -9,6 +9,8 @@
  * so validation will not be applied upon it.
  */
 
+declare(strict_types=1);
+
 namespace MakinaCorpus\Normalizer;
 
 /**

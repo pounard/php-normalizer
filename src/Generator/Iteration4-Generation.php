@@ -6,6 +6,8 @@
  * without going throught the (de)normalizer between types.
  */
 
+declare(strict_types=1);
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;

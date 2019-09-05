@@ -5,6 +5,8 @@
  * Generate code.
  */
 
+declare(strict_types=1);
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
