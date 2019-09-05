@@ -26,6 +26,7 @@
             "src/Error.php",
             "src/Normalizer.php",
             "src/Options.php",
+            "src/Strategy.php",
             "src/TypeDefinition.php"
         ],
         "files": [
