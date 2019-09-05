@@ -28,6 +28,13 @@
             "src/Options.php",
             "src/TypeDefinition.php"
         ],
+        "files": [
+            "src/Generator/Iteration1-Reference.php",
+            "src/Generator/Iteration2-Generation.php",
+            "src/Generator/Iteration3-Helper.php",
+            "src/Generator/Iteration3-Reference.php",
+            "src/Generator/Iteration4-Generation.php"
+        ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
@@ -39,6 +46,8 @@
             "benchmarks/Definitions.php"
         ],
         "psr-4": {
+            "Generated\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated/MakinaCorpus/Normalizer/Benchmarks/",
+            "Generated\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated/MakinaCorpus/Normalizer/Tests/Functional/",
             "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
         }

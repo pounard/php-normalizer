@@ -35,7 +35,7 @@ types:
     MakinaCorpus\Normalizer\Benchmarks\MockArticle:
         properties:
             id:
-                type: uuid
+                type: string
                 optional: true
             createdAt:
                 type: date
@@ -54,12 +54,7 @@ types:
                 type: text_with_format
                 optional: true
 
-    # Find a way to make this implicit.
-    Ramsey\Uuid\UuidInterface:
-        terminal: true
-
 type_aliases:
     app.article: MakinaCorpus\Normalizer\Benchmarks\MockArticle
     date: DateTimeImmutable
     text_with_format: MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat
-    uuid: Ramsey\Uuid\UuidInterface

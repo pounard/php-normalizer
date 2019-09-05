@@ -9,7 +9,7 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-class NormalizeArticleBench
+final class NormalizeArticleBench
 {
     use NormalizerBenchmarkTrait;
 

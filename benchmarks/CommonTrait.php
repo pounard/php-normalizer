@@ -14,9 +14,7 @@ use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
-use MakinaCorpus\Normalizer\UuidNormalizer;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
-use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer as SymfonyUuidNormalizer;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -86,7 +84,7 @@ final class ObjectGenerator
 
         $hydrator = \Closure::bind(static function () use ($faker) {
             $object = new MockArticle();
-            $object->id = Uuid::uuid4();
+            $object->id = (string)Uuid::uuid4();
             $object->createdAt = $faker->dateTimeThisCentury;
             $object->updatedAt = $faker->dateTimeThisCentury;
             $object->authors = ObjectGenerator::generateNameArray($faker);
@@ -204,7 +202,6 @@ trait NormalizerBenchmarkTrait
         return $this->defaultNormalizer = new DefaultNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
-            new UuidNormalizer(),
         ]);
     }
 
@@ -262,7 +259,6 @@ trait NormalizerBenchmarkTrait
 
         return $this->symfonyNormalizer = new Serializer([
             new DateTimeNormalizer(),
-            new SymfonyUuidNormalizer(),
             new ObjectNormalizer(
                 $classMetadataFactory,
                 /* NameConverterInterface $nameConverter = */ null,

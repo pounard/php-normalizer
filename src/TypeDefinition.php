@@ -58,6 +58,23 @@ interface PropertyDefinition
      * Get property collection type.
      */
     public function getCollectionType(): ?string;
+
+    /**
+     * Clone the instance with the given definition overrides
+     *
+     * Available options are the same as defined in the yaml file configuration:
+     *   - aliases: string[] (default: string[])
+     *   - collection: bool (default: false)
+     *   - collection_type: string (default: array)
+     *   - groups: string[] (default: [])
+     *   - normalized_name: ?string (default: null)
+     *   - optional: bool (default: false)
+     *   - type: string (default: "null")
+     *
+     * Any null value will be ignored. 'aliases' and 'groups' will only append
+     * new values to existing, it will not remove already set ones.
+     */
+    public function with(array $overrides): PropertyDefinition;
 }
 
 /**
@@ -84,6 +101,21 @@ interface TypeDefinition
      * @return PropertyDefinition[]
      */
     public function getProperties(): array;
+
+    /**
+     * Clone the instance with the given definition overrides
+     *
+     * Available options are the same as defined in the yaml file configuration:
+     *   - normalized_name: ?string (default: null)
+     *   - properties: array[]
+     *
+     * 'properties' array keys must be native PHP property names, values then
+     * are arrays as defined in:
+     *
+     * @see \MakinaCorpus\Normalizer\PropertyDefinition::with()
+     *   For 'properties' values definition documentation.
+     */
+    public function with(array $overrides): TypeDefinition;
 }
 
 /**
@@ -192,9 +224,11 @@ final class DefaultPropertyDefinition implements PropertyDefinition
     public function getCandidateNames(): array
     {
         return $this->candidateNames ?? (
-            $this->candidateNames = \array_merge(
-                [$this->name, $this->getNormalizedName()],
-                $this->getAliases()
+            $this->candidateNames = \array_unique(
+                \array_merge(
+                    [$this->name, $this->getNormalizedName()],
+                    $this->getAliases()
+                )
             )
         );
     }
@@ -248,6 +282,38 @@ final class DefaultPropertyDefinition implements PropertyDefinition
             return null;
         }
         return $this->collectionType ?? 'array';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(array $overrides): PropertyDefinition
+    {
+        $ret = clone $this;
+
+        if (isset($overrides['aliases'])) {
+            $ret->aliases = \array_unique(\array_merge($ret->aliases, $overrides['aliases']));
+        }
+        if (isset($overrides['collection'])) {
+            $ret->collection = (bool)$overrides['collection'];
+        }
+        if (isset($overrides['collection_type'])) {
+            $ret->collectionType = $overrides['collection_type'];
+        }
+        if (isset($overrides['groups'])) {
+            $ret->groups = \array_unique(\array_merge($ret->groups, $overrides['groups']));
+        }
+        if (isset($overrides['normalized_name'])) {
+            $ret->normalizedName = $overrides['normalized_name'];
+        }
+        if (isset($overrides['optional'])) {
+            $ret->optional = (bool)$overrides['optional'];
+        }
+        if (isset($overrides['type'])) {
+            $ret->type = $overrides['type'];
+        }
+
+        return $ret;
     }
 }
 
@@ -312,6 +378,33 @@ final class DefaultTypeDefinition implements TypeDefinition
     {
         return empty($this->properties);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(array $overrides): TypeDefinition
+    {
+        $ret = clone $this;
+        $properties = $overrides['properties'] ?? [];
+
+        if (isset($overrides['normalized_name'])) {
+            $this->normalizedName = $overrides['normalized_name'];
+        }
+
+        // Override (and deep clone) properties at the same time
+        foreach ($this->properties as $name) {
+            $ret->properties[$name] = $this->properties[$name]->with($properties[$name] ?? []);
+        }
+
+        // Add potentially missing (newly added) properties
+        foreach ($properties as $name => $definition) {
+            if (!isset($ret->properties[$name])) {
+                $ret->properties[$name] = DefaultPropertyDefinition::fromArray($this->name, $name, $definition);
+            }
+        }
+
+        return $ret;
+    }
 }
 
 /**
@@ -365,7 +458,7 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
                 $alias, $name
             ));
         }
-        throw new TypeDoesNotExistError(\sprintf("Type '%s' does not exist", $name));
+        throw new TypeDoesNotExistError($name);
     }
 
     /**

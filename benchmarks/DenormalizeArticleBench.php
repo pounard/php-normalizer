@@ -9,7 +9,7 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-class DenormalizeArticleBench
+final class DenormalizeArticleBench
 {
     use NormalizerBenchmarkTrait;
 
@@ -28,7 +28,73 @@ class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchMap() : void
+    public function benchIteration1WithCache() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator1(MockArticle::class, $data, $this->cachedContext);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration1() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator1(MockArticle::class, $data, $this->context);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration2WithCache() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator2(MockArticle::class, $data, $this->cachedContext);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration2() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator2(MockArticle::class, $data, $this->context);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration3WithCache() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator3(MockArticle::class, $data, $this->cachedContext);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration3() : void
+    {
+        foreach ($this->data as $data) {
+            \hydrator3(MockArticle::class, $data, $this->context);
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchCustomWithConfig() : void
     {
         foreach ($this->data as $data) {
             $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->context);
@@ -39,7 +105,7 @@ class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchReflection() : void
+    public function benchCustomWithReflection() : void
     {
         foreach ($this->data as $data) {
             $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->cachedContext);

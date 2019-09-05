@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * Simpler scenario: all optional scalars
@@ -100,7 +99,7 @@ trait LotsOfProperties
         return $this->foo;
     }
 
-    public function setFoo(/* ?\UuidInterface */ $value): void
+    public function setFoo(/* ?string */ $value): void
     {
         $this->foo = $value;
     }
@@ -112,7 +111,7 @@ trait LotsOfProperties
         return $this->bar;
     }
 
-    public function setBar(/* ?\UuidInterface */ $value): void
+    public function setBar(/* ?string */ $value): void
     {
         $this->bar = $value;
     }
@@ -124,7 +123,7 @@ trait LotsOfProperties
         return $this->baz;
     }
 
-    public function setBaz(/* ?\UuidInterface */ $value): void
+    public function setBaz(/* ?string */ $value): void
     {
         $this->baz = $value;
     }
@@ -186,15 +185,15 @@ final class MockArticle extends MockWithText
 {
     use LotsOfProperties;
 
-    /** @var \Ramsey\Uuid\UuidInterface */
+    /** @var string */
     private $id;
 
-    public function getId(): UuidInterface
+    public function getId(): string
     {
-        return $this->id ?? ($this->id = Uuid::uuid4());
+        return $this->id ?? ($this->id = (string)Uuid::uuid4());
     }
 
-    public function setId(/* ?\UuidInterface */ $value): void
+    public function setId(/* ?string */ $value): void
     {
         $this->id = $value;
     }

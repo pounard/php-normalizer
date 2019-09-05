@@ -136,6 +136,12 @@ profiling files):
 XDEBUG_CONFIG="remote_enable=0 profiler_enable=1" vendor/bin/phpbench run --report 'generator: "table"' --revs 5
 ```
 
+Compare only denormalization:
+
+```sh
+vendor/bin/phpbench run --report 'generator: "table"' --iterations=10 --revs=10 --filter=Denorm
+```
+
 Arbitrary recent benchmark run result on php 7.3:
 
 ```

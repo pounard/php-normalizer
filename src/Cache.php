@@ -27,7 +27,21 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
     {
         $this->reflectors = $reflectors;
         $this->static = new ArrayTypeDefinitionMap([]);
-        // @todo load cache.
+    }
+
+    /**
+     * Load type from cache
+     */
+    protected function loadFromCache(string $name): ?TypeDefinition
+    {
+        return null;
+    }
+
+    /**
+     * Store into cache
+     */
+    protected function storeIntoCache(string $name, TypeDefinition $type): void
+    {
     }
 
     /**
@@ -86,16 +100,28 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
      */
     private function doGet(string $name): TypeDefinition
     {
+        /** @var \MakinaCorpus\Normalizer\TypeDefinition $type */
+        $type = null;
+
         // Else find it with reflectors and propagate it into the static array
         // based memory map, so we won't attempt anymore reflection at runtime.
         foreach ($this->reflectors as $instance) {
             if ($instance->exists($name)) {
                 try {
-                    return $instance->get($name);
+                    if (false && $type) {
+                        $type = $type->with($instance->get($name));
+                        break;
+                    } else {
+                        $type = $instance->get($name);
+                    }
                 } catch (TypeDoesNotExistError $e) {
                     continue;
                 }
             }
+        }
+
+        if ($type) {
+            return $type;
         }
         throw new TypeDoesNotExistError($name);
     }
@@ -114,10 +140,14 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
         }
 
         $nativeType = $this->static->getNativeType($name);
-        $this->static->addTypeDefinition($nativeType, $type = $this->doGet($nativeType));
 
-        // New types are added, add them to cache.
-        // @todo
+        if (!$type = $this->loadFromCache($nativeType)) {
+            $type = $this->doGet($nativeType);
+        }
+
+        // New types are added, add them to memory and to cache.
+        $this->static->addTypeDefinition($nativeType, $type);
+        $this->storeIntoCache($name, $type);
 
         return $type;
     }
