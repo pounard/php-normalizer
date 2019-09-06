@@ -35,10 +35,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration1WithCache() : void
+    public function benchIteration1WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithCache()));
+            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
 
@@ -46,10 +46,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration1() : void
+    public function benchIteration1WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithConfig()));
+            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 
@@ -57,10 +57,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration2WithCache() : void
+    public function benchIteration2WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithCache()));
+            display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
 
@@ -68,10 +68,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration2() : void
+    public function benchIteration2WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithConfig()));
+            display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 
@@ -79,10 +79,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration3WithCache() : void
+    public function benchIteration3WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator3(MockArticle::class, $data, $this->getContextWithCache()));
+            display_or_not(\hydrator3(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
 
@@ -90,10 +90,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration3() : void
+    public function benchIteration3WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator3(MockArticle::class, $data, $this->getContextWithConfig()));
+            display_or_not(\hydrator3(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 
@@ -101,10 +101,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration4WithCache() : void
+    public function benchIteration4WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator4(MockArticle::class, $data, $this->getContextWithCache()));
+            display_or_not(\hydrator4(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
 
@@ -112,10 +112,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchIteration4() : void
+    public function benchIteration4WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator4(MockArticle::class, $data, $this->getContextWithConfig()));
+            display_or_not(\hydrator4(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 
@@ -123,10 +123,21 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithConfig() : void
+    public function benchIteration5WithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithConfig());
+            display_or_not($this->normalizer5->denormalize(MockArticle::class, $data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration5WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer5->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 
@@ -137,7 +148,18 @@ final class DenormalizeArticleBench
     public function benchCustomWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithCache());
+            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithReflection());
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchCustomWithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly());
         }
     }
 

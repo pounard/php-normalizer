@@ -161,12 +161,15 @@ trait NormalizerBenchmarkTrait
     /** @var \Symfony\Component\Serializer\Serializer */
     private $symfonyNormalizerProxy;
 
-    private function getContextWithCache(): Context
+    /** @var \Normalizer5 */
+    private $normalizer5;
+
+    private function getContextWithReflection(): Context
     {
         return $this->cachedContext = $this->cachedContext->fresh();
     }
 
-    private function getContextWithConfig(): Context
+    private function getContextWithConfigOnly(): Context
     {
         return $this->context = $this->context->fresh();
     }
@@ -176,12 +179,12 @@ trait NormalizerBenchmarkTrait
      */
     private function initializeComponents(): void
     {
-        $this->createTypeDefinitionMap();
-        $this->createDefaultNormalizer();
-        $this->createCachedContext();
-        $this->createContext();
-        $this->createSymfonyNormalizer();
-        $this->createSymfonyProxy();
+        $this->cachedContext = $this->createCachedContext();
+        $this->context = $this->createContext();
+        $this->defaultNormalizer = $this->createDefaultNormalizer();
+        $this->normalizer5 = $this->createNormalizer5();
+        $this->symfonyNormalizer = $this->createSymfonyNormalizer();
+        $this->symfonyNormalizerProxy = $this->createSymfonyProxy();
     }
 
     /**
@@ -190,6 +193,7 @@ trait NormalizerBenchmarkTrait
     private function createCachedTypeDefinitionMap(): TypeDefinitionMap
     {
         return new MemoryTypeDefinitionMapCache([
+            $this->createTypeDefinitionMap(),
             new ReflectionTypeDefinitionMap()
         ]);
     }
@@ -209,7 +213,7 @@ trait NormalizerBenchmarkTrait
      */
     private function createDefaultNormalizer(): DefaultNormalizer
     {
-        return $this->defaultNormalizer = new DefaultNormalizer([
+        return new DefaultNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
         ]);
@@ -220,7 +224,7 @@ trait NormalizerBenchmarkTrait
      */
     private function createCachedContext(array $options = []): Context
     {
-        return $this->cachedContext = new Context($this->createCachedTypeDefinitionMap(), $options);
+        return new Context($this->createCachedTypeDefinitionMap(), $options);
     }
 
     /**
@@ -228,7 +232,15 @@ trait NormalizerBenchmarkTrait
      */
     private function createContext(array $options = []): Context
     {
-        return $this->context = new Context($this->createTypeDefinitionMap(), $options);
+        return new Context($this->createTypeDefinitionMap(), $options);
+    }
+
+    /**
+     * Create iteration 5 normalizer
+     */
+    private function createNormalizer5(): \Normalizer5
+    {
+        return new \Normalizer5(new \Generator5Runtime());
     }
 
     /**
@@ -267,7 +279,7 @@ trait NormalizerBenchmarkTrait
     {
         list($classMetadataFactory, $propertyTypeExtractor) = $this->prepareSymfonyInternals();
 
-        return $this->symfonyNormalizer = new Serializer([
+        return new Serializer([
             new DateTimeNormalizer(),
             new ObjectNormalizer(
                 $classMetadataFactory,
@@ -281,7 +293,7 @@ trait NormalizerBenchmarkTrait
 
     private function createSymfonyProxy()
     {
-        return $this->symfonyNormalizerProxy = new Serializer([
+        return new Serializer([
             new NormalizerProxy(
                 new ContextFactory(
                     $this->createCachedTypeDefinitionMap()
