@@ -34,7 +34,8 @@
             "src/Generator/Iteration2-Generation.php",
             "src/Generator/Iteration3-Helper.php",
             "src/Generator/Iteration3-Reference.php",
-            "src/Generator/Iteration4-Generation.php"
+            "src/Generator/Iteration4-Generation.php",
+            "src/Generator/Iteration5-RecursiveGeneration.php"
         ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",
@@ -51,6 +52,8 @@
             "Generated2\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated2/MakinaCorpus/Normalizer/Tests/Functional/",
             "Generated4\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated4/MakinaCorpus/Normalizer/Benchmarks/",
             "Generated4\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated4/MakinaCorpus/Normalizer/Tests/Functional/",
+            "Generated5\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated5/MakinaCorpus/Normalizer/Benchmarks/",
+            "Generated5\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated5/MakinaCorpus/Normalizer/Tests/Functional/",
             "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
         }

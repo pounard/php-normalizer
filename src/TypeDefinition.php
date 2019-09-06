@@ -452,6 +452,28 @@ final class DefaultTypeDefinition implements TypeDefinition
 }
 
 /**
+ * Blacklist
+ */
+trait WithBlacklistTypeDefinitionMap
+{
+    private $blacklist = [];
+
+    /**
+     * @param string[] $typeList
+     *   PHP class name list
+     */
+    public function setBlacklist(array $typeList): void
+    {
+        $this->blacklist = \array_flip($typeList);
+    }
+
+    public function isBlacklisted(string $type): bool
+    {
+        return isset($this->blacklist[$type]);
+    }
+}
+
+/**
  * Array based type definition map
  */
 final class ArrayTypeDefinitionMap implements TypeDefinitionMap
@@ -510,7 +532,9 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
      */
     public function exists(string $name): bool
     {
-        return isset($this->types[$name]) || isset($this->types[$name]);
+        $key = $this->aliases[$name] ?? $name;
+
+        return isset($this->types[$key]);
     }
 
     /**

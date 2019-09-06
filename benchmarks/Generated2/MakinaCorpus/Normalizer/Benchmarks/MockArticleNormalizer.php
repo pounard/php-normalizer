@@ -107,7 +107,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('text_with_format', $value, $context);
         }
-        if (!null === $value || \gettype($value) === 'text_with_format') {
+        if (!null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat) {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);

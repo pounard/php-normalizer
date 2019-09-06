@@ -9,6 +9,8 @@ namespace MakinaCorpus\Normalizer;
  */
 abstract class TypeDefinitionMapCache implements TypeDefinitionMap
 {
+    use WithBlacklistTypeDefinitionMap;
+
     /** @var TypeDefinitionMap[] */
     private $reflectors;
 
@@ -81,7 +83,9 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
      */
     public function exists(string $name): bool
     {
-        return $this->existing[$name] ?? ($this->existing[$name] = $this->doExists($name));
+        return !$this->isBlacklisted($name) && (
+            $this->existing[$name] ?? ($this->existing[$name] = $this->doExists($name))
+        );
     }
 
     /**

@@ -85,9 +85,9 @@ final class Psr4AppNamingStrategy implements NamingStrategy
         $prefixLength = \strlen($generatedClassNamespace);
         if (\substr($userClassName, 0, $prefixLength) === $generatedClassNamespace) {
             $userClassName = \substr($userClassName, $prefixLength);
-            if ($this->namespaceInfix) {
-                $generatedClassNamespace .= $this->namespaceInfix."\\";
-            }
+        }
+        if ($this->namespaceInfix) {
+            $generatedClassNamespace .= $this->namespaceInfix."\\";
         }
 
         return $generatedClassNamespace.$userClassName.$this->classNameSuffix;

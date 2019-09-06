@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Tests;
 
+use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
@@ -21,7 +23,6 @@ use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
 use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
 use PHPUnit\Framework\TestCase;
-use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use Symfony\Component\Yaml\Yaml;
 
 final class StupidTest extends TestCase
@@ -102,6 +103,18 @@ final class StupidTest extends TestCase
         yield from self::dataClassName(4);
     }
 
+    public static function dataClassName5()
+    {
+        // Functional tests
+        $basedir = __DIR__;
+        yield [MockArticle::class, $basedir];
+
+        // Benchmarks
+        $basedir = \dirname(__DIR__).'/benchmarks';
+        yield [AddToCartMessageBench::class, $basedir];
+        yield [MockArticleBench::class, $basedir];
+    }
+
     /**
      * @dataProvider dataClassName2
      */
@@ -144,5 +157,17 @@ final class StupidTest extends TestCase
         $writer = new \Writer($filename);
         $context = new Context($this->createCachedTypeDefinitionMap());
         \generate4_denormalizer_class($className, $context, $writer);
+    }
+
+    /**
+     * @dataProvider dataClassName5
+     */
+    public function testNormalizerGeneration5(string $className, string $basedir)
+    {
+        $this->expectNotToPerformAssertions();
+
+        $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
+        $generator = new \Generator5Impl($contextFactory, $basedir);
+        $generator->generateNormalizerClass($className);
     }
 }
