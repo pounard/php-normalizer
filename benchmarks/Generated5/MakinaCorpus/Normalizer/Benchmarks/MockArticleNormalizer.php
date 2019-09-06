@@ -35,13 +35,47 @@ final class MockArticleNormalizer
 
         // Denormalize 'id' property
         $value = Helper\find_value($input, ['id'], $context);
-        $value = Helper\to_string($value, $context);
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'id' cannot be null", $context);
+            } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
+        }
         \call_user_func(self::$accessor, $ret, 'id', $value);
+
+        // Denormalize 'foo' property
+        $value = Helper\find_value($input, ['foo'], $context);
+        $value = Helper\to_string($value, $context);
+        \call_user_func(self::$accessor, $ret, 'foo', $value);
+
+        // Denormalize 'bar' property
+        $value = Helper\find_value($input, ['bar'], $context);
+        $value = Helper\to_int($value, $context);
+        \call_user_func(self::$accessor, $ret, 'bar', $value);
+
+        // Denormalize 'baz' property
+        $value = Helper\find_value($input, ['baz'], $context);
+        $value = Helper\to_float($value, $context);
+        \call_user_func(self::$accessor, $ret, 'baz', $value);
+
+        // Denormalize 'filename' property
+        $value = Helper\find_value($input, ['filename'], $context);
+        $value = Helper\to_string($value, $context);
+        \call_user_func(self::$accessor, $ret, 'filename', $value);
 
         // Denormalize 'createdAt' property
         $value = Helper\find_value($input, ['createdAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'createdAt' cannot be null", $context);
+            } else if (!($value instanceof \DateTimeInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'createdAt', $value);
 
@@ -49,6 +83,10 @@ final class MockArticleNormalizer
         $value = Helper\find_value($input, ['updatedAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
+            if (!(null === $value || $value instanceof \DateTimeInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'updatedAt', $value);
 
@@ -80,28 +118,12 @@ final class MockArticleNormalizer
         $value = Helper\find_value($input, ['text'], $context);
         if (null !== $value) {
             $value = \Generated5\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($value, $context, $normalizer);
+            if (!(null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
-
-        // Denormalize 'foo' property
-        $value = Helper\find_value($input, ['foo'], $context);
-        
-        \call_user_func(self::$accessor, $ret, 'foo', $value);
-
-        // Denormalize 'bar' property
-        $value = Helper\find_value($input, ['bar'], $context);
-        
-        \call_user_func(self::$accessor, $ret, 'bar', $value);
-
-        // Denormalize 'baz' property
-        $value = Helper\find_value($input, ['baz'], $context);
-        
-        \call_user_func(self::$accessor, $ret, 'baz', $value);
-
-        // Denormalize 'filename' property
-        $value = Helper\find_value($input, ['filename'], $context);
-        $value = Helper\to_string($value, $context);
-        \call_user_func(self::$accessor, $ret, 'filename', $value);
 
         return $ret;
     }

@@ -41,7 +41,11 @@ final class MockWithTextNormalizer
         // Denormalize 'text' property
         $value = Helper\find_value($input, ['text', 'markup'], $context);
         if (null !== $value && $normalizer) {
-            $value = $normalizer('text_with_format', $value, $context);
+            $value = $normalizer('MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat', $value, $context);
+            if (!(null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
 

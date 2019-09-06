@@ -153,10 +153,18 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
-     * Get native type for
+     * {@inheritdoc}
      */
     public function getNativeType(string $name): string
     {
         return $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllAliases(): array
+    {
+        return [];
     }
 }

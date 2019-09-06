@@ -39,13 +39,11 @@ final class Normalizer5
             return $external->value;
         }
 
-        $typeDef = $context->getType($type);
+        $nativeType = $context->getNativeType($type);
+        $normalizer = $this->generator->getNormalizerClass($nativeType);
 
         return \call_user_func(
-            [
-                $this->generator->getNormalizerClass($typeDef->getNativeName()),
-                'denormalize'
-            ],
+            [$normalizer, 'denormalize'],
             $input,
             $context,
             'hydrator4'
@@ -197,22 +195,17 @@ final class Generator5Impl implements Generator5
      */
     private function generatePropertyValueValidate(PropertyDefinition $property, Context $context): string
     {
-        try {
-            $typeDef = $context->getType($property->getTypeName());
-            $nativeType = $typeDef->getNativeName();
-        } catch (TypeDoesNotExistError $e) {
-            $nativeType = $property->getTypeName();
-        }
-    
+        $nativeType = $context->getNativeType($property->getTypeName());
+
         if (!\class_exists($nativeType) && !interface_exists($nativeType)) {
             if (\strpos($nativeType, '\\')) {
                 throw new \LogicException(\sprintf("Cannot dump normalizer: class '%s' for property '%s' does not exist", $nativeType, $property->getNativeName()));
             }
-    
+
             if ($property->isOptional()) {
-                return "null === \$value || \gettype(\$value) === '".$nativeType."'";
+                return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
             } else {
-                return "\gettype(\$value) === '".$nativeType."'";
+                return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
             }
         } else if ($property->isOptional()) {
             return "null === \$value || \$value instanceof \\".$nativeType;
@@ -227,19 +220,31 @@ final class Generator5Impl implements Generator5
     private function generatePropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
     {
         $indentation = \str_repeat(" ", 4 * $indent);
-        $type = $property->getTypeName();
+        $propName = $property->getNativeName();
+        $type = $context->getNativeType($property->getTypeName());
         $nativeType = \addslashes($type);
+        $validation = $this->generatePropertyValueValidate($property, $context);
         $ret = [];
 
         // Attempt eager related class code generation, if possible.
         try {
-            $targetTypeDef = $context->getType($type);
-            $targetNativeType = $targetTypeDef->getNativeName();
-
-            if (\class_exists($targetNativeType)) {
-                $normalizerClassName = $this->generateNormalizerClass($targetNativeType);
+            if (\class_exists($type)) {
+                $normalizerClassName = $this->generateNormalizerClass($type);
                 $ret[] = "if (null !== \$value) {";
                 $ret[] = "    \$value = \\".$normalizerClassName."::denormalize(\$value, \$context, \$normalizer);";
+                if ($property->isOptional()) {
+                    $ret[] = "    if (!(".$validation.")) {";
+                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                    $ret[] = "        \$value = null;";
+                    $ret[] = "    }";
+                } else {
+                    $ret[] = "    if (null === \$value) {";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                    $ret[] = "    } else if (!(".$validation.")) {";
+                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                    $ret[] = "        \$value = null;";
+                    $ret[] = "    }";
+                }
                 $ret[] = "}";
 
                 return \implode("\n".$indentation, $ret);
@@ -268,6 +273,19 @@ final class Generator5Impl implements Generator5
             default:
                 $ret[] = "if (null !== \$value && \$normalizer) {";
                 $ret[] = "    {$variable} = \$normalizer('{$nativeType}', \$value, \$context);";
+                if ($property->isOptional()) {
+                    $ret[] = "    if (!(".$validation.")) {";
+                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                    $ret[] = "        \$value = null;";
+                    $ret[] = "    }";
+                } else {
+                    $ret[] = "    if (null === \$value) {";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                    $ret[] = "    } else if (!(".$validation.")) {";
+                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                    $ret[] = "        \$value = null;";
+                    $ret[] = "    }";
+                }
                 $ret[] = "}";
                 break;
         }

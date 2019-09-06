@@ -37,12 +37,61 @@ final class MockArticleNormalizer
             $context->addError("Property 'id' cannot be null");
         }
         if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
+            $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
         }
-        if (!\gettype($value) === 'string') {
+        if (!$value instanceof \Ramsey\Uuid\UuidInterface) {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'id', $value);
+
+        // Denormalize 'foo' property
+        $value = self::find('foo', $input, ['foo'], $context);
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('string', $value, $context);
+        }
+        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'foo', $value);
+
+        // Denormalize 'bar' property
+        $value = self::find('bar', $input, ['bar'], $context);
+        if (null === $value) {
+            $context->addError("Property 'bar' cannot be null");
+        }
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('int', $value, $context);
+        }
+        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'int') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'bar', $value);
+
+        // Denormalize 'baz' property
+        $value = self::find('baz', $input, ['baz'], $context);
+        if (null === $value) {
+            $context->addError("Property 'baz' cannot be null");
+        }
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('float', $value, $context);
+        }
+        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'float') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'baz', $value);
+
+        // Denormalize 'filename' property
+        $value = self::find('filename', $input, ['filename'], $context);
+        if (null === $value) {
+            $context->addError("Property 'filename' cannot be null");
+        }
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('string', $value, $context);
+        }
+        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+            $value = null;
+        }
+        \call_user_func(self::$accessor, $ret, 'filename', $value);
 
         // Denormalize 'createdAt' property
         $value = self::find('createdAt', $input, ['createdAt'], $context);
@@ -59,13 +108,10 @@ final class MockArticleNormalizer
 
         // Denormalize 'updatedAt' property
         $value = self::find('updatedAt', $input, ['updatedAt'], $context);
-        if (null === $value) {
-            $context->addError("Property 'updatedAt' cannot be null");
-        }
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
         }
-        if (!$value instanceof \DateTimeInterface) {
+        if (!null === $value || $value instanceof \DateTimeInterface) {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'updatedAt', $value);
@@ -83,7 +129,7 @@ final class MockArticleNormalizer
                 if (null !== $value && $normalizer) {
                     $value = $normalizer('string', $value, $context);
                 }
-                if (\gettype($value) === 'string') {
+                if (\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
                     $propValue[$index] = $value;
                 } else {
                     $propValue[$index] = null;
@@ -97,7 +143,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \gettype($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'title', $value);
@@ -105,52 +151,12 @@ final class MockArticleNormalizer
         // Denormalize 'text' property
         $value = self::find('text', $input, ['text'], $context);
         if (null !== $value && $normalizer) {
-            $value = $normalizer('text_with_format', $value, $context);
+            $value = $normalizer('MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat', $value, $context);
         }
         if (!null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat) {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
-
-        // Denormalize 'foo' property
-        $value = self::find('foo', $input, ['foo'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('null', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'null') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'foo', $value);
-
-        // Denormalize 'bar' property
-        $value = self::find('bar', $input, ['bar'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('null', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'null') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'bar', $value);
-
-        // Denormalize 'baz' property
-        $value = self::find('baz', $input, ['baz'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('null', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'null') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'baz', $value);
-
-        // Denormalize 'filename' property
-        $value = self::find('filename', $input, ['filename'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('string', $value, $context);
-        }
-        if (!null === $value || \gettype($value) === 'string') {
-            $value = null;
-        }
-        \call_user_func(self::$accessor, $ret, 'filename', $value);
 
         return $ret;
     }

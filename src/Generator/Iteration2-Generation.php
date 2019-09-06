@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use MakinaCorpus\Normalizer\TypeDoesNotExistError;
 
 /**
  * Simple test write
@@ -67,8 +66,8 @@ function hydrator2(string $type, /* string|array|T */ $input, Context $context) 
         return $external->value;
     }
 
-    $typeDef = $context->getType($type);
-    $normalizer = generate2_compute_normalizer_name($typeDef->getNativeName());
+    $nativeType = $context->getNativeType($type);
+    $normalizer = generate2_compute_normalizer_name($nativeType);
 
     return \call_user_func(
         [$normalizer, 'denormalize'],
@@ -91,23 +90,18 @@ function generate2_compute_normalizer_name(string $nativeType): string
 /**
  * Generate type validation condition
  */
-function generate2_validation(PropertyDefinition $property, Context $context): string {
-
-    try {
-        $typeDef = $context->getType($property->getTypeName());
-        $nativeType = $typeDef->getNativeName();
-    } catch (TypeDoesNotExistError $e) {
-        $nativeType = $property->getTypeName();
-    }
+function generate2_validation(PropertyDefinition $property, Context $context): string
+{
+    $nativeType = $context->getNativeType($property->getTypeName());
 
     if (!\class_exists($nativeType) && !interface_exists($nativeType)) {
         if (\strpos($nativeType, '\\')) {
             throw new \LogicException(\sprintf("Cannot dump normalizer: class '%s' for property '%s' does not exist", $nativeType, $property->getNativeName()));
         }
         if ($property->isOptional()) {
-            return "null === \$value || \gettype(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
         } else {
-            return "\gettype(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;
@@ -122,7 +116,8 @@ function generate2_validation(PropertyDefinition $property, Context $context): s
 function generate2_property_set(PropertyDefinition $property, Context $context, Writer $writer)
 {
     $propName = \addslashes($property->getNativeName());
-    $nativeType = \addslashes($property->getTypeName());
+    $type = $context->getNativeType($property->getTypeName());
+    $nativeType = \addslashes($type);
     $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
     $validation = generate2_validation($property, $context);
 
@@ -161,7 +156,8 @@ EOT
 function generate2_property_set_collection(PropertyDefinition $property, Context $context, Writer $writer)
 {
     $propName = \addslashes($property->getNativeName());
-    $nativeType = \addslashes($property->getTypeName());
+    $type = $context->getNativeType($property->getTypeName());
+    $nativeType = \addslashes($type);
     $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
     $validation = generate2_validation($property, $context);
 

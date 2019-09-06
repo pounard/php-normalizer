@@ -10,6 +10,7 @@ declare(strict_types=1);
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use function MakinaCorpus\Normalizer\find_value;
+use function MakinaCorpus\Normalizer\gettype_real;
 use function MakinaCorpus\Normalizer\to_bool;
 use function MakinaCorpus\Normalizer\to_float;
 use function MakinaCorpus\Normalizer\to_int;
@@ -59,9 +60,10 @@ function hydrator3_property_validate($value, PropertyDefinition $property, Conte
         return $value;
     }
 
-    $type = \is_object($value) ? \get_class($value) : \gettype($value);
+    $type = gettype_real($value);
+    $expected = $context->getNativeType($property->getTypeName());
 
-    if ($type !== ($expected = $property->getTypeName())) {
+    if ($type !== $expected) {
         $context->addError(\sprintf("Property type mismatch: expected '%s' got '%s'", $expected, $type));
     }
 

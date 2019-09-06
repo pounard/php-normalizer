@@ -4,6 +4,7 @@ namespace MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer;
 
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
+use function MakinaCorpus\Normalizer\gettype_real;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -29,10 +30,7 @@ final class NormalizerProxy implements NormalizerInterface, DenormalizerInterfac
      */
     private function getDataType($data): string
     {
-        if (\is_object($data)) {
-            return \get_class($data);
-        }
-        return \gettype($data);
+        return gettype_real($data);
     }
 
     /**

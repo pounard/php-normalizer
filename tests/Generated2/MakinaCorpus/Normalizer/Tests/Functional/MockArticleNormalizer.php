@@ -83,7 +83,7 @@ final class MockArticleNormalizer
                 if (null !== $value && $normalizer) {
                     $value = $normalizer('string', $value, $context);
                 }
-                if (\gettype($value) === 'string') {
+                if (\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
                     $propValue[$index] = $value;
                 } else {
                     $propValue[$index] = null;
@@ -97,7 +97,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \gettype($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'title', $value);
@@ -105,7 +105,7 @@ final class MockArticleNormalizer
         // Denormalize 'text' property
         $value = self::find('text', $input, ['text'], $context);
         if (null !== $value && $normalizer) {
-            $value = $normalizer('text_with_format', $value, $context);
+            $value = $normalizer('MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat', $value, $context);
         }
         if (!null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat) {
             $value = null;

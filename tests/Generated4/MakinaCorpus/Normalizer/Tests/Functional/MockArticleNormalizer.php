@@ -37,6 +37,12 @@ final class MockArticleNormalizer
         $value = Helper\find_value($input, ['id'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'id' cannot be null", $context);
+            } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'id', $value);
 
@@ -44,6 +50,12 @@ final class MockArticleNormalizer
         $value = Helper\find_value($input, ['createdAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'createdAt' cannot be null", $context);
+            } else if (!($value instanceof \DateTimeInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'createdAt', $value);
 
@@ -51,6 +63,12 @@ final class MockArticleNormalizer
         $value = Helper\find_value($input, ['updatedAt'], $context);
         if (null !== $value && $normalizer) {
             $value = $normalizer('DateTimeInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'updatedAt' cannot be null", $context);
+            } else if (!($value instanceof \DateTimeInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'updatedAt', $value);
 
@@ -81,7 +99,11 @@ final class MockArticleNormalizer
         // Denormalize 'text' property
         $value = Helper\find_value($input, ['text'], $context);
         if (null !== $value && $normalizer) {
-            $value = $normalizer('text_with_format', $value, $context);
+            $value = $normalizer('MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat', $value, $context);
+            if (!(null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
         }
         \call_user_func(self::$accessor, $ret, 'text', $value);
 

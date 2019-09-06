@@ -37,9 +37,9 @@ final class AddToCartMessageNormalizer
             $context->addError("Property 'orderId' cannot be null");
         }
         if (null !== $value && $normalizer) {
-            $value = $normalizer('int', $value, $context);
+            $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
         }
-        if (!\gettype($value) === 'int') {
+        if (!$value instanceof \Ramsey\Uuid\UuidInterface) {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'orderId', $value);
@@ -52,7 +52,7 @@ final class AddToCartMessageNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('int', $value, $context);
         }
-        if (!\gettype($value) === 'int') {
+        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'int') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'productId', $value);
@@ -63,9 +63,9 @@ final class AddToCartMessageNormalizer
             $context->addError("Property 'amount' cannot be null");
         }
         if (null !== $value && $normalizer) {
-            $value = $normalizer('int', $value, $context);
+            $value = $normalizer('float', $value, $context);
         }
-        if (!\gettype($value) === 'int') {
+        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'float') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'amount', $value);

@@ -16,6 +16,12 @@ interface DataTransformationError extends NormalizerError
 {
 }
 
+final class RuntimeError
+    extends \InvalidArgumentException
+    implements DataTransformationError
+{
+}
+
 final class NotImplementedError
     extends \BadMethodCallException
     implements NormalizerError

@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use MakinaCorpus\Normalizer\TypeDoesNotExistError;
 
 /**
  * Hydrate object using the generated hydrator
@@ -22,8 +21,8 @@ function hydrator4(string $type, /* string|array|T */ $input, Context $context) 
         return $external->value;
     }
 
-    $typeDef = $context->getType($type);
-    $normalizer = generate4_compute_normalizer_name($typeDef->getNativeName());
+    $nativeType = $context->getNativeType($type);
+    $normalizer = generate4_compute_normalizer_name($nativeType);
 
     return \call_user_func(
         [$normalizer, 'denormalize'],
@@ -48,12 +47,7 @@ function generate4_compute_normalizer_name(string $nativeType): string
  */
 function generate4_validation(PropertyDefinition $property, Context $context): string
 {
-    try {
-        $typeDef = $context->getType($property->getTypeName());
-        $nativeType = $typeDef->getNativeName();
-    } catch (TypeDoesNotExistError $e) {
-        $nativeType = $property->getTypeName();
-    }
+    $nativeType = $context->getNativeType($property->getTypeName());
 
     if (!\class_exists($nativeType) && !interface_exists($nativeType)) {
         if (\strpos($nativeType, '\\')) {
@@ -61,9 +55,9 @@ function generate4_validation(PropertyDefinition $property, Context $context): s
         }
 
         if ($property->isOptional()) {
-            return "null === \$value || \gettype(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
         } else {
-            return "\gettype(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;
@@ -75,8 +69,10 @@ function generate4_validation(PropertyDefinition $property, Context $context): s
 function generate4_property_handle_value(PropertyDefinition $property, Context $context, int $indent, string $variable): string
 {
     $indentation = \str_repeat(" ", 4 * $indent);
-    $type = $property->getTypeName();
+    $propName = $property->getNativeName();
+    $type = $context->getNativeType($property->getTypeName());
     $nativeType = \addslashes($type);
+    $validation = generate4_validation($property, $context);
     $ret = [];
 
     // @todo Here allow custom implementation to write code
@@ -99,6 +95,19 @@ function generate4_property_handle_value(PropertyDefinition $property, Context $
         default:
             $ret[] = "if (null !== \$value && \$normalizer) {";
             $ret[] = "    {$variable} = \$normalizer('{$nativeType}', \$value, \$context);";
+            if ($property->isOptional()) {
+                $ret[] = "    if (!(".$validation.")) {";
+                $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                $ret[] = "        \$value = null;";
+                $ret[] = "    }";
+            } else {
+                $ret[] = "    if (null === \$value) {";
+                $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                $ret[] = "    } else if (!(".$validation.")) {";
+                $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                $ret[] = "        \$value = null;";
+                $ret[] = "    }";
+            }
             $ret[] = "}";
             break;
     }

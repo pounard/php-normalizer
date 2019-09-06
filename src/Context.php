@@ -72,6 +72,11 @@ interface ValidationResultBuilder
     public function getDepth(): int;
 
     /**
+     * Get current path
+     */
+    public function getPath(): string;
+
+    /**
      * Enter property in current context
      */
     public function enter(string $propName): void;
@@ -109,22 +114,22 @@ final class DefaultValidationResultBuilder implements ValidationResultBuilder, V
     private $currentPath;
 
     /**
-     * Get current path
-     */
-    private function getCurrentPath(): ?string
-    {
-        if (!$this->currentPath && $this->currentContext) {
-            return $this->currentPath = \implode(self::PATH_SEP, $this->currentContext);
-        }
-        return $this->currentPath;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getDepth(): int
     {
         return $this->depth;
+    }
+
+    /**
+     * Get current path
+     */
+    public function getPath(): string
+    {
+        if (!$this->currentPath && $this->currentContext) {
+            return $this->currentPath = \implode(self::PATH_SEP, $this->currentContext);
+        }
+        return $this->currentPath ?? '(none)';
     }
 
     /**
@@ -157,7 +162,7 @@ final class DefaultValidationResultBuilder implements ValidationResultBuilder, V
      */
     public function addError(string $message): void
     {
-        $this->errors[$this->getCurrentPath()][] = $message;
+        $this->errors[$this->getPath()][] = $message;
     }
 
     /**
@@ -165,7 +170,7 @@ final class DefaultValidationResultBuilder implements ValidationResultBuilder, V
      */
     public function addWarning(string $message): void
     {
-        $this->warnings[$this->getCurrentPath()][] = $message;
+        $this->warnings[$this->getPath()][] = $message;
     }
 
     /**
@@ -392,6 +397,9 @@ final class Context implements ValidationResultBuilder
      */
     public function addError(string $message): void
     {
+        if (!$this->verbose) {
+            throw new RuntimeError(\sprintf("%s: %s", $this->validationResult->getPath(), $message));
+        }
         $this->validationResult->addError($message);
     }
 
@@ -401,6 +409,14 @@ final class Context implements ValidationResultBuilder
     public function getDepth(): int
     {
         return $this->validationResult->getDepth();
+    }
+
+    /**
+     * Get current path
+     */
+    public function getPath(): string
+    {
+        $this->validationResult->getPath();
     }
 
     /**

@@ -34,6 +34,7 @@ declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
+use function MakinaCorpus\Normalizer\gettype_real;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -108,9 +109,17 @@ function hydrator1_property_validate($value, PropertyDefinition $property, Conte
         return $value;
     }
 
-    $type = \is_object($value) ? \get_class($value) : \gettype($value);
+    $type = gettype_real($value);
+    $expected = $context->getNativeType($property->getTypeName());
 
-    if ($type !== ($expected = $property->getTypeName())) {
+    $isValid = false;
+    if (class_exists($expected) || interface_exists($expected)) {
+        $isValid = ($value instanceof $expected);
+    } else {
+        $isValid = ($type === $expected);
+    }
+
+    if (!$isValid) {
         $context->addError(\sprintf("Property type mismatch: expected '%s' got '%s'", $expected, $type));
     }
 

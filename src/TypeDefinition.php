@@ -151,6 +151,14 @@ interface TypeDefinitionMap
      * Get native type for
      */
     public function getNativeType(string $name): string;
+
+    /**
+     * Get all aliases
+     *
+     * @return string[]
+     *   Keys are aliases, values are target classes
+     */
+    public function getAllAliases(): array;
 }
 
 /**
@@ -553,5 +561,13 @@ final class ArrayTypeDefinitionMap implements TypeDefinitionMap
     public function getNativeType(string $name): string
     {
         return $this->aliases[$name] ?? $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllAliases(): array
+    {
+        return $this->aliases;
     }
 }

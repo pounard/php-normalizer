@@ -35,7 +35,15 @@ final class AddToCartMessageNormalizer
 
         // Denormalize 'orderId' property
         $value = Helper\find_value($input, ['orderId'], $context);
-        $value = Helper\to_int($value, $context);
+        if (null !== $value && $normalizer) {
+            $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'orderId' cannot be null", $context);
+            } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
+                Helper\handle_error("Type mismatch", $context);
+                $value = null;
+            }
+        }
         \call_user_func(self::$accessor, $ret, 'orderId', $value);
 
         // Denormalize 'productId' property
@@ -45,7 +53,7 @@ final class AddToCartMessageNormalizer
 
         // Denormalize 'amount' property
         $value = Helper\find_value($input, ['amount'], $context);
-        $value = Helper\to_int($value, $context);
+        $value = Helper\to_float($value, $context);
         \call_user_func(self::$accessor, $ret, 'amount', $value);
 
         return $ret;

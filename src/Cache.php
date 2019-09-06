@@ -11,11 +11,11 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
 {
     use WithBlacklistTypeDefinitionMap;
 
-    /** @var TypeDefinitionMap[] */
-    private $reflectors;
+    /** @var string[] */
+    private $aliases = [];
 
-    /** @var ArrayTypeDefinitionMap */
-    private $static;
+    /** @var TypeDefinitionMap[] */
+    private $reflectors = [];
 
     /** @var bool[] */
     private $existing = [];
@@ -27,8 +27,10 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
      */
     public function __construct(iterable $reflectors)
     {
-        $this->reflectors = $reflectors;
-        $this->static = new ArrayTypeDefinitionMap([]);
+        foreach ($reflectors as $reflector) {
+            $this->reflectors[] = $reflector;
+            $this->aliases += $reflector->getAllAliases();
+        }
     }
 
     /**
@@ -67,8 +69,8 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
      */
     private function doExists(string $name): bool
     {
-        if ($this->static->exists($name)) {
-            return true;
+        if (isset($this->aliases[$name])) {
+            return true; 
         }
         foreach ($this->reflectors as $instance) {
             if ($instance->exists($name)) {
@@ -96,7 +98,7 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
         // Considering that specific implementations should not carry
         // user configuration, we skip this for reflectors, user configuration
         // aliases and such is to be overriden by the one set in this object.
-        return $this->static->getNativeType($name);
+        return $this->aliases[$name] ?? $name;
     }
 
     /**
@@ -138,21 +140,24 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
             throw new TypeDoesNotExistError($name);
         }
 
-        if ($this->static->exists($name)) {
-            return $this->static->get($name);
-        }
-
-        $nativeType = $this->static->getNativeType($name);
+        $nativeType = $this->getNativeType($name);
 
         if (!$type = $this->loadFromCache($nativeType)) {
             $type = $this->doGet($nativeType);
         }
 
         // New types are added, add them to memory and to cache.
-        $this->static->addTypeDefinition($nativeType, $type);
         $this->storeIntoCache($name, $type);
 
         return $type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllAliases(): array
+    {
+        return $this->aliases;
     }
 }
 
