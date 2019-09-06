@@ -34,19 +34,24 @@ final class Normalizer5
      */
     public function denormalize(string $type, /* string|array|T */ $input, Context $context) /* : T */
     {
-        $external = hydrator1_external_implementation($type, $input, $context);
+        $nativeType = $context->getNativeType($type);
+
+        $external = hydrator1_external_implementation($nativeType, $input, $context);
         if ($external->handled) {
             return $external->value;
         }
 
-        $nativeType = $context->getNativeType($type);
         $normalizer = $this->generator->getNormalizerClass($nativeType);
+
+        if (!$normalizer) {
+            throw new \RuntimeException("Implemeent me");
+        }
 
         return \call_user_func(
             [$normalizer, 'denormalize'],
             $input,
             $context,
-            'hydrator4'
+            [$this, 'denormalize']
         );
     }
 }

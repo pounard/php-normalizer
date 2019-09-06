@@ -18,13 +18,14 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Simpler scenario: all optional scalars
  */
 class MockTextWithFormat
 {
-    /** @var string */
+    /** @var ?string */
     private $text;
 
     public function getText(): ?string
@@ -55,7 +56,7 @@ class MockWithTitle
     /** @var string */
     private $title;
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -75,7 +76,7 @@ class MockWithTitle
  */
 class MockWithText extends MockWithTitle
 {
-    /** @var MockTextWithFormat */
+    /** @var ?MockTextWithFormat */
     private $text;
 
     /** @return null|MockTextWithFormat */
@@ -92,50 +93,54 @@ class MockWithText extends MockWithTitle
 
 trait LotsOfProperties
 {
+    /** @var ?string */
     private $foo;
 
-    public function getFoo()
+    public function getFoo(): ?string
     {
         return $this->foo;
     }
 
-    public function setFoo(/* ?string */ $value): void
+    public function setFoo(?string $value): void
     {
         $this->foo = $value;
     }
 
+    /** @var int */
     private $bar;
 
-    public function getBar()
+    public function getBar(): int
     {
         return $this->bar;
     }
 
-    public function setBar(/* ?string */ $value): void
+    public function setBar(int $value): void
     {
         $this->bar = $value;
     }
 
+    /** @var float */
     private $baz;
 
-    public function getBaz()
+    public function getBaz(): float
     {
         return $this->baz;
     }
 
-    public function setBaz(/* ?string */ $value): void
+    public function setBaz(float $value): void
     {
         $this->baz = $value;
     }
 
+    /** @var string */
     private $filename;
 
-    public function getFilename(): ?string
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
-    public function setFilename(/* ?string */ $value): void
+    public function setFilename(string $value): void
     {
         $this->filename = $value;
     }
@@ -146,33 +151,33 @@ trait LotsOfProperties
  */
 final class AddToCartMessage
 {
-    /** @var int */
+    /** @var UuidInterface */
     private $orderId;
 
     /** @var int */
     private $productId;
 
-    /** @var int */
+    /** @var float */
     private $amount;
 
-    public function __construct(int $orderId, int $productId, int $amount = 1)
+    public function __construct(UuidInterface $orderId, int $productId, float $amount = 1.0)
     {
         $this->orderId = $orderId;
         $this->productId = $productId;
         $this->amount = $amount;
     }
 
-    public function getOrderId(): ?int
+    public function getOrderId(): UuidInterface
     {
         return $this->orderId;
     }
 
-    public function getProductId(): ?int
+    public function getProductId(): int
     {
         return $this->productId;
     }
 
-    public function getAmount(): int
+    public function getAmount(): float
     {
         return $this->amount;
     }
@@ -185,15 +190,15 @@ final class MockArticle extends MockWithText
 {
     use LotsOfProperties;
 
-    /** @var string */
+    /** @var UuidInterface */
     private $id;
 
-    public function getId(): string
+    public function getId(): UuidInterface
     {
-        return $this->id ?? ($this->id = (string)Uuid::uuid4());
+        return $this->id ?? ($this->id = Uuid::uuid4());
     }
 
-    public function setId(/* ?string */ $value): void
+    public function setId(UuidInterface $value): void
     {
         $this->id = $value;
     }
@@ -212,16 +217,16 @@ final class MockArticle extends MockWithText
         $this->createdAt = $value;
     }
 
-    /** @var \DateTimeInterface */
+    /** @var ?\DateTimeInterface */
     private $updatedAt;
 
-    /** @return \DateTimeInterface */
+    /** @return ?\DateTimeInterface */
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdateddAt(/* ?\DateTimeInterface */ $value): void
+    public function setUpdateddAt(?\DateTimeInterface $value): void
     {
         $this->updatedAt = $value;
     }

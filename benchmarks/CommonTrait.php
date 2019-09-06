@@ -14,7 +14,9 @@ use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
+use MakinaCorpus\Normalizer\UuidNormalizer as CustomUuidNormalizer;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
+use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer as SymfonyUuidNormalizer;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -65,7 +67,7 @@ final class ObjectGenerator
                 ],
                 'foo' => $faker->jobTitle,
                 'bar' => $faker->randomDigitNotNull,
-                'baz' => $faker->company,
+                'baz' => $faker->randomFloat(),
                 'filename' => $faker->freeEmail,
             ];
         }
@@ -84,7 +86,7 @@ final class ObjectGenerator
 
         $hydrator = \Closure::bind(static function () use ($faker) {
             $object = new MockArticle();
-            $object->id = (string)Uuid::uuid4();
+            $object->id = Uuid::uuid4();
             $object->createdAt = $faker->dateTimeThisCentury;
             $object->updatedAt = $faker->dateTimeThisCentury;
             $object->authors = ObjectGenerator::generateNameArray($faker);
@@ -115,9 +117,9 @@ final class ObjectGenerator
 
         for ($i = 0; $i < $count; ++$i) {
             $ret[] = [
-                'orderId' => $faker->randomDigitNotNull,
+                'orderId' => (string)Uuid::uuid4(),
                 'productId' => $faker->randomDigitNotNull,
-                'amount' => $faker->randomDigit,
+                'amount' => $faker->randomFloat(),
             ];
         }
 
@@ -134,7 +136,7 @@ final class ObjectGenerator
         $faker = \Faker\Factory::create();
 
         for ($i = 0; $i < $count; ++$i) {
-            $ret[] = new AddToCartMessage($faker->randomDigitNotNull, $faker->randomDigitNotNull, $faker->randomDigit);
+            $ret[] = new AddToCartMessage(Uuid::uuid4(), $faker->randomDigitNotNull, $faker->randomDigit);
         }
 
         return $ret;
@@ -192,8 +194,11 @@ trait NormalizerBenchmarkTrait
      */
     private function createCachedTypeDefinitionMap(): TypeDefinitionMap
     {
+        $data = Yaml::parseFile(__DIR__.'/definitions.yaml');
+
         return new MemoryTypeDefinitionMapCache([
-            $this->createTypeDefinitionMap(),
+            // Expose only aliases, to be more fair to Symfony's serializer
+            new ArrayTypeDefinitionMap([], $data['type_aliases']),
             new ReflectionTypeDefinitionMap()
         ]);
     }
@@ -216,6 +221,7 @@ trait NormalizerBenchmarkTrait
         return new DefaultNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
+            new CustomUuidNormalizer()
         ]);
     }
 
@@ -281,10 +287,11 @@ trait NormalizerBenchmarkTrait
 
         return new Serializer([
             new DateTimeNormalizer(),
+            new SymfonyUuidNormalizer(),
             new ObjectNormalizer(
                 $classMetadataFactory,
                 /* NameConverterInterface $nameConverter = */ null,
-                /* $propertyTypeExtractor */ null,
+                /* PropertyAccessorInterface $propertyAccessor */ null,
                 $propertyTypeExtractor,
                 /* ClassDiscriminatorResolverInterface $classDiscriminatorResolver = */ null
             ),

@@ -247,12 +247,14 @@ function hydrator1_external_implementation(string $type, $input, Context $contex
  */
 function hydrator1(string $type, /* string|array|T */ $input, Context $context) /* : T */
 {
-    $external = hydrator1_external_implementation($type, $input, $context);
+    $nativeType = $context->getNativeType($type);
+
+    $external = hydrator1_external_implementation($nativeType, $input, $context);
     if ($external->handled) {
         return $external->value;
     }
 
-    $typeDef = $context->getType($type);
+    $typeDef = $context->getType($nativeType);
 
     if ($typeDef->isTerminal()) {
         // Custom normalizer
@@ -276,7 +278,7 @@ function hydrator1(string $type, /* string|array|T */ $input, Context $context) 
     /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
     foreach ($typeDef->getProperties() as $property) {
         hydrator1_instance_set_value(
-            $type, $instance, $property->getNativeName(),
+            $nativeType, $instance, $property->getNativeName(),
             hydrator1_property_handle($input, $property, $context),
             $context
         );

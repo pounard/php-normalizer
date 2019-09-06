@@ -49,37 +49,15 @@ function hydrator3_instance_set_value(string $type, object $instance, string $pr
 }
 
 /**
- * Validate value
- */
-function hydrator3_property_validate($value, PropertyDefinition $property, Context $context)
-{
-    if (null === $value) {
-        if (!$property->isOptional()) {
-            $context->addError("Property cannot be null");
-        }
-        return $value;
-    }
-
-    $type = gettype_real($value);
-    $expected = $context->getNativeType($property->getTypeName());
-
-    if ($type !== $expected) {
-        $context->addError(\sprintf("Property type mismatch: expected '%s' got '%s'", $expected, $type));
-    }
-
-    return $value;
-}
-
-/**
  * Extract a single value
  */
 function hydrator3_property_handle_value($value, PropertyDefinition $property, Context $context)
 {
-    if (!hydrator3_property_validate($value, $property, $context)) {
-        return null;
-    }
     if (null !== $value) {
-        return hydrator3($property->getTypeName(), $value, $context);
+        $value = hydrator3($property->getTypeName(), $value, $context);
+    }
+    if (!hydrator1_property_validate($value, $property, $context)) {
+        return null;
     }
     return null;
 }
@@ -159,12 +137,14 @@ function hydrator3_external_implementation(string $type, $input, Context $contex
  */
 function hydrator3(string $type, /* string|array|T */ $input, Context $context) /* : T */
 {
-    $external = hydrator3_external_implementation($type, $input, $context);
+    $nativeType = $context->getNativeType($type);
+
+    $external = hydrator3_external_implementation($nativeType, $input, $context);
     if ($external->handled) {
         return $external->value;
     }
 
-    $typeDef = $context->getType($type);
+    $typeDef = $context->getType($nativeType);
 
     if ($typeDef->isTerminal()) {
         // Custom normalizer
@@ -188,7 +168,7 @@ function hydrator3(string $type, /* string|array|T */ $input, Context $context) 
     /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
     foreach ($typeDef->getProperties() as $property) {
         hydrator3_instance_set_value(
-            $type, $instance, $property->getNativeName(),
+            $nativeType, $instance, $property->getNativeName(),
             hydrator3_property_handle($input, $property, $context),
             $context
         );

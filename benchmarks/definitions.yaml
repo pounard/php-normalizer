@@ -3,14 +3,14 @@ types:
     MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage:
         properties:
             orderId:
-                type: int
-                optional: true
+                type: uuid
+                optional: false
             productId:
                 type: int
-                optional: true
+                optional: false
             amount:
-                type: int
-                optional: true
+                type: float
+                optional: false
 
     MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat:
         properties:
@@ -35,11 +35,23 @@ types:
     MakinaCorpus\Normalizer\Benchmarks\MockArticle:
         properties:
             id:
+                type: uuid
+                optional: false
+            foo:
+                type: string
+                optional: true
+            bar:
+                type: int
+                optional: false
+            baz:
+                type: float
+                optional: false
+            filename:
                 type: string
                 optional: false
             createdAt:
                 type: date
-                optional: true
+                optional: false
             updatedAt:
                 type: date
                 optional: true
@@ -57,4 +69,5 @@ types:
 type_aliases:
     app.article: MakinaCorpus\Normalizer\Benchmarks\MockArticle
     date: DateTimeImmutable
+    uuid: Ramsey\Uuid\UuidInterface
     text_with_format: MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat
