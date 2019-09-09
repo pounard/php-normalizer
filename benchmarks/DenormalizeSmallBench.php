@@ -4,13 +4,6 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
-if (!\function_exists('display_or_not')) {
-    function display_or_not($values)
-    {
-        // print_r($values);
-    }
-}
-
 /**
  * Benchmark stream denormalization
  *

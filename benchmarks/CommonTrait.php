@@ -31,6 +31,13 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Yaml\Yaml;
 
+if (!\function_exists('display_or_not')) {
+    function display_or_not($values)
+    {
+        // print_r($values);
+    }
+}
+
 final class ObjectGenerator
 {
     /**
@@ -85,23 +92,30 @@ final class ObjectGenerator
 
         $faker = \Faker\Factory::create();
 
-        $hydrator = \Closure::bind(static function () use ($faker) {
-            $object = new MockArticle();
+        $hydrator1 = \Closure::bind(static function (MockArticle $object) use ($faker) {
             $object->id = Uuid::uuid4();
             $object->createdAt = $faker->dateTimeThisCentury;
             $object->updatedAt = $faker->dateTimeThisCentury;
             $object->authors = ObjectGenerator::generateNameArray($faker);
-            $object->title = $faker->sentence;
-            $object->text = new MockTextWithFormat($faker->text, 'application/text+html');
             $object->foo = $faker->jobTitle;
             $object->bar = $faker->randomDigitNotNull;
-            $object->baz = $faker->company;
+            $object->baz = $faker->randomFloat();
             $object->filename = $faker->freeEmail;
-            return $object;
         }, null, MockArticle::class);
 
+        $hydrator2 = \Closure::bind(static function (MockWithTitle $object) use ($faker) {
+            $object->title = $faker->sentence;
+        }, null, MockWithTitle::class);
+
+        $hydrator3 = \Closure::bind(static function (MockWithText $object) use ($faker) {
+            $object->text = new MockTextWithFormat($faker->text, 'application/text+html');
+        }, null, MockWithText::class);
+
         for ($i = 0; $i < $count; ++$i) {
-            $ret[] = call_user_func($hydrator);
+            $ret[] = $object = new MockArticle();
+            call_user_func($hydrator1, $object);
+            call_user_func($hydrator2, $object);
+            call_user_func($hydrator3, $object);
         }
 
         return $ret;

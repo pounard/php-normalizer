@@ -9,7 +9,7 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-final class NormalizeSmallBench
+final class TheOtherWaySmallBench
 {
     use NormalizerBenchmarkTrait;
 
@@ -53,7 +53,7 @@ final class NormalizeSmallBench
     public function benchSymfony() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizer->normalize($data, AddToCartMessage::class);
+            $this->symfonyNormalizer->normalize($data);
         }
     }
 
@@ -64,7 +64,7 @@ final class NormalizeSmallBench
     public function benchSymfonyProxy() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizerProxy->normalize($data, AddToCartMessage::class);
+            $this->symfonyNormalizerProxy->normalize($data);
         }
     }
 }

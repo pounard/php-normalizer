@@ -62,9 +62,11 @@ types:
             title:
                 type: string
                 optional: false
+                declaring_class: MakinaCorpus\Normalizer\Benchmarks\MockWithTitle
             text:
                 type: text_with_format
                 optional: true
+                declaring_class: MakinaCorpus\Normalizer\Benchmarks\MockWithText
 
 type_aliases:
     app.article: MakinaCorpus\Normalizer\Benchmarks\MockArticle

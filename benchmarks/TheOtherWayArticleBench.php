@@ -55,7 +55,7 @@ final class NormalizeArticleBench
     public function benchSymfony() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizer->normalize($data, MockArticle::class);
+            $this->symfonyNormalizer->normalize($data);
         }
     }
 
@@ -66,7 +66,7 @@ final class NormalizeArticleBench
     public function benchSymfonyProxy() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizerProxy->normalize($data, MockArticle::class);
+            $this->symfonyNormalizerProxy->normalize($data);
         }
     }
 }
