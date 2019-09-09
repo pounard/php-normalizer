@@ -21,10 +21,19 @@ use MakinaCorpus\Normalizer\Context;
 final class MockArticleNormalizer
 {
     /** @var callable */
+    public static $normalizer0;
+
+    /** @var callable */
     public static $denormalizer0;
 
     /** @var callable */
+    public static $normalizer1;
+
+    /** @var callable */
     public static $denormalizer1;
+
+    /** @var callable */
+    public static $normalizer2;
 
     /** @var callable */
     public static $denormalizer2;
@@ -33,33 +42,122 @@ final class MockArticleNormalizer
      * Create and normalize MakinaCorpus\Normalizer\Benchmarks\MockArticle instances.
      *
      * @param callable $normalizer
-     *   A callback that will hydrate externally handled values, parameters are:
-     *      - string $type PHP native type to hydrate
+     *   A callback that will normalize externally handled values, parameters are:
+     *      - mixed $input raw value from denormalized data
+     *      - Context $context the context
+     */
+    public static function normalize($object, Context $context, ?callable $normalizer = null): array
+    {
+        $ret = [];
+
+        (self::$normalizer0)($ret, $object, $context, $normalizer);
+        (self::$normalizer1)($ret, $object, $context, $normalizer);
+        (self::$normalizer2)($ret, $object, $context, $normalizer);
+
+        return $ret;
+    }
+
+    /**
+     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\MockArticle instances.
+     *
+     * @param callable $normalizer
+     *   A callback that will denormalize externally handled values, parameters are:
+     *      - string $type PHP native type
      *      - mixed $input raw value from normalized data
      *      - Context $context the context
      */
-    public static function denormalize(array $input, Context $context, ?callable $normalizer = null): MockArticle
+    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockArticle
     {
         $ret = (new \ReflectionClass(MockArticle::class))->newInstanceWithoutConstructor();
 
-        (self::$denormalizer0)($ret, $input, $context, $normalizer);
-        (self::$denormalizer1)($ret, $input, $context, $normalizer);
-        (self::$denormalizer2)($ret, $input, $context, $normalizer);
+        (self::$denormalizer0)($ret, $input, $context, $denormalizer);
+        (self::$denormalizer1)($ret, $input, $context, $denormalizer);
+        (self::$denormalizer2)($ret, $input, $context, $denormalizer);
 
         return $ret;
     }
 }
 
 /**
+ * Normalizer for properties of MockArticle.
+ */
+MockArticleNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
+
+        // Denormalize 'id' property
+        $value = $object->id;
+        if (null !== $value && $normalizer) {
+            $value = $normalizer($value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'id' cannot be null", $context);
+            }
+        }
+        $ret['id'] = $value;
+
+        // Denormalize 'foo' property
+        $value = $object->foo;
+        $value = Helper\to_string($value, $context);
+        $ret['foo'] = $value;
+
+        // Denormalize 'bar' property
+        $value = $object->bar;
+        $value = Helper\to_int($value, $context);
+        $ret['bar'] = $value;
+
+        // Denormalize 'baz' property
+        $value = $object->baz;
+        $value = Helper\to_float($value, $context);
+        $ret['baz'] = $value;
+
+        // Denormalize 'filename' property
+        $value = $object->filename;
+        $value = Helper\to_string($value, $context);
+        $ret['filename'] = $value;
+
+        // Denormalize 'createdAt' property
+        $value = $object->createdAt;
+        if (null !== $value && $normalizer) {
+            $value = $normalizer($value, $context);
+            if (null === $value) {
+                Helper\handle_error("Property 'createdAt' cannot be null", $context);
+            }
+        }
+        $ret['createdAt'] = $value;
+
+        // Denormalize 'updatedAt' property
+        $value = $object->updatedAt;
+        if (null !== $value && $normalizer) {
+            $value = $normalizer($value, $context);
+        }
+        $ret['updatedAt'] = $value;
+
+        // Denormalize 'authors' collection property
+        $normalizedValues = [];
+        $values = $object->authors;
+        if (!\is_iterable($values)) {
+            $values = Helper\to_string($value, $context);
+            $normalizedValues[] = $values;
+        } else {
+            foreach ($values as $index => $value) {
+                $value = Helper\to_string($value, $context);
+                $normalizedValues[$index] = $value;
+            }
+        }
+        $ret['authors'] = $normalizedValues;
+    },
+    null, MockArticle::class
+);
+
+/**
  * Denormalizer for properties of MockArticle.
  */
 MockArticleNormalizer::$denormalizer0 = \Closure::bind(
-    static function (MockArticle $instance, array $input, Context $context, ?callable $normalizer = null): void {
+    static function (MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'id' property
         $value = Helper\find_value($input, ['id'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
+        if (null !== $value && $denormalizer) {
+            $value = $denormalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
             if (null === $value) {
                 Helper\handle_error("Property 'id' cannot be null", $context);
             } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
@@ -91,8 +189,8 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'createdAt' property
         $value = Helper\find_value($input, ['createdAt'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('DateTimeInterface', $value, $context);
+        if (null !== $value && $denormalizer) {
+            $value = $denormalizer('DateTimeInterface', $value, $context);
             if (null === $value) {
                 Helper\handle_error("Property 'createdAt' cannot be null", $context);
             } else if (!($value instanceof \DateTimeInterface)) {
@@ -104,8 +202,8 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'updatedAt' property
         $value = Helper\find_value($input, ['updatedAt'], $context);
-        if (null !== $value && $normalizer) {
-            $value = $normalizer('DateTimeInterface', $value, $context);
+        if (null !== $value && $denormalizer) {
+            $value = $denormalizer('DateTimeInterface', $value, $context);
             if (!(null === $value || $value instanceof \DateTimeInterface)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
@@ -121,13 +219,8 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
             $propValue[] = $values;
         } else {
             foreach ($values as $index => $value) {
-                try {
-                    $context->enter((string)$index);
-                    $value = Helper\to_string($value, $context);
-                    $propValue[$index] = $value; 
-                } finally {
-                    $context->leave();
-                }
+                $value = Helper\to_string($value, $context);
+                $propValue[$index] = $value;
             }
         }
         $instance->authors = $propValue;
@@ -136,10 +229,24 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 );
 
 /**
+ * Normalizer for properties of MockWithTitle.
+ */
+MockArticleNormalizer::$normalizer1 = \Closure::bind(
+    static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
+
+        // Denormalize 'title' property
+        $value = $object->title;
+        $value = Helper\to_string($value, $context);
+        $ret['title'] = $value;
+    },
+    null, MockWithTitle::class
+);
+
+/**
  * Denormalizer for properties of MockWithTitle.
  */
 MockArticleNormalizer::$denormalizer1 = \Closure::bind(
-    static function (MockWithTitle $instance, array $input, Context $context, ?callable $normalizer = null): void {
+    static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'title' property
         $value = Helper\find_value($input, ['title'], $context);
@@ -150,10 +257,26 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
 );
 
 /**
+ * Normalizer for properties of MockWithText.
+ */
+MockArticleNormalizer::$normalizer2 = \Closure::bind(
+    static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
+
+        // Denormalize 'text' property
+        $value = $object->text;
+        if (null !== $value) {
+            $value = \Generated7\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($value, $context, $normalizer);
+        }
+        $ret['text'] = $value;
+    },
+    null, MockWithText::class
+);
+
+/**
  * Denormalizer for properties of MockWithText.
  */
 MockArticleNormalizer::$denormalizer2 = \Closure::bind(
-    static function (MockWithText $instance, array $input, Context $context, ?callable $normalizer = null): void {
+    static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'text' property
         $value = Helper\find_value($input, ['text'], $context);

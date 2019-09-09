@@ -144,6 +144,60 @@ final class Normalizer6
      *
      * Hardcode some scalar types, defer on external implementations.
      */
+    private function externalNormalisation($object, Context $context): HydratorOption
+    {
+        $type = gettype_real($object);
+
+        switch ($type) {
+            case 'bool':
+                return HydratorOption::ok($object);
+            case 'float':
+                return HydratorOption::ok($object);
+            case 'int':
+                return HydratorOption::ok($object);
+            case 'null':
+                return HydratorOption::ok($object);
+            case 'string':
+                return HydratorOption::ok($object);
+        }
+
+        if ($this->chain->supportsNormalization($type)) {
+            return HydratorOption::ok($this->chain->normalize($type, $object, $context));
+        }
+
+        return HydratorOption::miss();
+    }
+
+    /**
+     * Dernormalise object
+     */
+    public function normalize($object, Context $context) /* : T */
+    {
+        $external = $this->externalNormalisation($object, $context);
+        if ($external->handled) {
+            return $external->value;
+        }
+
+        $nativeType = gettype_real($object);
+        $normalizer = $this->generator->getNormalizerClass($nativeType);
+
+        if (!$normalizer) {
+            throw new \RuntimeException("Implement me");
+        }
+
+        return \call_user_func(
+            [$normalizer, 'normalize'],
+            $object,
+            $context,
+            [$this, 'normalize']
+        );
+    }
+
+    /**
+     * Allow external implementations.
+     *
+     * Hardcode some scalar types, defer on external implementations.
+     */
     private function externalDenormalisation(string $type, $input, Context $context): HydratorOption
     {
         switch ($type) {

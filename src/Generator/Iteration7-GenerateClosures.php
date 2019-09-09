@@ -81,9 +81,132 @@ final class Generator7Impl implements Generator5
     }
 
     /**
+     * Generate value conversion code
+     */
+    private function generateNormalizerPropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
+    {
+        $indentation = \str_repeat(" ", 4 * $indent);
+        $propName = $property->getNativeName();
+        $escapedPropName = \addslashes($propName);
+        $type = $context->getNativeType($property->getTypeName());
+        $ret = [];
+
+        // Temporary variable, we may get rid of this one, but I'm not sure
+        // this will ever make any differences in speed.
+        $ret[] = "\$value = \$object->".$propName.";";
+
+        // Attempt eager related class code generation, if possible.
+        try {
+            if (\class_exists($type)) {
+                $normalizerClassName = $this->generateNormalizerClass($type);
+                $ret[] = "if (null !== \$value) {";
+                $ret[] = "    \$value = \\".$normalizerClassName."::normalize(\$value, \$context, \$normalizer);";
+                if (!$property->isOptional()) {
+                    $ret[] = "    if (null === \$value) {";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
+                    $ret[] = "    }";
+                }
+                $ret[] = "}";
+
+                return \implode("\n".$indentation, $ret);
+            }
+        } catch (TypeDoesNotExistError $e) {
+            $context->addWarning($e->getMessage());
+        }
+
+        // @todo Here allow custom implementation to write code
+        // Scalar helpers validate at the same time.
+        switch ($property->getTypeName()) {
+            case 'bool':
+                $ret[] = "{$variable} = Helper\\to_bool(\$value, \$context);";
+                break;
+            case 'float':
+                $ret[] = "{$variable} = Helper\\to_float(\$value, \$context);";
+                break;
+            case 'int':
+                $ret[] = "{$variable} = Helper\\to_int(\$value, \$context);";
+                break;
+            case 'null':
+                break;
+            case 'string':
+                $ret[] = "{$variable} = Helper\\to_string(\$value, \$context);";
+                break;
+            default:
+                $ret[] = "if (null !== \$value && \$normalizer) {";
+                $ret[] = "    {$variable} = \$normalizer(\$value, \$context);";
+                if (!$property->isOptional()) {
+                    $ret[] = "    if (null === \$value) {";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
+                    $ret[] = "    }";
+                }
+                $ret[] = "}";
+                break;
+        }
+
+        return \implode("\n".$indentation, $ret);
+    }
+
+    /**
+     * Generate single value property set
+     */
+    private function generateNormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    {
+        $propName = \addslashes($property->getNativeName());
+        $normalizedName = \addslashes($property->getNormalizedName());
+        $handleCode = $this->generateNormalizerPropertyValueConvert($property, $context, 2, '$value');
+
+        $writer->write(<<<EOT
+        // Denormalize '{$propName}' property
+        {$handleCode}
+        \$ret['{$normalizedName}'] = \$value;
+EOT
+        );
+    }
+
+    /**
+     * Generate value collection property set
+     */
+    private function generateNormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    {
+        $propName = \addslashes($property->getNativeName());
+        $normalizedName = \addslashes($property->getNormalizedName());
+        $handleCode1 = $this->generateDenormalizerPropertyValueConvert($property, $context, 3, '$values');
+        $handleCode2 = $this->generateDenormalizerPropertyValueConvert($property, $context, 5, '$value');
+
+        $writer->write(<<<EOT
+        // Denormalize '{$propName}' collection property
+        \$normalizedValues = [];
+        \$values = \$object->{$propName};
+        if (!\is_iterable(\$values)) {
+            {$handleCode1}
+            \$normalizedValues[] = \$values;
+        } else {
+            foreach (\$values as \$index => \$value) {
+                {$handleCode2}
+                \$normalizedValues[\$index] = \$value;
+            }
+        }
+        \$ret['{$normalizedName}'] = \$normalizedValues;
+EOT
+        );
+    }
+
+    /**
+     * Generate property handling code
+     */
+    private function generateNormalizerProperty(PropertyDefinition $property, Context $context, Writer $writer): void
+    {
+        if ($property->isCollection()) {
+            $this->generateNormalizerPropertyCollection($property, $context, $writer);
+        } else {
+            $this->generateNormalizerPropertyValue($property, $context, $writer);
+        }
+    }
+
+    /**
      * Generate type validation condition
      */
-    private function generatePropertyValueValidate(PropertyDefinition $property, Context $context): string
+    private function generateDenormalizerPropertyValueValidate(PropertyDefinition $property, Context $context): string
     {
         $nativeType = $context->getNativeType($property->getTypeName());
 
@@ -107,13 +230,14 @@ final class Generator7Impl implements Generator5
     /**
      * Generate value conversion code
      */
-    private function generatePropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
+    private function generateDenormalizerPropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
     {
         $indentation = \str_repeat(" ", 4 * $indent);
         $propName = $property->getNativeName();
+        $escapedPropName = \addslashes($propName);
         $type = $context->getNativeType($property->getTypeName());
         $nativeType = \addslashes($type);
-        $validation = $this->generatePropertyValueValidate($property, $context);
+        $validation = $this->generateDenormalizerPropertyValueValidate($property, $context);
         $ret = [];
 
         // Attempt eager related class code generation, if possible.
@@ -129,7 +253,7 @@ final class Generator7Impl implements Generator5
                     $ret[] = "    }";
                 } else {
                     $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
                     $ret[] = "    } else if (!(".$validation.")) {";
                     $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
                     $ret[] = "        \$value = null;";
@@ -161,8 +285,8 @@ final class Generator7Impl implements Generator5
                 $ret[] = "{$variable} = Helper\\to_string(\$value, \$context);";
                 break;
             default:
-                $ret[] = "if (null !== \$value && \$normalizer) {";
-                $ret[] = "    {$variable} = \$normalizer('{$nativeType}', \$value, \$context);";
+                $ret[] = "if (null !== \$value && \$denormalizer) {";
+                $ret[] = "    {$variable} = \$denormalizer('{$nativeType}', \$value, \$context);";
                 if ($property->isOptional()) {
                     $ret[] = "    if (!(".$validation.")) {";
                     $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
@@ -170,7 +294,7 @@ final class Generator7Impl implements Generator5
                     $ret[] = "    }";
                 } else {
                     $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
                     $ret[] = "    } else if (!(".$validation.")) {";
                     $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
                     $ret[] = "        \$value = null;";
@@ -186,11 +310,11 @@ final class Generator7Impl implements Generator5
     /**
      * Generate single value property set
      */
-    private function generatePropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
-        $handleCode = $this->generatePropertyValueConvert($property, $context, 2, '$value');
+        $handleCode = $this->generateDenormalizerPropertyValueConvert($property, $context, 2, '$value');
 
         $writer->write(<<<EOT
         // Denormalize '{$propName}' property
@@ -204,12 +328,12 @@ EOT
     /**
      * Generate value collection property set
      */
-    private function generatePropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
-        $handleCode1 = $this->generatePropertyValueConvert($property, $context, 3, '$values');
-        $handleCode2 = $this->generatePropertyValueConvert($property, $context, 5, '$value');
+        $handleCode1 = $this->generateDenormalizerPropertyValueConvert($property, $context, 3, '$values');
+        $handleCode2 = $this->generateDenormalizerPropertyValueConvert($property, $context, 5, '$value');
 
         $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
@@ -220,13 +344,8 @@ EOT
             \$propValue[] = \$values;
         } else {
             foreach (\$values as \$index => \$value) {
-                try {
-                    \$context->enter((string)\$index);
-                    {$handleCode2}
-                    \$propValue[\$index] = \$value; 
-                } finally {
-                    \$context->leave();
-                }
+                {$handleCode2}
+                \$propValue[\$index] = \$value;
             }
         }
         \$instance->{$propName} = \$propValue;
@@ -237,12 +356,12 @@ EOT
     /**
      * Generate property handling code
      */
-    private function generateProperty(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerProperty(PropertyDefinition $property, Context $context, Writer $writer): void
     {
         if ($property->isCollection()) {
-            $this->generatePropertyCollection($property, $context, $writer);
+            $this->generateDenormalizerPropertyCollection($property, $context, $writer);
         } else {
-            $this->generatePropertyValue($property, $context, $writer);
+            $this->generateDenormalizerPropertyValue($property, $context, $writer);
         }
     }
 
@@ -327,6 +446,9 @@ EOT
         for ($index = 0; $index < \count($perClassMap); $index++) {
             $writer->write(<<<EOT
     /** @var callable */
+    public static \$normalizer{$index};
+
+    /** @var callable */
     public static \$denormalizer{$index};
 EOT
             );
@@ -338,12 +460,40 @@ EOT
      * Create and normalize {$nativeType} instances.
      *
      * @param callable \$normalizer
-     *   A callback that will hydrate externally handled values, parameters are:
-     *      - string \$type PHP native type to hydrate
+     *   A callback that will normalize externally handled values, parameters are:
+     *      - mixed \$input raw value from denormalized data
+     *      - Context \$context the context
+     */
+    public static function normalize(\$object, Context \$context, ?callable \$normalizer = null): array
+    {
+        \$ret = [];
+EOT
+        );
+
+        $writer->write("\n");
+        for ($index = 0; $index < \count($perClassMap); $index++) {
+            $writer->write("\n");
+            $writer->write(<<<EOT
+        (self::\$normalizer{$index})(\$ret, \$object, \$context, \$normalizer);
+EOT
+            );
+        }
+        $writer->write("\n\n");
+
+        $writer->write(<<<EOT
+        return \$ret;
+    }
+
+    /**
+     * Create and denormalize {$nativeType} instances.
+     *
+     * @param callable \$normalizer
+     *   A callback that will denormalize externally handled values, parameters are:
+     *      - string \$type PHP native type
      *      - mixed \$input raw value from normalized data
      *      - Context \$context the context
      */
-    public static function denormalize(array \$input, Context \$context, ?callable \$normalizer = null): {$localClassName}
+    public static function denormalize(array \$input, Context \$context, ?callable \$denormalizer = null): {$localClassName}
     {
         \$ret = (new \ReflectionClass({$localClassName}::class))->newInstanceWithoutConstructor();
 EOT
@@ -353,7 +503,7 @@ EOT
         for ($index = 0; $index < \count($perClassMap); $index++) {
             $writer->write("\n");
             $writer->write(<<<EOT
-        (self::\$denormalizer{$index})(\$ret, \$input, \$context, \$normalizer);
+        (self::\$denormalizer{$index})(\$ret, \$input, \$context, \$denormalizer);
 EOT
             );
         }
@@ -371,16 +521,35 @@ EOT
             $writer->write("\n\n");
             $writer->write(<<<EOT
 /**
- * Denormalizer for properties of {$className}.
+ * Normalizer for properties of {$className}.
  */
-{$localClassName}Normalizer::\$denormalizer{$index} = \Closure::bind(
-    static function ({$className} \$instance, array \$input, Context \$context, ?callable \$normalizer = null): void {
+{$localClassName}Normalizer::\$normalizer{$index} = \Closure::bind(
+    static function (array &\$ret, {$className} \$object, Context \$context, ?callable \$normalizer = null): void {
 EOT
             );
 
             foreach ($properties as $property) {
                 $writer->write("\n\n");
-                $this->generateProperty($property, $context, $writer);
+                $this->generateNormalizerProperty($property, $context, $writer);
+            }
+
+            $writer->write("\n");
+            $writer->write(<<<EOT
+    },
+    null, {$className}::class
+);
+
+/**
+ * Denormalizer for properties of {$className}.
+ */
+{$localClassName}Normalizer::\$denormalizer{$index} = \Closure::bind(
+    static function ({$className} \$instance, array \$input, Context \$context, ?callable \$denormalizer = null): void {
+EOT
+            );
+
+            foreach ($properties as $property) {
+                $writer->write("\n\n");
+                $this->generateDenormalizerProperty($property, $context, $writer);
             }
 
             $writer->write("\n");

@@ -260,3 +260,143 @@ function hydrator1(string $type, /* string|array|T */ $input, Context $context) 
 
     return $instance;
 }
+
+/**
+ * Extract property value from object
+ */
+function normalizer1_extract_value($object, PropertyDefinition $property, Context $context)
+{
+    $stealer = \Closure::bind(
+        static function () use ($object, $property) {
+            return $object->{$property->getNativeName()};
+        },
+        null, $property->getDeclaringClass()
+    );
+
+    return $stealer();
+}
+
+/**
+ * Handle single property value
+ */
+function normalizer1_property_handle_value($value, PropertyDefinition $property, Context $context)
+{
+    //$nativeType = $context->getNativeType($property->getTypeName());
+
+    // @todo validation? -> use validate_scalar() ou validate_object()
+    // @todo circular dependencies?
+
+    return normalizer1($value, $context);
+}
+
+/**
+ * Handle property
+ */
+function normalizer1_property_handle($object, PropertyDefinition $property, Context $context)
+{
+    try {
+        $context->enter($property->getNativeName());
+        $values = normalizer1_extract_value($object, $property, $context);
+
+        // Handle collection
+        if (!$property->isCollection()) {
+            // Non-collection property handling
+            return normalizer1_property_handle_value($values, $property, $context);
+        }
+
+        // Check for emptyness, we don't support non nullable collections.
+        if (null === $values || [] === $values) {
+            return [];
+        }
+
+        // If collection was wrongly NOT a collection
+        if (!\is_iterable($values)) {
+            try {
+                $context->enter("0");
+                return normalizer1_property_handle_value($values, $property, $context);
+            } finally {
+                $context->leave();
+            }
+        }
+
+        // Normal collection processing.
+        $ret = [];
+        foreach ($values as $index => $value) {
+            try {
+                $context->enter((string)$index);
+                $ret[$index] = normalizer1_property_handle_value($value, $property, $context);
+            } finally {
+                $context->leave();
+            }
+        }
+        return $ret;
+
+    } finally {
+        $context->leave($property->getNormalizedName());
+    }
+}
+
+/**
+ * Degradation of re-entring into the generator
+ *
+ * @todo This is basically cheating in benchmarks.
+ */
+function normalizer1_external_implementation(string $type, $input, Context $context): HydratorOption
+{
+    switch ($type) {
+        case 'bool':
+            return HydratorOption::ok($input);
+        case 'float':
+            return HydratorOption::ok($input);
+        case 'int':
+            return HydratorOption::ok($input);
+        case 'null':
+            return HydratorOption::ok($input);
+        case 'string':
+            return HydratorOption::ok($input);
+        case 'date':
+        case 'DateTime':
+        case 'DateTimeInterface':
+        case 'DateTimeImmutable':
+            return HydratorOption::ok($input->format(\DateTime::RFC3339));
+        case Ramsey\Uuid\Uuid::class:
+        case Ramsey\Uuid\UuidInterface::class:
+            return HydratorOption::ok($input->__toString());
+    }
+    return HydratorOption::miss();
+}
+
+/**
+ * Hydrate object
+ */
+function normalizer1(/* string|array|T */ $object, Context $context) /* : scalar|array */
+{
+    $nativeType = gettype_real($object);
+
+    $external = normalizer1_external_implementation($nativeType, $object, $context);
+    if ($external->handled) {
+        return $external->value;
+    }
+
+    $typeDef = $context->getType($nativeType);
+
+    if ($typeDef->isTerminal()) {
+        // Custom normalizer
+        $context->addWarning("Definition is terminal, custom processing is not implemented yet");
+
+        return $object;
+    }
+
+    if (null === $object) {
+        return $object;
+    }
+
+    $ret = [];
+
+    /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
+    foreach ($typeDef->getProperties() as $property) {
+        $ret[$property->getNormalizedName()] = normalizer1_property_handle($object, $property, $context);
+    }
+
+    return $ret;
+}

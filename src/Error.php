@@ -58,6 +58,21 @@ final class InvalidOptionValueError
 {
 }
 
+class TypeMismatchError
+    extends \InvalidArgumentException
+    implements ConfigurationError
+{
+    public function __construct($expected, $type, $code = 0, $previous = null)
+    {
+        if (\strpos($type, ' ')) {
+            $message = $type;
+        } else {
+            $message = \sprintf("Expected type '%s', got '%s'", $expected, $type);
+        }
+        parent::__construct($message, (int)$code, $previous);
+    }
+}
+
 class TypeDoesNotExistError
     extends \InvalidArgumentException
     implements ConfigurationError

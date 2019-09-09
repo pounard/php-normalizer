@@ -9,7 +9,7 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
  *
  * @BeforeMethods({"setUp"})
  */
-final class NormalizeArticleBench
+final class TheOtherWayArticleBench
 {
     use NormalizerBenchmarkTrait;
 
@@ -28,11 +28,10 @@ final class NormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchMap() : void
+    public function benchIteration1WithReflection() : void
     {
-        $context = $this->context->fresh();
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->normalize(MockArticle::class, $data, $context);
+            display_or_not(\normalizer1($data, $this->getContextWithReflection()));
         }
     }
 
@@ -40,11 +39,54 @@ final class NormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchReflection() : void
+    public function benchIteration1WithConfigOnly() : void
     {
-        $context = $this->cachedContext->fresh();
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->normalize(MockArticle::class, $data, $context);
+            display_or_not(\normalizer1($data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration7WithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer7->normalize($data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration7WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer7->normalize($data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchCustomWithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            $this->defaultNormalizer->normalize(MockArticle::class, $data, $this->getContextWithReflection());
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchCustomWithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            $this->defaultNormalizer->normalize(MockArticle::class, $data, $this->getContextWithConfigOnly());
         }
     }
 
