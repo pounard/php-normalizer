@@ -8,9 +8,9 @@
 declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\HydratorOption;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use function MakinaCorpus\Normalizer\find_value;
-use function MakinaCorpus\Normalizer\gettype_real;
 use function MakinaCorpus\Normalizer\to_bool;
 use function MakinaCorpus\Normalizer\to_float;
 use function MakinaCorpus\Normalizer\to_int;

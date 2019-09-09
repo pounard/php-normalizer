@@ -277,9 +277,6 @@ EOT
             $imports[] = $nativeType;
         }
 
-        // Class static closures.
-        $closures = [];
-
         // Create a property map based upon the declaring class and access
         // scope (private, protected).
         $perClassMap = [];
@@ -298,7 +295,6 @@ EOT
             } else {
                 $perClassMap[$localDeclaringClassName][] = $property;
             }
-            $closures[$localClassName] = 'denormalizer'.($index++);
         }
 
         // Generate imports.

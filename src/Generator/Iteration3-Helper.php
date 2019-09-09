@@ -14,6 +14,37 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer;
 
 /**
+ * Option type for hydrator1_external_implementation()
+ */
+final class HydratorOption
+{
+    /** @var bool */
+    public $handled;
+
+    /** @var mixed */
+    public $value;
+
+    /**
+     * Got a value
+     */
+    public static function ok($value): self
+    {
+        $ret = new self;
+        $ret->value = $value;
+        $ret->handled = true;
+        return $ret;
+    }
+
+    /**
+     * Does not handle type
+     */
+    public static function miss(): self
+    {
+        return new self;
+    }
+}
+
+/**
  * Alias of \gettype() which returns PHP type hints.
  */
 function gettype_real($value): string

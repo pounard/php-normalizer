@@ -33,6 +33,7 @@
 declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\HydratorOption;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use function MakinaCorpus\Normalizer\gettype_real;
 use Ramsey\Uuid\Uuid;
@@ -187,39 +188,12 @@ function hydrator1_property_handle(array $input, PropertyDefinition $property, C
 }
 
 /**
- * Option type for hydrator1_external_implementation()
- */
-final class HydratorOption
-{
-    public $handled;
-    public $value;
-
-    /**
-     * Got a value
-     */
-    public static function ok($value)
-    {
-        $ret = new self;
-        $ret->value = $value;
-        $ret->handled = true;
-        return $ret;
-    }
-
-    /**
-     * Does not handle type
-     */
-    public static function miss()
-    {
-        return new self;
-    }
-}
-
-/**
  * Degradation of re-entring into the generator
  *
  * @todo This is basically cheating in benchmarks.
  */
-function hydrator1_external_implementation(string $type, $input, Context $context): HydratorOption {
+function hydrator1_external_implementation(string $type, $input, Context $context): HydratorOption
+{
     switch ($type) {
         case 'bool':
             return HydratorOption::ok($input);

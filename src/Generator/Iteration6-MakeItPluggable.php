@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Denormalizer;
+use MakinaCorpus\Normalizer\HydratorOption;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\UnsupportedTypeError;
+use function MakinaCorpus\Normalizer\gettype_real;
 
 final class NormalizerChain6 implements Normalizer, Denormalizer
 {
@@ -179,7 +181,7 @@ final class Normalizer6
         $normalizer = $this->generator->getNormalizerClass($nativeType);
 
         if (!$normalizer) {
-            throw new \RuntimeException("Implemeent me");
+            throw new \RuntimeException("Implement me");
         }
 
         return \call_user_func(
