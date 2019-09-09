@@ -159,6 +159,8 @@ More iterations will come, a few things are still missing in generated code:
 Benchmarks compare Symfony implementation vs this API implementation VS all
 iterations verions.
 
+## Running benchmarks
+
 In order to run benchmarks:
 
 ```sh
@@ -178,45 +180,99 @@ Compare only denormalization:
 vendor/bin/phpbench run --report 'generator: "table", sort: {benchmark: "asc", mean: "asc"}' --iterations=10 --revs=10 --filter=Denorm
 ```
 
-Arbitrary recent benchmark run result on php 7.3:
+## Arbitrary recent benchmark run result on php 7.3:
+
+Please note that all results are to be taken with prudence: some of the
+iterations don't lead to coherent data, Symfony itself misbehave sometimes.
+
+Implementations that works fine are:
+
+ - Iteration1
+ - Iteration7
+ - Custom
+
+Because normalizers were very, very fast to implement after the denormalizer
+skeleton was fully written, going throught all iterations for normalization
+was unnecessary, only iterations 1 and 7 are implemented.
+
+### Denormalizing very small objects
 
 ```
-+-------------------------+---------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+--------+
-| benchmark               | subject                   | tag | groups | params | revs | its | mem_peak   | best        | mean        | mode        | worst       | stdev     | rstdev | diff   |
-+-------------------------+---------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+--------+
-| DenormalizeSmallBench   | benchIteration1WithCache  |     |        | []     | 50   | 30  | 6,003,856b | 722.860μs   | 1,174.854μs | 872.595μs   | 3,191.080μs | 658.964μs | 56.09% | 5.71x  |
-| DenormalizeSmallBench   | benchIteration1           |     |        | []     | 50   | 30  | 5,379,800b | 564.340μs   | 724.789μs   | 650.635μs   | 1,185.420μs | 143.227μs | 19.76% | 3.52x  |
-| DenormalizeSmallBench   | benchIteration2WithCache  |     |        | []     | 50   | 30  | 6,003,856b | 403.380μs   | 462.533μs   | 427.998μs   | 535.800μs   | 40.850μs  | 8.83%  | 2.25x  |
-| DenormalizeSmallBench   | benchIteration2           |     |        | []     | 50   | 30  | 5,396,744b | 234.660μs   | 263.428μs   | 244.058μs   | 321.980μs   | 23.872μs  | 9.06%  | 1.28x  |
-| DenormalizeSmallBench   | benchIteration3WithCache  |     |        | []     | 50   | 30  | 6,003,856b | 756.440μs   | 927.259μs   | 821.391μs   | 1,704.720μs | 233.704μs | 25.20% | 4.51x  |
-| DenormalizeSmallBench   | benchIteration3           |     |        | []     | 50   | 30  | 5,379,800b | 606.520μs   | 719.647μs   | 689.143μs   | 1,636.280μs | 177.310μs | 24.64% | 3.50x  |
-| DenormalizeSmallBench   | benchIteration4WithCache  |     |        | []     | 50   | 30  | 6,003,856b | 359.740μs   | 426.945μs   | 396.987μs   | 682.340μs   | 61.972μs  | 14.52% | 2.08x  |
-| DenormalizeSmallBench   | benchIteration4           |     |        | []     | 50   | 30  | 5,390,520b | 186.880μs   | 205.682μs   | 197.821μs   | 342.180μs   | 28.081μs  | 13.65% | 1.00x  |
-| DenormalizeSmallBench   | benchCustomWithConfig     |     |        | []     | 50   | 30  | 5,427,184b | 454.440μs   | 477.985μs   | 473.571μs   | 509.360μs   | 12.923μs  | 2.70%  | 2.32x  |
-| DenormalizeSmallBench   | benchCustomWithReflection |     |        | []     | 50   | 30  | 6,004,528b | 668.000μs   | 815.374μs   | 779.836μs   | 1,269.560μs | 133.475μs | 16.37% | 3.96x  |
-| DenormalizeSmallBench   | benchSymfony              |     |        | []     | 50   | 30  | 6,055,336b | 1,128.480μs | 1,263.127μs | 1,235.948μs | 1,627.720μs | 101.063μs | 8.00%  | 6.14x  |
-| DenormalizeSmallBench   | benchSymfonyProxy         |     |        | []     | 50   | 30  | 6,005,304b | 707.380μs   | 796.639μs   | 826.676μs   | 877.660μs   | 48.916μs  | 6.14%  | 3.87x  |
-| DenormalizeArticleBench | benchIteration1WithCache  |     |        | []     | 50   | 30  | 6,486,093b | 2,761.260μs | 3,166.854μs | 2,963.546μs | 4,711.600μs | 489.760μs | 15.47% | 15.40x |
-| DenormalizeArticleBench | benchIteration1           |     |        | []     | 50   | 30  | 5,748,895b | 1,578.460μs | 1,724.799μs | 1,681.579μs | 2,048.940μs | 113.624μs | 6.59%  | 8.39x  |
-| DenormalizeArticleBench | benchIteration2           |     |        | []     | 50   | 30  | 5,789,850b | 841.240μs   | 1,051.113μs | 947.955μs   | 1,750.100μs | 245.442μs | 23.35% | 5.11x  |
-| DenormalizeArticleBench | benchIteration3WithCache  |     |        | []     | 50   | 30  | 6,486,055b | 2,830.560μs | 2,992.171μs | 2,928.322μs | 3,325.180μs | 128.881μs | 4.31%  | 14.55x |
-| DenormalizeArticleBench | benchIteration3           |     |        | []     | 50   | 30  | 5,749,098b | 1,594.320μs | 1,902.089μs | 1,744.422μs | 2,964.000μs | 353.609μs | 18.59% | 9.25x  |
-| DenormalizeArticleBench | benchIteration4           |     |        | []     | 50   | 30  | 5,774,577b | 720.520μs   | 820.649μs   | 821.035μs   | 972.300μs   | 57.285μs  | 6.98%  | 3.99x  |
-| DenormalizeArticleBench | benchCustomWithConfig     |     |        | []     | 50   | 30  | 5,823,098b | 1,246.180μs | 1,368.924μs | 1,372.057μs | 1,579.460μs | 77.426μs  | 5.66%  | 6.66x  |
-| DenormalizeArticleBench | benchCustomWithReflection |     |        | []     | 50   | 30  | 6,486,880b | 2,335.140μs | 2,671.507μs | 2,474.711μs | 3,993.760μs | 403.226μs | 15.09% | 12.99x |
-| DenormalizeArticleBench | benchSymfony              |     |        | []     | 50   | 30  | 6,563,819b | 2,692.000μs | 2,864.325μs | 2,767.577μs | 3,420.680μs | 156.726μs | 5.47%  | 13.93x |
-| DenormalizeArticleBench | benchSymfonyProxy         |     |        | []     | 50   | 30  | 6,490,979b | 2,421.720μs | 2,735.031μs | 2,545.931μs | 4,610.400μs | 550.397μs | 20.12% | 13.30x |
-| NormalizeSmallBench     | benchMap                  |     |        | []     | 50   | 30  | 5,414,664b | 400.200μs   | 463.751μs   | 423.487μs   | 616.560μs   | 50.267μs  | 10.84% | 2.25x  |
-| NormalizeSmallBench     | benchReflection           |     |        | []     | 50   | 30  | 5,992,896b | 589.100μs   | 698.739μs   | 646.449μs   | 946.480μs   | 89.080μs  | 12.75% | 3.40x  |
-| NormalizeSmallBench     | benchSymfony              |     |        | []     | 50   | 30  | 5,552,296b | 374.500μs   | 502.091μs   | 421.526μs   | 1,125.440μs | 172.337μs | 34.32% | 2.44x  |
-| NormalizeSmallBench     | benchSymfonyProxy         |     |        | []     | 50   | 30  | 5,993,336b | 658.500μs   | 766.249μs   | 790.622μs   | 1,019.540μs | 75.024μs  | 9.79%  | 3.73x  |
-| NormalizeArticleBench   | benchMap                  |     |        | []     | 50   | 30  | 5,798,291b | 681.140μs   | 813.481μs   | 768.356μs   | 992.800μs   | 82.251μs  | 10.11% | 3.96x  |
-| NormalizeArticleBench   | benchReflection           |     |        | []     | 50   | 30  | 6,410,878b | 1,995.640μs | 2,337.365μs | 2,154.886μs | 4,461.540μs | 509.888μs | 21.81% | 11.36x |
-| NormalizeArticleBench   | benchSymfony              |     |        | []     | 50   | 30  | 5,986,809b | 1,407.340μs | 1,550.210μs | 1,480.062μs | 1,806.920μs | 95.754μs  | 6.18%  | 7.54x  |
-| NormalizeArticleBench   | benchSymfonyProxy         |     |        | []     | 50   | 30  | 6,413,746b | 2,115.560μs | 2,400.141μs | 2,288.178μs | 3,472.600μs | 315.005μs | 13.12% | 11.67x |
-+-------------------------+---------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+--------+
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
+| benchmark             | subject                       | tag | groups | params | revs | its | mem_peak   | best        | mean        | mode        | worst       | stdev     | rstdev | diff  |
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
+| DenormalizeSmallBench | benchIteration4WithConfigOnly |     |        | []     | 15   | 15  | 6,574,808b | 375.333μs   | 387.516μs   | 380.785μs   | 471.400μs   | 23.159μs  | 5.98%  | 1.00x |
+| DenormalizeSmallBench | benchIteration4WithReflection |     |        | []     | 15   | 15  | 6,574,808b | 375.800μs   | 393.218μs   | 383.998μs   | 464.933μs   | 24.479μs  | 6.23%  | 1.01x |
+| DenormalizeSmallBench | benchIteration2WithReflection |     |        | []     | 15   | 15  | 6,576,832b | 415.133μs   | 426.733μs   | 428.398μs   | 445.667μs   | 7.848μs   | 1.84%  | 1.10x |
+| DenormalizeSmallBench | benchIteration5WithConfigOnly |     |        | []     | 15   | 15  | 6,574,544b | 405.667μs   | 429.862μs   | 417.228μs   | 515.067μs   | 27.733μs  | 6.45%  | 1.11x |
+| DenormalizeSmallBench | benchIteration2WithConfigOnly |     |        | []     | 15   | 15  | 6,576,832b | 414.667μs   | 431.213μs   | 424.981μs   | 504.000μs   | 20.994μs  | 4.87%  | 1.11x |
+| DenormalizeSmallBench | benchIteration5WithReflection |     |        | []     | 15   | 15  | 6,574,544b | 405.000μs   | 436.693μs   | 416.286μs   | 618.600μs   | 54.919μs  | 12.58% | 1.13x |
+| DenormalizeSmallBench | benchIteration7WithReflection |     |        | []     | 15   | 15  | 6,577,280b | 455.933μs   | 475.782μs   | 467.184μs   | 521.267μs   | 20.208μs  | 4.25%  | 1.23x |
+| DenormalizeSmallBench | benchIteration6WithConfigOnly |     |        | []     | 15   | 15  | 6,574,920b | 464.000μs   | 483.707μs   | 474.056μs   | 568.867μs   | 26.478μs  | 5.47%  | 1.25x |
+| DenormalizeSmallBench | benchIteration7WithConfigOnly |     |        | []     | 15   | 15  | 6,577,280b | 453.267μs   | 486.498μs   | 464.297μs   | 601.600μs   | 45.110μs  | 9.27%  | 1.26x |
+| DenormalizeSmallBench | benchIteration6WithReflection |     |        | []     | 15   | 15  | 6,574,920b | 462.667μs   | 495.360μs   | 476.258μs   | 673.133μs   | 52.797μs  | 10.66% | 1.28x |
+| DenormalizeSmallBench | benchCustomWithConfigOnly     |     |        | []     | 15   | 15  | 6,607,272b | 630.733μs   | 669.178μs   | 650.222μs   | 811.800μs   | 49.216μs  | 7.35%  | 1.73x |
+| DenormalizeSmallBench | benchIteration1WithConfigOnly |     |        | []     | 15   | 15  | 6,560,080b | 844.333μs   | 875.778μs   | 856.814μs   | 964.667μs   | 38.487μs  | 4.39%  | 2.26x |
+| DenormalizeSmallBench | benchSymfony                  |     |        | []     | 15   | 15  | 7,280,624b | 2,021.533μs | 2,150.422μs | 2,130.163μs | 2,338.733μs | 73.215μs  | 3.40%  | 5.55x |
+| DenormalizeSmallBench | benchCustomWithReflection     |     |        | []     | 15   | 15  | 7,204,416b | 2,197.133μs | 2,279.236μs | 2,246.225μs | 2,482.200μs | 73.474μs  | 3.22%  | 5.88x |
+| DenormalizeSmallBench | benchSymfonyProxy             |     |        | []     | 15   | 15  | 7,205,192b | 2,258.333μs | 2,359.769μs | 2,316.943μs | 2,598.667μs | 96.251μs  | 4.08%  | 6.09x |
+| DenormalizeSmallBench | benchIteration1WithReflection |     |        | []     | 15   | 15  | 7,203,744b | 2,439.600μs | 2,528.831μs | 2,469.243μs | 2,783.867μs | 108.108μs | 4.28%  | 6.53x |
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
 ```
 
-Please note that the *WithCache* suffix is confusing, it actually points to
-implementations using runtime reflection to determine types.
+### Normalizing very small objects
 
+```
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
+| benchmark             | subject                       | tag | groups | params | revs | its | mem_peak   | best        | mean        | mode        | worst       | stdev     | rstdev | diff  |
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
+| TheOtherWaySmallBench | benchIteration7WithConfigOnly |     |        | []     | 15   | 15  | 6,568,912b | 243.933μs   | 262.853μs   | 252.839μs   | 318.533μs   | 20.313μs  | 7.73%  | 1.00x |
+| TheOtherWaySmallBench | benchIteration7WithReflection |     |        | []     | 15   | 15  | 6,568,912b | 242.733μs   | 265.267μs   | 250.417μs   | 351.800μs   | 32.839μs  | 12.38% | 1.01x |
+| TheOtherWaySmallBench | benchIteration1WithConfigOnly |     |        | []     | 15   | 15  | 6,536,336b | 428.267μs   | 455.916μs   | 447.352μs   | 583.067μs   | 34.837μs  | 7.64%  | 1.73x |
+| TheOtherWaySmallBench | benchCustomWithConfigOnly     |     |        | []     | 15   | 15  | 6,596,480b | 456.867μs   | 484.596μs   | 478.795μs   | 520.533μs   | 17.331μs  | 3.58%  | 1.84x |
+| TheOtherWaySmallBench | benchSymfony                  |     |        | []     | 15   | 15  | 6,760,336b | 590.133μs   | 618.489μs   | 605.904μs   | 754.600μs   | 39.306μs  | 6.36%  | 2.35x |
+| TheOtherWaySmallBench | benchIteration1WithReflection |     |        | []     | 15   | 15  | 7,194,544b | 1,897.867μs | 2,016.329μs | 2,001.948μs | 2,238.800μs | 90.053μs  | 4.47%  | 7.67x |
+| TheOtherWaySmallBench | benchCustomWithReflection     |     |        | []     | 15   | 15  | 7,195,216b | 1,950.800μs | 2,132.684μs | 2,044.819μs | 2,713.400μs | 201.825μs | 9.46%  | 8.11x |
+| TheOtherWaySmallBench | benchSymfonyProxy             |     |        | []     | 15   | 15  | 7,195,992b | 2,017.800μs | 2,137.627μs | 2,073.905μs | 2,339.933μs | 106.468μs | 4.98%  | 8.13x |
++-----------------------+-------------------------------+-----+--------+--------+------+-----+------------+-------------+-------------+-------------+-------------+-----------+--------+-------+
+```
+
+### Denormalizing large objects with multiple inheritance levels
+
+```
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+| benchmark               | subject                       | tag | groups | params | revs | its | mem_peak   | best         | mean         | mode         | worst        | stdev     | rstdev | diff   |
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+| DenormalizeArticleBench | benchIteration5WithReflection |     |        | []     | 15   | 15  | 6,624,362b | 879.667μs    | 978.409μs    | 982.655μs    | 1,080.533μs  | 46.233μs  | 4.73%  | 1.00x  |
+| DenormalizeArticleBench | benchIteration4WithConfigOnly |     |        | []     | 15   | 15  | 6,624,494b | 930.667μs    | 984.116μs    | 968.178μs    | 1,081.600μs  | 43.452μs  | 4.42%  | 1.01x  |
+| DenormalizeArticleBench | benchIteration5WithConfigOnly |     |        | []     | 15   | 15  | 6,624,364b | 936.733μs    | 994.724μs    | 970.229μs    | 1,192.200μs  | 66.027μs  | 6.64%  | 1.02x  |
+| DenormalizeArticleBench | benchIteration2WithReflection |     |        | []     | 15   | 15  | 6,634,997b | 1,059.467μs  | 1,132.644μs  | 1,091.771μs  | 1,285.600μs  | 68.522μs  | 6.05%  | 1.16x  |
+| DenormalizeArticleBench | benchIteration6WithConfigOnly |     |        | []     | 15   | 15  | 6,624,410b | 1,056.667μs  | 1,166.040μs  | 1,175.607μs  | 1,254.000μs  | 49.585μs  | 4.25%  | 1.19x  |
+| DenormalizeArticleBench | benchIteration2WithConfigOnly |     |        | []     | 15   | 15  | 6,635,710b | 1,054.267μs  | 1,166.929μs  | 1,118.013μs  | 1,328.000μs  | 82.964μs  | 7.11%  | 1.19x  |
+| DenormalizeArticleBench | benchIteration6WithReflection |     |        | []     | 15   | 15  | 6,624,742b | 1,082.267μs  | 1,185.524μs  | 1,175.837μs  | 1,285.733μs  | 57.043μs  | 4.81%  | 1.21x  |
+| DenormalizeArticleBench | benchIteration7WithConfigOnly |     |        | []     | 15   | 15  | 6,658,483b | 1,153.600μs  | 1,248.080μs  | 1,196.183μs  | 1,473.600μs  | 98.204μs  | 7.87%  | 1.28x  |
+| DenormalizeArticleBench | benchIteration7WithReflection |     |        | []     | 15   | 15  | 6,658,508b | 1,180.800μs  | 1,335.640μs  | 1,385.584μs  | 1,451.200μs  | 85.723μs  | 6.42%  | 1.37x  |
+| DenormalizeArticleBench | benchCustomWithConfigOnly     |     |        | []     | 15   | 15  | 6,670,859b | 1,872.667μs  | 2,073.307μs  | 2,103.217μs  | 2,253.933μs  | 102.006μs | 4.92%  | 2.12x  |
+| DenormalizeArticleBench | benchIteration1WithConfigOnly |     |        | []     | 15   | 15  | 6,594,358b | 3,005.600μs  | 3,186.889μs  | 3,195.733μs  | 3,338.333μs  | 98.687μs  | 3.10%  | 3.26x  |
+| DenormalizeArticleBench | benchSymfony                  |     |        | []     | 15   | 15  | 7,427,237b | 4,465.267μs  | 4,717.373μs  | 4,629.497μs  | 5,126.067μs  | 197.297μs | 4.18%  | 4.82x  |
+| DenormalizeArticleBench | benchCustomWithReflection     |     |        | []     | 15   | 15  | 7,354,583b | 9,834.333μs  | 10,476.747μs | 10,231.877μs | 11,664.467μs | 515.844μs | 4.92%  | 10.71x |
+| DenormalizeArticleBench | benchSymfonyProxy             |     |        | []     | 15   | 15  | 7,355,357b | 10,641.133μs | 11,187.507μs | 11,388.919μs | 12,010.733μs | 408.076μs | 3.65%  | 11.43x |
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+```
+
+### Normalizing large objects with multiple inheritance levels
+
+```
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+| benchmark               | subject                       | tag | groups | params | revs | its | mem_peak   | best         | mean         | mode         | worst        | stdev     | rstdev | diff   |
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+| TheOtherWayArticleBench | benchIteration7WithReflection |     |        | []     | 15   | 15  | 6,668,389b | 527.467μs    | 560.587μs    | 554.696μs    | 650.600μs    | 27.561μs  | 4.92%  | 1.00x  |
+| TheOtherWayArticleBench | benchIteration7WithConfigOnly |     |        | []     | 15   | 15  | 6,668,254b | 533.400μs    | 572.747μs    | 556.026μs    | 656.400μs    | 35.610μs  | 6.22%  | 1.02x  |
+| TheOtherWayArticleBench | benchCustomWithConfigOnly     |     |        | []     | 15   | 15  | 6,645,334b | 1,610.400μs  | 1,753.920μs  | 1,691.582μs  | 1,947.667μs  | 100.245μs | 5.72%  | 3.13x  |
+| TheOtherWayArticleBench | benchIteration1WithConfigOnly |     |        | []     | 15   | 15  | 6,605,880b | 1,555.600μs  | 1,886.280μs  | 1,893.617μs  | 2,120.067μs  | 138.489μs | 7.34%  | 3.36x  |
+| TheOtherWayArticleBench | benchSymfony                  |     |        | []     | 15   | 15  | 6,839,113b | 2,260.733μs  | 2,359.436μs  | 2,341.765μs  | 2,554.400μs  | 73.247μs  | 3.10%  | 4.21x  |
+| TheOtherWayArticleBench | benchCustomWithReflection     |     |        | []     | 15   | 15  | 7,341,492b | 9,413.467μs  | 10,012.391μs | 9,741.095μs  | 10,653.600μs | 418.889μs | 4.18%  | 17.86x |
+| TheOtherWayArticleBench | benchSymfonyProxy             |     |        | []     | 15   | 15  | 7,342,292b | 9,802.400μs  | 10,366.564μs | 10,251.729μs | 11,353.800μs | 409.447μs | 3.95%  | 18.49x |
+| TheOtherWayArticleBench | benchIteration1WithReflection |     |        | []     | 15   | 15  | 7,341,487b | 10,761.800μs | 11,271.644μs | 11,097.759μs | 12,336.800μs | 399.588μs | 3.55%  | 20.11x |
++-------------------------+-------------------------------+-----+--------+--------+------+-----+------------+--------------+--------------+--------------+--------------+-----------+--------+--------+
+```
