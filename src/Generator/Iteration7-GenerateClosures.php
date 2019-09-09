@@ -245,7 +245,7 @@ EOT
             if (\class_exists($type)) {
                 $normalizerClassName = $this->generateNormalizerClass($type);
                 $ret[] = "if (null !== \$value) {";
-                $ret[] = "    \$value = \\".$normalizerClassName."::denormalize(\$value, \$context, \$normalizer);";
+                $ret[] = "    \$value = \\".$normalizerClassName."::denormalize(\$value, \$context, \$denormalizer);";
                 if ($property->isOptional()) {
                     $ret[] = "    if (!(".$validation.")) {";
                     $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";

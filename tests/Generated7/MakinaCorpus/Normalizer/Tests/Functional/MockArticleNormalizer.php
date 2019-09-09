@@ -220,7 +220,7 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
         // Denormalize 'text' property
         $value = Helper\find_value($input, ['text'], $context);
         if (null !== $value) {
-            $value = \Generated7\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($value, $context, $normalizer);
+            $value = \Generated7\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($value, $context, $denormalizer);
             if (!(null === $value || $value instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
