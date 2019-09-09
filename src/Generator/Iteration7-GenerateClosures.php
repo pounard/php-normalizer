@@ -1,148 +1,24 @@
 <?php
 /**
- * Iteration #5.
+ * Iteration #7.
  *
- * Generate code recursively stopping on blacklists.
+ * Re-use code from iteration #7 - generate code within closures for direct
+ * objects property access, and correct property access, depending on the
+ * declaring class.
  */
 
 declare(strict_types=1);
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\NamingStrategy;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
 
 /**
- * Normalizer
- */
-final class Normalizer5
-{
-    /** @var \Generator5 */
-    private $generator;
-
-    /**
-     * Constructor
-     */
-    public function __construct(Generator5 $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    /**
-     * Dernormalise object
-     */
-    public function denormalize(string $type, /* string|array|T */ $input, Context $context) /* : T */
-    {
-        $nativeType = $context->getNativeType($type);
-
-        $external = hydrator1_external_implementation($nativeType, $input, $context);
-        if ($external->handled) {
-            return $external->value;
-        }
-
-        $normalizer = $this->generator->getNormalizerClass($nativeType);
-
-        if (!$normalizer) {
-            throw new \RuntimeException("Implemeent me");
-        }
-
-        return \call_user_func(
-            [$normalizer, 'denormalize'],
-            $input,
-            $context,
-            [$this, 'denormalize']
-        );
-    }
-}
-
-/**
- * Generator interface
- */
-interface Generator5
-{
-    /**
-     * Get normalizer class name
-     *
-     * It can return null if the class does not exist and the generator is not
-     * able to generate the normalizer.
-     */
-    public function getNormalizerClass(string $className): ?string;
-
-    /**
-     * Get normalizer class
-     *
-     * @return string
-     *   Generated normalizer class name
-     */
-    public function generateNormalizerClass(string $className): string;
-}
-
-/**
  * Generator wrapper, with naming strategy
  */
-final class Generator5Runtime implements Generator5
-{
-    /** @var \MakinaCorpus\Normalizer\NamingStrategy */
-    private $namingStrategy;
-
-    /** @var string[] */
-    private $nameMap = [];
-
-    /**
-     * Constructor
-     *
-     * @param string $projectSourceRoot
-     */
-    public function __construct(?NamingStrategy $namingStrategy)
-    {
-        if (!$namingStrategy) {
-            $namingStrategy = new Psr4AppNamingStrategy();
-        }
-        $this->namingStrategy = $namingStrategy;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNormalizerClass(string $className): ?string
-    {
-        $normalizerClass = $this->nameMap[$className] ?? null;
-        if ($normalizerClass) {
-            return $normalizerClass;
-        }
-        if (false === $normalizerClass) {
-            return null;
-        }
-
-        $normalizerClass = $this->namingStrategy->generateClassName($className, '\\');
-
-        if (!\class_exists($normalizerClass)) {
-            // We store booleans in the array otherwise isset() could return
-            // null, we should then user \array_key_exists(), but it is way
-            // slower to execute.
-            $this->nameMap[$normalizerClass] = false;
-
-            return null;
-        }
-
-        return $normalizerClass;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function generateNormalizerClass(string $className): string
-    {
-        throw new \LogicException("You cannot wake up the generator at runtime");
-    }
-}
-
-/**
- * Generator wrapper, with naming strategy
- */
-final class Generator5Impl implements Generator5
+final class Generator7Impl implements Generator5
 {
     /** @var \MakinaCorpus\Normalizer\ContextFactory */
     private $contextFactory;
@@ -164,7 +40,7 @@ final class Generator5Impl implements Generator5
     public function __construct(ContextFactory $contextFactory, string $projectSourceDirectory, ?string $projectPsr4Namespace = null)
     {
         $this->contextFactory = $contextFactory;
-        $this->namingStrategy = new Psr4AppNamingStrategy('Normalizer', 'Generated5');
+        $this->namingStrategy = new Psr4AppNamingStrategy('Normalizer', 'Generated7');
         $this->projectPsr4Namespace = $projectPsr4Namespace;
         $this->projectSourceDirectory = $projectSourceDirectory;
     }
@@ -315,7 +191,7 @@ final class Generator5Impl implements Generator5
         // Denormalize '{$propName}' property
         \$value = Helper\\find_value(\$input, {$candidateNames}, \$context);
         {$handleCode}
-        \call_user_func(self::\$accessor, \$ret, '{$propName}', \$value);
+        \$instance->{$propName} = \$value;
 EOT
         );
     }
@@ -348,7 +224,7 @@ EOT
                 }
             }
         }
-        \call_user_func(self::\$accessor, \$ret, '{$propName}', \$propValue);
+        \$instance->{$propName} = \$propValue;
 EOT
         );
     }
@@ -391,10 +267,36 @@ EOT
         $generatedLocalClassName = \array_pop($parts);
         $generatedClassNamespace = \implode('\\', $parts);
 
-        $imports = [Context::class];
+        $imports = [Context::class, 'MakinaCorpus\Normalizer as Helper'];
         if ($generatedClassNamespace !== $classNamespace) {
             $imports[] = $nativeType;
         }
+
+        // Class static closures.
+        $closures = [];
+
+        // Create a property map based upon the declaring class and access
+        // scope (private, protected).
+        $perClassMap = [];
+        $index = 0;
+        /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
+        foreach ($properties = $typeDef->getProperties() as $property) {
+            // Get relative name.
+            // @todo handle name conflicts.
+            $parts = \array_filter(\explode('\\', $declaringClass = $property->getDeclaringClass()));
+            $localDeclaringClassName = \array_pop($parts);
+            // Only create a new closure for when the property cannot be
+            // accessed by the hydrated class.
+            if ('private' === $property->getDeclaredScope() && $declaringClass !== $nativeType) {
+                $imports[] = $declaringClass;
+                $perClassMap[$localDeclaringClassName][] = $property;
+            } else {
+                $perClassMap[$localDeclaringClassName][] = $property;
+            }
+            $closures[$localClassName] = 'denormalizer'.($index++);
+        }
+
+        // Generate imports.
         \sort($imports);
         $importsAsString = "use ".\implode(";\nuse ", $imports).';';
 
@@ -412,14 +314,25 @@ namespace {$generatedClassNamespace};
 
 {$importsAsString}
 
-use MakinaCorpus\Normalizer as Helper;
-
+/**
+ * Public implementation of (de)normalizer for class {$localClassName}.
+ */
 final class {$generatedLocalClassName}
 {
-    // @todo Use GeneratedHydrator trick for inheritance
-    /** @var callable */
-    public static \$accessor;
+EOT
+        );
 
+        $writer->write("\n");
+        for ($index = 0; $index < \count($perClassMap); $index++) {
+            $writer->write(<<<EOT
+    /** @var callable */
+    public static \$denormalizer{$index};
+EOT
+            );
+            $writer->write("\n\n");
+        }
+
+        $writer->write(<<<EOT
     /**
      * Create and normalize {$nativeType} instances.
      *
@@ -435,28 +348,49 @@ final class {$generatedLocalClassName}
 EOT
         );
 
-        $properties = $typeDef->getProperties();
-        if ($properties) {
-            foreach ($typeDef->getProperties() as $property) {
-                $writer->write("\n\n");
-                $this->generateProperty($property, $context, $writer);
-            }
+        $writer->write("\n");
+        for ($index = 0; $index < \count($perClassMap); $index++) {
+            $writer->write("\n");
+            $writer->write(<<<EOT
+        (self::\$denormalizer{$index})(\$ret, \$input, \$context, \$normalizer);
+EOT
+            );
         }
-
         $writer->write("\n\n");
+
         $writer->write(<<<EOT
         return \$ret;
     }
 }
-
-{$localClassName}Normalizer::\$accessor = \Closure::bind(
-    static function ({$localClassName} \$instance, string \$propName, \$value): void {
-        \$instance->{\$propName} = \$value;
-    },
-    null, {$localClassName}::class
-);
 EOT
         );
+
+        $index = 0;
+        foreach ($perClassMap as $className => $properties) {
+            $writer->write("\n\n");
+            $writer->write(<<<EOT
+/**
+ * Denormalizer for properties of {$className}.
+ */
+{$localClassName}Normalizer::\$denormalizer{$index} = \Closure::bind(
+    static function ({$className} \$instance, array \$input, Context \$context, ?callable \$normalizer = null): void {
+EOT
+            );
+
+            foreach ($properties as $property) {
+                $writer->write("\n\n");
+                $this->generateProperty($property, $context, $writer);
+            }
+
+            $writer->write("\n");
+            $writer->write(<<<EOT
+    },
+    null, {$className}::class
+);
+EOT
+            );
+            $index++;
+        }
 
         $writer->write("\n");
 

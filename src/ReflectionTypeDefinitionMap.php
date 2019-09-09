@@ -74,26 +74,26 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
                     if ($type->isCollection()) {
                         $valueType = $type->getCollectionValueType();
                         return [
-                            'type' => $valueType->getClassName() ?? $valueType->getBuiltinType(),
-                            'optional' => $type->isNullable(),
                             'collection' => true,
                             'collection_type' => $type->getClassName() ?? $type->getBuiltinType(),
+                            'optional' => $type->isNullable(),
+                            'type' => $valueType->getClassName() ?? $valueType->getBuiltinType(),
                         ];
                     }
                     return [
-                        'type' => $type->getClassName() ?? $type->getBuiltinType(),
-                        'optional' => $type->isNullable(),
                         'collection' => false,
                         'collection_type' => $type->getBuiltinType(),
+                        'optional' => $type->isNullable(),
+                        'type' => $type->getClassName() ?? $type->getBuiltinType(),
                     ];
                 }
             }
         }
 
         return [
-            'type' => null,
-            'optional' => true,
             'collection' => false,
+            'optional' => true,
+            'type' => null,
         ];
     }
 
@@ -126,7 +126,10 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 
         /** @var \ReflectionProperty $propDef */
         foreach ($this->findAllProperties($ref) as $propDef) {
-            $data['properties'][$propDef->getName()] = $this->findPropertyDefinition($class, $propDef);
+            $def = $this->findPropertyDefinition($class, $propDef);
+            $def['declared_scope'] = $propDef->isProtected() ? 'protected' : ($propDef->isPrivate() ? 'private' : 'public');
+            $def['declaring_class'] = $propDef->getDeclaringClass()->name;
+            $data['properties'][$propDef->getName()] = $def;
         }
 
         return DefaultTypeDefinition::fromArray($class, $data);

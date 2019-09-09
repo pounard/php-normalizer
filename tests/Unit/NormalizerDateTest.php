@@ -9,7 +9,7 @@ use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\InvalidValueTypeError;
 use MakinaCorpus\Normalizer\Option;
-use MakinaCorpus\Normalizer\UnupportedTypeError;
+use MakinaCorpus\Normalizer\UnsupportedTypeError;
 use PHPUnit\Framework\TestCase;
 
 final class NormalizerDateTest extends TestCase
@@ -62,7 +62,7 @@ final class NormalizerDateTest extends TestCase
         $context = $this->createContext();
         $normalizer = new DateNormalizer();
 
-        $this->expectException(UnupportedTypeError::class);
+        $this->expectException(UnsupportedTypeError::class);
         $normalizer->normalize('BWAAAA', new \DateTime(), $context);
     }
 
@@ -106,7 +106,7 @@ final class NormalizerDateTest extends TestCase
         $context = $this->createContext();
         $normalizer = new DateNormalizer();
 
-        $this->expectException(UnupportedTypeError::class);
+        $this->expectException(UnsupportedTypeError::class);
         $normalizer->denormalize('BWAAAA', '2019-06-22', $context);
     }
 

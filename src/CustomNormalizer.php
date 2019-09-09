@@ -58,7 +58,7 @@ final class ScalarNormalizer implements Normalizer, Denormalizer
                 return (string)$object;
 
             default:
-                throw new UnupportedTypeError(\sprintf("Unsupported type '%s'", $type));
+                throw new UnsupportedTypeError(\sprintf("Unsupported type '%s'", $type));
         }
     }
 
@@ -155,7 +155,7 @@ final class DateNormalizer implements Normalizer, Denormalizer
                 );
         }
 
-        throw new UnupportedTypeError(\sprintf("Unsupported type '%s'", $type));
+        throw new UnsupportedTypeError(\sprintf("Unsupported type '%s'", $type));
     }
 
     /**
@@ -182,7 +182,7 @@ final class DateNormalizer implements Normalizer, Denormalizer
                 return self::createDateWithFormat($format, $data);
         }
 
-        throw new UnupportedTypeError(\sprintf("Unsupported type '%s'", $type));
+        throw new UnsupportedTypeError(\sprintf("Unsupported type '%s'", $type));
     }
 }
 

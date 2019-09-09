@@ -76,24 +76,26 @@ final class DenormalizeSmallBench
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration3WithReflection() : void
     {
         foreach ($this->data as $data) {
             \hydrator3(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration3WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             \hydrator3(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
+     */
 
     /**
      * @Revs(50)
@@ -136,6 +138,50 @@ final class DenormalizeSmallBench
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer5->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration6WithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer6->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration6WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer6->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration7WithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer7->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration7WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer7->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 

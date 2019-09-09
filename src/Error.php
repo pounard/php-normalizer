@@ -40,7 +40,7 @@ final class InvalidValueTypeError
 {
 }
 
-final class UnupportedTypeError
+final class UnsupportedTypeError
     extends \InvalidArgumentException
     implements DataTransformationError
 {

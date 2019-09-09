@@ -10,6 +10,11 @@ namespace MakinaCorpus\Normalizer;
 interface PropertyDefinition
 {
     /**
+     * Always assume the worse
+     */
+    const DEFAULT_SCOPE = 'private';
+
+    /**
      * Get property native name
      */
     public function getNativeName(): string;
@@ -40,6 +45,16 @@ interface PropertyDefinition
     public function getOwnerType(): string;
 
     /**
+     * Class declaring the property
+     */
+    public function getDeclaringClass(): string;
+
+    /**
+     * Get declared scope, may return 'public', 'protected' or 'private'.
+     */
+    public function getDeclaredScope(): string;
+
+    /**
      * May return a PHP type, a normalized type name, or a type alias
      */
     public function getTypeName(): string;
@@ -66,6 +81,8 @@ interface PropertyDefinition
      *   - aliases: string[] (default: string[])
      *   - collection: bool (default: false)
      *   - collection_type: string (default: array)
+     *   - declared_scope: string (default: private)
+     *   - declaring_class: string (default: owner value)
      *   - groups: string[] (default: [])
      *   - normalized_name: ?string (default: null)
      *   - optional: bool (default: false)
@@ -193,6 +210,12 @@ final class DefaultPropertyDefinition implements PropertyDefinition
     /** @var string */
     private $owner;
 
+    /** @var ?string */
+    private $declaringClass;
+
+    /** @var ?string */
+    private $declaredScope;
+
     /** @var string */
     private $type;
 
@@ -205,6 +228,8 @@ final class DefaultPropertyDefinition implements PropertyDefinition
         $ret->aliases = $definition['aliases'] ?? null;
         $ret->collection = (bool)($definition['collection'] ?? false);
         $ret->collectionType = $definition['collection_type'] ?? null;
+        $ret->declaredScope = $definition['declared_scope'] ?? null;
+        $ret->declaringClass = $definition['declaring_class'] ?? null;
         $ret->groups = $definition['groups'] ?? [];
         $ret->name = $name;
         $ret->normalizedName = $definition['normalized_name'] ?? null;
@@ -284,6 +309,22 @@ final class DefaultPropertyDefinition implements PropertyDefinition
     }
 
     /**
+     * Class declaring the property
+     */
+    public function getDeclaringClass(): string
+    {
+        return $this->declaringClass ?? $this->owner;
+    }
+
+    /**
+     * Get declared scope, may return 'public', 'protected' or 'private'.
+     */
+    public function getDeclaredScope(): string
+    {
+        return $this->declaredScope ?? self::DEFAULT_SCOPE;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getGroups(): array
@@ -318,6 +359,12 @@ final class DefaultPropertyDefinition implements PropertyDefinition
         if (isset($overrides['collection_type'])) {
             $ret->collectionType = $overrides['collection_type'];
         }
+        if (isset($overrides['declared_scope'])) {
+            $ret->declaredScope = $overrides['declared_scope'];
+        }
+        if (isset($overrides['declaring_class'])) {
+            $ret->declaringClass = $overrides['declaring_class'];
+        }
         if (isset($overrides['groups'])) {
             $ret->groups = \array_unique(\array_merge($ret->groups, $overrides['groups']));
         }
@@ -343,6 +390,8 @@ final class DefaultPropertyDefinition implements PropertyDefinition
             'aliases' => $this->aliases,
             'collection' => $this->collection,
             'collection_type' => $this->collectionType,
+            'declared_scope' => $this->declaredScope,
+            'declaring_class' => $this->declaringClass,
             'groups' => $this->groups,
             'normalized_name' => $this->normalizedName,
             'optional' => $this->optional,
