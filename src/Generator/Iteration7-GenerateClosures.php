@@ -5,6 +5,11 @@
  * Re-use code from iteration #7 - generate code within closures for direct
  * objects property access, and correct property access, depending on the
  * declaring class.
+ *
+ * Next step:
+ *   - better error handling, add handle_type_mismatch() function,
+ *   - remove enter() and leave() calls in generated code,
+ *   - then normalizers!
  */
 
 declare(strict_types=1);
