@@ -185,6 +185,16 @@ vendor/bin/phpbench run --report 'generator: "table", sort: {benchmark: "asc", m
 Please note that all results are to be taken with prudence: some of the
 iterations don't lead to coherent data, Symfony itself misbehave sometimes.
 
+Also you have to note that Symfony implementation is not bootstrapped using
+full caches, as it would within a Symfony application in production mode,
+nevertheless you have to take into account that:
+
+ - class discrimination is not setup, it makes it faster,
+ - no annotations were used, and Doctrine annotations are not setup, it should
+   also make it faster,
+ - tested use cases are not complex, there is no nested objects, only one
+   in the "article" tests.
+
 Implementations that works fine are:
 
  - Iteration1
