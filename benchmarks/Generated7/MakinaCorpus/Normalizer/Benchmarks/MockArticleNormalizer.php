@@ -233,7 +233,6 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
  */
 MockArticleNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-
         // Denormalize 'title' property
         $value = $object->title;
         $value = Helper\to_string($value, $context);
@@ -247,7 +246,6 @@ MockArticleNormalizer::$normalizer1 = \Closure::bind(
  */
 MockArticleNormalizer::$denormalizer1 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-
         // Denormalize 'title' property
         $value = Helper\find_value($input, ['title'], $context);
         $value = Helper\to_string($value, $context);
@@ -261,7 +259,6 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
  */
 MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
-
         // Denormalize 'text' property
         $value = $object->text;
         if (null !== $value) {
@@ -277,7 +274,6 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
  */
 MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-
         // Denormalize 'text' property
         $value = Helper\find_value($input, ['text'], $context);
         if (null !== $value) {

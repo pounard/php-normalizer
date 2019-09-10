@@ -528,8 +528,13 @@ EOT
 EOT
             );
 
+            $count = \count($properties);
             foreach ($properties as $property) {
-                $writer->write("\n\n");
+                if (1 === $count) { // Minor useless tweak.
+                    $writer->write("\n");
+                } else {
+                    $writer->write("\n\n");
+                }
                 $this->generateNormalizerProperty($property, $context, $writer);
             }
 
@@ -547,8 +552,13 @@ EOT
 EOT
             );
 
+            $count = \count($properties);
             foreach ($properties as $property) {
-                $writer->write("\n\n");
+                if (1 === $count) { // Minor useless tweak.
+                    $writer->write("\n");
+                } else {
+                    $writer->write("\n\n");
+                }
                 $this->generateDenormalizerProperty($property, $context, $writer);
             }
 
