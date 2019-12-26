@@ -104,32 +104,38 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'id' required property
         $option = Helper::find($input, ['id'], $context);
-        if (null === $option->value) {
-            if (null === $instance->id) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
+            } else if (null === $option->value) {
+                $instance->id = null;
+            } else {
+                $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
             }
-        } else {
-            $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'createdAt' required property
         $option = Helper::find($input, ['createdAt'], $context);
-        if (null === $option->value) {
-            if (null === $instance->createdAt) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+            } else if (null === $option->value) {
+                $instance->createdAt = null;
+            } else {
+                $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
             }
-        } else {
-            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'updatedAt' required property
         $option = Helper::find($input, ['updatedAt'], $context);
-        if (null === $option->value) {
-            if (null === $instance->updatedAt) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
+            } else if (null === $option->value) {
+                $instance->updatedAt = null;
+            } else {
+                $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
             }
-        } else {
-            $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'authors' collection property
@@ -172,22 +178,22 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
 
         // Denormalize 'title' nullable property
         $option = Helper::find($input, ['title'], $context);
-        if (null === $option->value) {
-            if (null !== $instance->title && $option->success) {
+        if ($option->success) {
+            if (null === $option->value) {
                 $instance->title = null;
+            } else {
+                $instance->title = Helper::toString($option->value);
             }
-        } else {
-            $instance->title = Helper::toString($option->value);
         }
 
         // Denormalize 'text' nullable property
         $option = Helper::find($input, ['text'], $context);
-        if (null === $option->value) {
-            if (null !== $instance->text && $option->success) {
+        if ($option->success) {
+            if (null === $option->value) {
                 $instance->text = null;
+            } else {
+                $instance->text = \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($option->value, $context, $denormalizer);
             }
-        } else {
-            $instance->text = \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($option->value, $context, $denormalizer);
         }
     },
     null, MockWithText::class

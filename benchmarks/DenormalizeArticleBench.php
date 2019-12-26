@@ -7,6 +7,9 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
 /**
  * Benchmark stream denormalization
  *
+ * Iteration 2 to 6 are disabled because they don't support class inheritance,
+ * or wrongly, which makes results bias and useless.
+ *
  * @BeforeMethods({"setUp"})
  */
 final class DenormalizeArticleBench
@@ -49,24 +52,26 @@ final class DenormalizeArticleBench
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration2WithReflection() : void
     {
         foreach ($this->data as $data) {
             display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration2WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not(\hydrator2(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)
@@ -107,57 +112,62 @@ final class DenormalizeArticleBench
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration4WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not(\hydrator4(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration5WithReflection() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer5->denormalize(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration5WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer5->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration6WithReflection() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer6->denormalize(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration6WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer6->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)

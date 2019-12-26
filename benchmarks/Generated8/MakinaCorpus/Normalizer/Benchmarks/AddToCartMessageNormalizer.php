@@ -86,32 +86,38 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'orderId' required property
         $option = Helper::find($input, ['orderId'], $context);
-        if (null === $option->value) {
-            if (null === $instance->orderId) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'orderId'), $context);
+            } else if (null === $option->value) {
+                $instance->orderId = null;
+            } else {
+                $instance->orderId = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
             }
-        } else {
-            $instance->orderId = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'productId' required property
         $option = Helper::find($input, ['productId'], $context);
-        if (null === $option->value) {
-            if (null === $instance->productId) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'productId'), $context);
+            } else if (null === $option->value) {
+                $instance->productId = null;
+            } else {
+                $instance->productId = Helper::toInt($option->value);
             }
-        } else {
-            $instance->productId = Helper::toInt($option->value);
         }
 
         // Denormalize 'amount' required property
         $option = Helper::find($input, ['amount'], $context);
-        if (null === $option->value) {
-            if (null === $instance->amount) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'amount'), $context);
+            } else if (null === $option->value) {
+                $instance->amount = null;
+            } else {
+                $instance->amount = Helper::toFloat($option->value);
             }
-        } else {
-            $instance->amount = Helper::toFloat($option->value);
         }
     },
     null, AddToCartMessage::class

@@ -258,12 +258,12 @@ EOT
             $writer->write(<<<EOT
         // Denormalize '{$propName}' nullable property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (null === {$input}) {
-            if (null !== {$output} && \$option->success) {
+        if (\$option->success) {
+            if (null === {$input}) {
                 {$output} = null;
+            } else {
+                {$output} = {$denormalizeCall};
             }
-        } else {
-            {$output} = {$denormalizeCall};
         }
 EOT
             );
@@ -271,12 +271,14 @@ EOT
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (null === {$input}) {
-            if (null === {$output}) {
+        if (\$option->success) {
+            if (null === {$input}) {
                 Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            } else if (null === {$input}) {
+                {$output} = null;
+            } else {
+                {$output} = {$denormalizeCall};
             }
-        } else {
-            {$output} = {$denormalizeCall};
         }
 EOT
             );

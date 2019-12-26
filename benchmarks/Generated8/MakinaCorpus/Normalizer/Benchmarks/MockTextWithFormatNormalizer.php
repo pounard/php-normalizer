@@ -83,22 +83,24 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'text' nullable property
         $option = Helper::find($input, ['text', 'value'], $context);
-        if (null === $option->value) {
-            if (null !== $instance->text && $option->success) {
+        if ($option->success) {
+            if (null === $option->value) {
                 $instance->text = null;
+            } else {
+                $instance->text = Helper::toString($option->value);
             }
-        } else {
-            $instance->text = Helper::toString($option->value);
         }
 
         // Denormalize 'format' required property
         $option = Helper::find($input, ['format'], $context);
-        if (null === $option->value) {
-            if (null === $instance->format) {
+        if ($option->success) {
+            if (null === $option->value) {
                 Helper::error(\sprintf("'%s' cannot be null", 'format'), $context);
+            } else if (null === $option->value) {
+                $instance->format = null;
+            } else {
+                $instance->format = Helper::toString($option->value);
             }
-        } else {
-            $instance->format = Helper::toString($option->value);
         }
     },
     null, MockTextWithFormat::class

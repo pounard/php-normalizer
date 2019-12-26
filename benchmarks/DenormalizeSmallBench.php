@@ -7,6 +7,9 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
 /**
  * Benchmark stream denormalization
  *
+ * Iteration 2 to 6 are disabled because they don't support class inheritance,
+ * or wrongly, which makes results bias and useless.
+ *
  * @BeforeMethods({"setUp"})
  */
 final class DenormalizeSmallBench
@@ -47,24 +50,26 @@ final class DenormalizeSmallBench
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration2WithReflection() : void
     {
         foreach ($this->data as $data) {
             \hydrator2(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration2WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             \hydrator2(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
+     */
 
     /**
      * @Revs(50)
@@ -93,68 +98,74 @@ final class DenormalizeSmallBench
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration4WithReflection() : void
     {
         foreach ($this->data as $data) {
             \hydrator4(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration4WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             \hydrator4(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration5WithReflection() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer5->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration5WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer5->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration6WithReflection() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer6->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection()));
         }
     }
+     */
 
     /**
      * @Revs(50)
      * @Iterations(30)
-     */
+     *
     public function benchIteration6WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
             display_or_not($this->normalizer6->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly()));
         }
     }
+     */
 
     /**
      * @Revs(50)

@@ -7,6 +7,9 @@ namespace MakinaCorpus\Normalizer\Benchmarks;
 /**
  * Benchmark stream denormalization
  *
+ * Iteration 2 to 6 are disabled because they don't support class inheritance,
+ * or wrongly, which makes results bias and useless.
+ *
  * @BeforeMethods({"setUp"})
  */
 final class TheOtherWayArticleBench
