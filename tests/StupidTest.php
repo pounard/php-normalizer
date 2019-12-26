@@ -115,7 +115,19 @@ final class StupidTest extends TestCase
         yield [MockArticleBench::class, $basedir];
     }
 
-        public static function dataClassName7()
+    public static function dataClassName7()
+    {
+        // Functional tests
+        $basedir = __DIR__;
+        yield [MockArticle::class, $basedir];
+
+        // Benchmarks
+        $basedir = \dirname(__DIR__).'/benchmarks';
+        yield [AddToCartMessageBench::class, $basedir];
+        yield [MockArticleBench::class, $basedir];
+    }
+
+    public static function dataClassName8()
     {
         // Functional tests
         $basedir = __DIR__;
@@ -192,6 +204,18 @@ final class StupidTest extends TestCase
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
         $generator = new \Generator7Impl($contextFactory, $basedir);
+        $generator->generateNormalizerClass($className);
+    }
+
+    /**
+     * @dataProvider dataClassName8
+     */
+    public function testNormalizerGeneration9(string $className, string $basedir)
+    {
+        $this->expectNotToPerformAssertions();
+
+        $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
+        $generator = new \Generator8Impl($contextFactory, $basedir);
         $generator->generateNormalizerClass($className);
     }
 }

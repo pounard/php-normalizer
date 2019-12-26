@@ -187,6 +187,9 @@ trait NormalizerBenchmarkTrait
     /** @var \Normalizer6 */
     private $normalizer7;
 
+    /** @var \Normalizer6 */
+    private $normalizer8;
+
     private function getContextWithReflection(): Context
     {
         return $this->cachedContext = $this->cachedContext->fresh();
@@ -208,6 +211,7 @@ trait NormalizerBenchmarkTrait
         $this->normalizer5 = $this->createNormalizer5();
         $this->normalizer6 = $this->createNormalizer6();
         $this->normalizer7 = $this->createNormalizer7();
+        $this->normalizer8 = $this->createNormalizer8();
         $this->symfonyNormalizer = $this->createSymfonyNormalizer();
         $this->symfonyNormalizerProxy = $this->createSymfonyProxy();
     }
@@ -292,14 +296,30 @@ trait NormalizerBenchmarkTrait
         );
     }
 
-        /**
-     * Create iteration 6 normalizer
+    /**
+     * Create iteration 7 normalizer
      */
     private function createNormalizer7(): \Normalizer6
     {
         return new \Normalizer6(
             new \Generator5Runtime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated7')
+            ),
+            new \NormalizerChain6([
+                new DateNormalizer(),
+                new CustomUuidNormalizer()
+            ]),
+        );
+    }
+
+    /**
+     * Create iteration 8 normalizer
+     */
+    private function createNormalizer8(): \Normalizer6
+    {
+        return new \Normalizer6(
+            new \Generator5Runtime(
+                new Psr4AppNamingStrategy('Normalizer', 'Generated8')
             ),
             new \NormalizerChain6([
                 new DateNormalizer(),

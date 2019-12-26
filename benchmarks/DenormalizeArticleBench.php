@@ -185,6 +185,28 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
+    public function benchIteration8WithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer8->denormalize(MockArticle::class, $data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration8WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer8->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
     public function benchCustomWithReflection() : void
     {
         foreach ($this->data as $data) {

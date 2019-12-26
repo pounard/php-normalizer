@@ -70,6 +70,28 @@ final class TheOtherWaySmallBench
      * @Revs(50)
      * @Iterations(30)
      */
+    public function benchIteration8WithReflection() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer8->normalize($data, $this->getContextWithReflection()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
+    public function benchIteration8WithConfigOnly() : void
+    {
+        foreach ($this->data as $data) {
+            display_or_not($this->normalizer8->normalize($data, $this->getContextWithConfigOnly()));
+        }
+    }
+
+    /**
+     * @Revs(50)
+     * @Iterations(30)
+     */
     public function benchCustomWithReflection() : void
     {
         foreach ($this->data as $data) {
