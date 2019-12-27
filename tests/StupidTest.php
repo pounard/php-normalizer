@@ -19,10 +19,10 @@ use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat as MockTextWithFormatB
 use MakinaCorpus\Normalizer\Benchmarks\MockWithText as MockWithTextBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle as MockWithTitleBench;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer;
+use MakinaCorpus\Normalizer\Generator\DefaultGenerator;
 use MakinaCorpus\Normalizer\Generator\Writer;
 use MakinaCorpus\Normalizer\Generator\Iterations\Generator5Impl;
 use MakinaCorpus\Normalizer\Generator\Iterations\Generator7Impl;
-use MakinaCorpus\Normalizer\Generator\Iterations\Generator8Impl;
 use function MakinaCorpus\Normalizer\Generator\Iterations\generate2_denormalizer_class;
 use function MakinaCorpus\Normalizer\Generator\Iterations\generate4_denormalizer_class;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
@@ -216,12 +216,12 @@ final class StupidTest extends TestCase
     /**
      * @dataProvider dataClassName8
      */
-    public function testNormalizerGeneration9(string $className, string $basedir)
+    public function testNormalizerGeneration8(string $className, string $basedir)
     {
         $this->expectNotToPerformAssertions();
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
-        $generator = new Generator8Impl($contextFactory, $basedir);
+        $generator = new DefaultGenerator($contextFactory, $basedir);
         $generator->generateNormalizerClass($className);
     }
 }

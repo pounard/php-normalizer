@@ -1,27 +1,23 @@
 <?php
-/**
- * Iteration #8.
- *
- * Re-use code from iteration #7 and make the generated code more readable and
- * faster whenever possible, cleanup helpers and generation code.
- */
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Generator\Iterations;
+namespace MakinaCorpus\Normalizer\Generator;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
-use MakinaCorpus\Normalizer\Generator\Generator;
-use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
-use MakinaCorpus\Normalizer\Generator\Writer;
 
 /**
- * Generator wrapper, with naming strategy
+ * Default normalizer generator.
+ *
+ * @todo
+ *  - inject naming strategy
+ *  - make it more configurable
+ *  - make it pluggable
  */
-final class Generator8Impl implements Generator
+final class DefaultGenerator implements Generator
 {
     /** @var ContextFactory */
     private $contextFactory;

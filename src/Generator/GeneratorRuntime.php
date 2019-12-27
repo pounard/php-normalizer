@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Generator;
 
 /**
- * This package's own generator implementation.
+ * Generator runtime is only able to load generated normalizers, but disallows
+ * runtime class generation: classes must be pre-generated using a warmup phase
+ * or using packaged already generated code.
  */
 final class GeneratorRuntime implements Generator
 {

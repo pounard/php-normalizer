@@ -37,8 +37,7 @@
             "src/Generator/Iterations/Iteration4-Generation.php",
             "src/Generator/Iterations/Iteration5-RecursiveGeneration.php",
             "src/Generator/Iterations/Iteration6-MakeItPluggable.php",
-            "src/Generator/Iterations/Iteration7-GenerateClosures.php",
-            "src/Generator/Iterations/Iteration8-Finalise.php"
+            "src/Generator/Iterations/Iteration7-GenerateClosures.php"
         ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",
