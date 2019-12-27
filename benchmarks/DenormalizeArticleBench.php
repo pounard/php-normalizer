@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
+use function MakinaCorpus\Normalizer\Generator\Iterations\hydrator1;
+
 /**
  * Benchmark stream denormalization
  *
@@ -34,7 +36,7 @@ final class DenormalizeArticleBench
     public function benchIteration1WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithReflection()));
+            display_or_not(hydrator1(MockArticle::class, $data, $this->getContextWithReflection()));
         }
     }
 
@@ -45,7 +47,7 @@ final class DenormalizeArticleBench
     public function benchIteration1WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(\hydrator1(MockArticle::class, $data, $this->getContextWithConfigOnly()));
+            display_or_not(hydrator1(MockArticle::class, $data, $this->getContextWithConfigOnly()));
         }
     }
 

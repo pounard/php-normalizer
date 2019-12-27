@@ -1,34 +1,32 @@
 <?php
 /**
- * Iteration #7.
+ * Iteration #8.
  *
- * Re-use code from iteration #7 - generate code within closures for direct
- * objects property access, and correct property access, depending on the
- * declaring class.
- *
- * Next step:
- *   - better error handling, add handle_type_mismatch() function,
- *   - remove enter() and leave() calls in generated code,
- *   - then normalizers!
+ * Re-use code from iteration #7 and make the generated code more readable and
+ * faster whenever possible, cleanup helpers and generation code.
  */
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use MakinaCorpus\Normalizer\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
+use MakinaCorpus\Normalizer\Generator\Generator;
+use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\Writer;
 
 /**
  * Generator wrapper, with naming strategy
  */
-final class Generator7Impl implements Generator5
+final class Generator8Impl implements Generator
 {
-    /** @var \MakinaCorpus\Normalizer\ContextFactory */
+    /** @var ContextFactory */
     private $contextFactory;
 
-    /** @var \MakinaCorpus\Normalizer\NamingStrategy */
+    /** @var \MakinaCorpus\Normalizer\Generator\NamingStrategy */
     private $namingStrategy;
 
     /** @var string */
@@ -45,7 +43,7 @@ final class Generator7Impl implements Generator5
     public function __construct(ContextFactory $contextFactory, string $projectSourceDirectory, ?string $projectPsr4Namespace = null)
     {
         $this->contextFactory = $contextFactory;
-        $this->namingStrategy = new Psr4AppNamingStrategy('Normalizer', 'Generated7');
+        $this->namingStrategy = new Psr4AppNamingStrategy('Normalizer', 'Generated8');
         $this->projectPsr4Namespace = $projectPsr4Namespace;
         $this->projectSourceDirectory = $projectSourceDirectory;
     }
@@ -74,76 +72,47 @@ final class Generator7Impl implements Generator5
             throw new \RuntimeException(\sprintf("%s: directory is not writable", $directory));
         }
 
-        $writer = new \Writer($filename);
+        $writer = new Writer($filename);
         $context = $this->contextFactory->createContext();
 
         return $this->generateClass($className, $normalizerClassName, $context, $writer);
     }
 
     /**
-     * Generate value conversion code
+     * Generate single value normalizer call code.
      */
-    private function generateNormalizerPropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
+    private function generateNormalizerCallValue(PropertyDefinition $property, Context $context, Writer $writer, string $input): string
     {
-        $indentation = \str_repeat(" ", 4 * $indent);
-        $propName = $property->getNativeName();
-        $escapedPropName = \addslashes($propName);
         $type = $context->getNativeType($property->getTypeName());
-        $ret = [];
-
-        // Temporary variable, we may get rid of this one, but I'm not sure
-        // this will ever make any differences in speed.
-        $ret[] = "\$value = \$object->".$propName.";";
+        $normalizeCall = null;
 
         // Attempt eager related class code generation, if possible.
-        try {
-            if (\class_exists($type)) {
+        if (\class_exists($type)) {
+            try {
                 $normalizerClassName = $this->generateNormalizerClass($type);
-                $ret[] = "if (null !== \$value) {";
-                $ret[] = "    \$value = \\".$normalizerClassName."::normalize(\$value, \$context, \$normalizer);";
-                if (!$property->isOptional()) {
-                    $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
-                    $ret[] = "    }";
-                }
-                $ret[] = "}";
-
-                return \implode("\n".$indentation, $ret);
+                $normalizeCall = "\\{$normalizerClassName}::normalize({$input}, \$context, \$normalizer)";
+            } catch (TypeDoesNotExistError $e) {
+                $context->addWarning($e->getMessage());
             }
-        } catch (TypeDoesNotExistError $e) {
-            $context->addWarning($e->getMessage());
         }
 
         // @todo Here allow custom implementation to write code
-        // Scalar helpers validate at the same time.
         switch ($property->getTypeName()) {
+            // When generating normalization (model to norm) from an object
+            // we do trust the incomming value type and just copy the value.
             case 'bool':
-                $ret[] = "{$variable} = Helper\\to_bool(\$value, \$context);";
-                break;
             case 'float':
-                $ret[] = "{$variable} = Helper\\to_float(\$value, \$context);";
-                break;
             case 'int':
-                $ret[] = "{$variable} = Helper\\to_int(\$value, \$context);";
-                break;
-            case 'null':
-                break;
             case 'string':
-                $ret[] = "{$variable} = Helper\\to_string(\$value, \$context);";
-                break;
-            default:
-                $ret[] = "if (null !== \$value && \$normalizer) {";
-                $ret[] = "    {$variable} = \$normalizer(\$value, \$context);";
-                if (!$property->isOptional()) {
-                    $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
-                    $ret[] = "    }";
-                }
-                $ret[] = "}";
+                $normalizeCall = "({$type}){$input}";
                 break;
         }
 
-        return \implode("\n".$indentation, $ret);
+        if (!$normalizeCall) {
+            $normalizeCall = "\$normalizer ? \$normalizer({$input}, \$context, \$normalizer) : {$input}";
+        }
+
+        return $normalizeCall;
     }
 
     /**
@@ -153,12 +122,13 @@ final class Generator7Impl implements Generator5
     {
         $propName = \addslashes($property->getNativeName());
         $normalizedName = \addslashes($property->getNormalizedName());
-        $handleCode = $this->generateNormalizerPropertyValueConvert($property, $context, 2, '$value');
+        $output = "\$ret['{$normalizedName}']";
+        $input = "\$object->{$propName}";
+        $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        // Denormalize '{$propName}' property
-        {$handleCode}
-        \$ret['{$normalizedName}'] = \$value;
+        // Normalize '{$propName}' property
+        {$output} = null === {$input} ? null : {$normalizeCall};
 EOT
         );
     }
@@ -170,23 +140,19 @@ EOT
     {
         $propName = \addslashes($property->getNativeName());
         $normalizedName = \addslashes($property->getNormalizedName());
-        $handleCode1 = $this->generateDenormalizerPropertyValueConvert($property, $context, 3, '$values');
-        $handleCode2 = $this->generateDenormalizerPropertyValueConvert($property, $context, 5, '$value');
+        $output = "\$ret['{$normalizedName}']";
+        $arrayInput = "\$object->{$propName}";
+        $input = "\$value";
+        $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        // Denormalize '{$propName}' collection property
-        \$normalizedValues = [];
-        \$values = \$object->{$propName};
-        if (!\is_iterable(\$values)) {
-            {$handleCode1}
-            \$normalizedValues[] = \$values;
-        } else {
-            foreach (\$values as \$index => \$value) {
-                {$handleCode2}
-                \$normalizedValues[\$index] = \$value;
+        // Normalize '{$propName}' property
+        {$output} = [];
+        if ({$arrayInput}) {
+            foreach ({$arrayInput} as \$index => {$input}) {
+                {$output}[\$index] = {$normalizeCall};
             }
         }
-        \$ret['{$normalizedName}'] = \$normalizedValues;
 EOT
         );
     }
@@ -204,107 +170,46 @@ EOT
     }
 
     /**
-     * Generate type validation condition
+     * Generate single value normalizer call code.
      */
-    private function generateDenormalizerPropertyValueValidate(PropertyDefinition $property, Context $context): string
+    private function generateDeormalizerCallValue(PropertyDefinition $property, Context $context, Writer $writer, string $input): string
     {
-        $nativeType = $context->getNativeType($property->getTypeName());
-
-        if (!\class_exists($nativeType) && !interface_exists($nativeType)) {
-            if (\strpos($nativeType, '\\')) {
-                throw new \LogicException(\sprintf("Cannot dump normalizer: class '%s' for property '%s' does not exist", $nativeType, $property->getNativeName()));
-            }
-
-            if ($property->isOptional()) {
-                return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
-            } else {
-                return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
-            }
-        } else if ($property->isOptional()) {
-            return "null === \$value || \$value instanceof \\".$nativeType;
-        } else {
-            return "\$value instanceof \\".$nativeType;
-        }
-    }
-
-    /**
-     * Generate value conversion code
-     */
-    private function generateDenormalizerPropertyValueConvert(PropertyDefinition $property, Context $context, int $indent, string $variable): string
-    {
-        $indentation = \str_repeat(" ", 4 * $indent);
-        $propName = $property->getNativeName();
-        $escapedPropName = \addslashes($propName);
         $type = $context->getNativeType($property->getTypeName());
-        $nativeType = \addslashes($type);
-        $validation = $this->generateDenormalizerPropertyValueValidate($property, $context);
-        $ret = [];
+        $normalizeCall = null;
 
         // Attempt eager related class code generation, if possible.
-        try {
-            if (\class_exists($type)) {
+        if (\class_exists($type)) {
+            try {
                 $normalizerClassName = $this->generateNormalizerClass($type);
-                $ret[] = "if (null !== \$value) {";
-                $ret[] = "    \$value = \\".$normalizerClassName."::denormalize(\$value, \$context, \$denormalizer);";
-                if ($property->isOptional()) {
-                    $ret[] = "    if (!(".$validation.")) {";
-                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
-                    $ret[] = "        \$value = null;";
-                    $ret[] = "    }";
-                } else {
-                    $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
-                    $ret[] = "    } else if (!(".$validation.")) {";
-                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
-                    $ret[] = "        \$value = null;";
-                    $ret[] = "    }";
-                }
-                $ret[] = "}";
-
-                return \implode("\n".$indentation, $ret);
+                $normalizeCall = "\\{$normalizerClassName}::denormalize({$input}, \$context, \$denormalizer)";
+            } catch (TypeDoesNotExistError $e) {
+                $context->addWarning($e->getMessage());
             }
-        } catch (TypeDoesNotExistError $e) {
-            $context->addWarning($e->getMessage());
         }
 
         // @todo Here allow custom implementation to write code
-        // Scalar helpers validate at the same time.
         switch ($property->getTypeName()) {
+            // When generating normalization (model to norm) from an object
+            // we do trust the incomming value type and just copy the value.
             case 'bool':
-                $ret[] = "{$variable} = Helper\\to_bool(\$value, \$context);";
-                break;
             case 'float':
-                $ret[] = "{$variable} = Helper\\to_float(\$value, \$context);";
-                break;
             case 'int':
-                $ret[] = "{$variable} = Helper\\to_int(\$value, \$context);";
-                break;
-            case 'null':
-                break;
             case 'string':
-                $ret[] = "{$variable} = Helper\\to_string(\$value, \$context);";
-                break;
-            default:
-                $ret[] = "if (null !== \$value && \$denormalizer) {";
-                $ret[] = "    {$variable} = \$denormalizer('{$nativeType}', \$value, \$context);";
-                if ($property->isOptional()) {
-                    $ret[] = "    if (!(".$validation.")) {";
-                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
-                    $ret[] = "        \$value = null;";
-                    $ret[] = "    }";
-                } else {
-                    $ret[] = "    if (null === \$value) {";
-                    $ret[] = "        Helper\\handle_error(\"Property '{$escapedPropName}' cannot be null\", \$context);";
-                    $ret[] = "    } else if (!(".$validation.")) {";
-                    $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
-                    $ret[] = "        \$value = null;";
-                    $ret[] = "    }";
-                }
-                $ret[] = "}";
+                $methodName = "to".\ucfirst($type);
+                $normalizeCall = "Helper::{$methodName}({$input})";
                 break;
         }
 
-        return \implode("\n".$indentation, $ret);
+        if (!$normalizeCall) {
+            if (\class_exists($type) || \interface_exists($type)) {
+                $typeString = '\\'.$type.'::class';
+            } else {
+                $typeString = "'{$type}'";
+            }
+            $normalizeCall = "\$denormalizer ? \$denormalizer({$typeString}, {$input}, \$context, \$denormalizer) : {$input}";
+        }
+
+        return $normalizeCall;
     }
 
     /**
@@ -314,15 +219,43 @@ EOT
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
-        $handleCode = $this->generateDenormalizerPropertyValueConvert($property, $context, 2, '$value');
 
-        $writer->write(<<<EOT
-        // Denormalize '{$propName}' property
-        \$value = Helper\\find_value(\$input, {$candidateNames}, \$context);
-        {$handleCode}
-        \$instance->{$propName} = \$value;
+        $output = "\$instance->{$propName}";
+        $input = "\$option->value";
+        $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+
+        if ($property->isOptional()) {
+            // Nullable properties can have a default value:
+            //   - if we find null, we must ensure there was an explicit null,
+            //   - if there is no explicit null, leave the default value as-is.
+            $writer->write(<<<EOT
+        // Denormalize '{$propName}' nullable property
+        \$option = Helper::find(\$input, {$candidateNames}, \$context);
+        if (\$option->success) {
+            if (null === {$input}) {
+                {$output} = null;
+            } else {
+                {$output} = {$denormalizeCall};
+            }
+        }
 EOT
-        );
+            );
+        } else {
+            $writer->write(<<<EOT
+        // Denormalize '{$propName}' required property
+        \$option = Helper::find(\$input, {$candidateNames}, \$context);
+        if (\$option->success) {
+            if (null === {$input}) {
+                Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            } else if (null === {$input}) {
+                {$output} = null;
+            } else {
+                {$output} = {$denormalizeCall};
+            }
+        }
+EOT
+            );
+        }
     }
 
     /**
@@ -332,23 +265,26 @@ EOT
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
-        $handleCode1 = $this->generateDenormalizerPropertyValueConvert($property, $context, 3, '$values');
-        $handleCode2 = $this->generateDenormalizerPropertyValueConvert($property, $context, 5, '$value');
+
+        $output = "\$instance->{$propName}";
+        $input = "\$value";
+        $arrayInput = "\$option->value";
+        $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
-        \$propValue = [];
-        \$values = Helper\\find_value(\$input, {$candidateNames}, \$context);
-        if (!\is_iterable(\$values)) {
-            {$handleCode1}
-            \$propValue[] = \$values;
-        } else {
-            foreach (\$values as \$index => \$value) {
-                {$handleCode2}
-                \$propValue[\$index] = \$value;
+        \$option = Helper::find(\$input, {$candidateNames}, \$context);
+        if (\$option->success && {$arrayInput}) {
+            if (!\is_iterable({$arrayInput})) {
+                {$arrayInput} = (array){$arrayInput};
+            }
+            if ({$arrayInput}) {
+                {$output} = [];
+                foreach ({$arrayInput} as \$index => {$input}) {
+                    {$output}[\$index] = {$denormalizeCall};
+                }
             }
         }
-        \$instance->{$propName} = \$propValue;
 EOT
         );
     }
@@ -391,7 +327,7 @@ EOT
         $generatedLocalClassName = \array_pop($parts);
         $generatedClassNamespace = \implode('\\', $parts);
 
-        $imports = [Context::class, 'MakinaCorpus\Normalizer as Helper'];
+        $imports = [Context::class, 'MakinaCorpus\Normalizer\\Helper'];
         if ($generatedClassNamespace !== $classNamespace) {
             $imports[] = $nativeType;
         }

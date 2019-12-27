@@ -49,7 +49,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'foo', $value);
@@ -62,7 +62,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('int', $value, $context);
         }
-        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'int') {
+        if (!\MakinaCorpus\Normalizer\Helper::getType($value) === 'int') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'bar', $value);
@@ -75,7 +75,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('float', $value, $context);
         }
-        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'float') {
+        if (!\MakinaCorpus\Normalizer\Helper::getType($value) === 'float') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'baz', $value);
@@ -88,7 +88,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+        if (!\MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'filename', $value);
@@ -129,7 +129,7 @@ final class MockArticleNormalizer
                 if (null !== $value && $normalizer) {
                     $value = $normalizer('string', $value, $context);
                 }
-                if (\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+                if (\MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
                     $propValue[$index] = $value;
                 } else {
                     $propValue[$index] = null;
@@ -143,7 +143,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'title', $value);

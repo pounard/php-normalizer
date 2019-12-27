@@ -34,7 +34,7 @@ final class ScalarNormalizer implements Normalizer, Denormalizer
         if (!\is_scalar($object) && 'null' !== $type) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for '%s', got '%s'",
-                $type, gettype_real($object)
+                $type, Helper::getType($object)
             ));
         }
 
@@ -147,7 +147,7 @@ final class DateNormalizer implements Normalizer, Denormalizer
                 if (!$object instanceof \DateTimeInterface) {
                     throw new InvalidValueTypeError(\sprintf(
                         "Invalid data type provided, awaiting for '%s', got '%s'",
-                        $type, gettype_real($object)
+                        $type, Helper::getType($object)
                     ));
                 }
                 return $object->format(
@@ -166,7 +166,7 @@ final class DateNormalizer implements Normalizer, Denormalizer
         if (!\is_string($data)) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for 'string', got '%s'",
-                gettype_real($data)
+                Helper::getType($data)
             ));
         }
 
@@ -209,7 +209,7 @@ final class UuidNormalizer implements Normalizer, Denormalizer
         if (!$object instanceof UuidInterface) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for '%s', got '%s'",
-                UuidInterface::class, gettype_real($object)
+                UuidInterface::class, Helper::getType($object)
             ));
         }
 
@@ -224,7 +224,7 @@ final class UuidNormalizer implements Normalizer, Denormalizer
         if (!\is_string($data)) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for 'string', got '%s'",
-                gettype_real($data)
+                Helper::getType($data)
             ));
         }
 

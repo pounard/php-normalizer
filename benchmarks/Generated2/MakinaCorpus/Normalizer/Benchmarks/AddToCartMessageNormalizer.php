@@ -52,7 +52,7 @@ final class AddToCartMessageNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('int', $value, $context);
         }
-        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'int') {
+        if (!\MakinaCorpus\Normalizer\Helper::getType($value) === 'int') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'productId', $value);
@@ -65,7 +65,7 @@ final class AddToCartMessageNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('float', $value, $context);
         }
-        if (!\MakinaCorpus\Normalizer\gettype_real($value) === 'float') {
+        if (!\MakinaCorpus\Normalizer\Helper::getType($value) === 'float') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'amount', $value);

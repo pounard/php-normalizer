@@ -36,7 +36,7 @@ final class MockWithTextNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'title', $value);

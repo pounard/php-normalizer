@@ -12,7 +12,7 @@ namespace Generated4\MakinaCorpus\Normalizer\Benchmarks;
 use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
 
-use MakinaCorpus\Normalizer as Helper;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 
 final class MockTextWithFormatNormalizer
 {

@@ -7,12 +7,14 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Denormalizer;
-use MakinaCorpus\Normalizer\HydratorOption;
+use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\UnsupportedTypeError;
-use function MakinaCorpus\Normalizer\gettype_real;
+use MakinaCorpus\Normalizer\Generator\Generator;
 
 final class NormalizerChain6 implements Normalizer, Denormalizer
 {
@@ -124,16 +126,16 @@ final class NormalizerChain6 implements Normalizer, Denormalizer
  */
 final class Normalizer6
 {
-    /** @var \Generator5 */
+    /** @var Generator */
     private $generator;
 
-    /** @var \NormalizerChain6 */
+    /** @var NormalizerChain6 */
     private $chain;
 
     /**
      * Constructor
      */
-    public function __construct(Generator5 $generator, NormalizerChain6 $chain)
+    public function __construct(Generator $generator, NormalizerChain6 $chain)
     {
         $this->chain = $chain;
         $this->generator = $generator;
@@ -146,7 +148,7 @@ final class Normalizer6
      */
     private function externalNormalisation($object, Context $context): HydratorOption
     {
-        $type = gettype_real($object);
+        $type = Helper::getType($object);
 
         switch ($type) {
             case 'bool':
@@ -178,7 +180,7 @@ final class Normalizer6
             return $external->value;
         }
 
-        $nativeType = gettype_real($object);
+        $nativeType = Helper::getType($object);
         $normalizer = $this->generator->getNormalizerClass($nativeType);
 
         if (!$normalizer) {

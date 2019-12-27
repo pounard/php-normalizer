@@ -83,7 +83,7 @@ final class MockArticleNormalizer
                 if (null !== $value && $normalizer) {
                     $value = $normalizer('string', $value, $context);
                 }
-                if (\MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+                if (\MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
                     $propValue[$index] = $value;
                 } else {
                     $propValue[$index] = null;
@@ -97,7 +97,7 @@ final class MockArticleNormalizer
         if (null !== $value && $normalizer) {
             $value = $normalizer('string', $value, $context);
         }
-        if (!null === $value || \MakinaCorpus\Normalizer\gettype_real($value) === 'string') {
+        if (!null === $value || \MakinaCorpus\Normalizer\Helper::getType($value) === 'string') {
             $value = null;
         }
         \call_user_func(self::$accessor, $ret, 'title', $value);

@@ -9,6 +9,7 @@ namespace MakinaCorpus\Normalizer;
  */
 final class ContextFactory
 {
+    /** @var TypeDefinitionMap */
     private $typeMap;
 
     /**

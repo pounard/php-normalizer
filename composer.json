@@ -24,22 +24,21 @@
             "src/CustomNormalizer.php",
             "src/DefaultNormalizer.php",
             "src/Error.php",
+            "src/Helper.php",
             "src/Normalizer.php",
             "src/Options.php",
-            "src/Strategy.php",
             "src/TypeDefinition.php"
         ],
         "files": [
-            "src/Generator/Iteration1-Reference.php",
-            "src/Generator/Iteration2-Generation.php",
-            "src/Generator/Iteration3-Helper.php",
-            "src/Generator/Iteration3-Reference.php",
-            "src/Generator/Iteration4-Generation.php",
-            "src/Generator/Iteration5-RecursiveGeneration.php",
-            "src/Generator/Iteration6-MakeItPluggable.php",
-            "src/Generator/Iteration7-GenerateClosures.php",
-            "src/Generator/Iteration8-Finalise.php",
-            "src/Generator/Iteration8-Helper.php"
+            "src/Generator/Iterations/Iteration1-Reference.php",
+            "src/Generator/Iterations/Iteration2-Generation.php",
+            "src/Generator/Iterations/Iteration3-Helper.php",
+            "src/Generator/Iterations/Iteration3-Reference.php",
+            "src/Generator/Iterations/Iteration4-Generation.php",
+            "src/Generator/Iterations/Iteration5-RecursiveGeneration.php",
+            "src/Generator/Iterations/Iteration6-MakeItPluggable.php",
+            "src/Generator/Iterations/Iteration7-GenerateClosures.php",
+            "src/Generator/Iterations/Iteration8-Finalise.php"
         ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",

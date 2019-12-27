@@ -7,25 +7,29 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\NamingStrategy;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use MakinaCorpus\Normalizer\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
+use MakinaCorpus\Normalizer\Generator\Generator;
+use MakinaCorpus\Normalizer\Generator\NamingStrategy;
+use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\Writer;
 
 /**
  * Normalizer
  */
 final class Normalizer5
 {
-    /** @var \Generator5 */
+    /** @var Generator */
     private $generator;
 
     /**
      * Constructor
      */
-    public function __construct(Generator5 $generator)
+    public function __construct(Generator $generator)
     {
         $this->generator = $generator;
     }
@@ -58,33 +62,11 @@ final class Normalizer5
 }
 
 /**
- * Generator interface
- */
-interface Generator5
-{
-    /**
-     * Get normalizer class name
-     *
-     * It can return null if the class does not exist and the generator is not
-     * able to generate the normalizer.
-     */
-    public function getNormalizerClass(string $className): ?string;
-
-    /**
-     * Get normalizer class
-     *
-     * @return string
-     *   Generated normalizer class name
-     */
-    public function generateNormalizerClass(string $className): string;
-}
-
-/**
  * Generator wrapper, with naming strategy
  */
-final class Generator5Runtime implements Generator5
+final class Generator5Runtime implements Generator
 {
-    /** @var \MakinaCorpus\Normalizer\NamingStrategy */
+    /** @var NamingStrategy */
     private $namingStrategy;
 
     /** @var string[] */
@@ -142,12 +124,12 @@ final class Generator5Runtime implements Generator5
 /**
  * Generator wrapper, with naming strategy
  */
-final class Generator5Impl implements Generator5
+final class Generator5Impl implements Generator
 {
-    /** @var \MakinaCorpus\Normalizer\ContextFactory */
+    /** @var ContextFactory */
     private $contextFactory;
 
-    /** @var \MakinaCorpus\Normalizer\NamingStrategy */
+    /** @var NamingStrategy */
     private $namingStrategy;
 
     /** @var string */
@@ -193,7 +175,7 @@ final class Generator5Impl implements Generator5
             throw new \RuntimeException(\sprintf("%s: directory is not writable", $directory));
         }
 
-        $writer = new \Writer($filename);
+        $writer = new Writer($filename);
         $context = $this->contextFactory->createContext();
 
         return $this->generateClass($className, $normalizerClassName, $context, $writer);
@@ -212,9 +194,9 @@ final class Generator5Impl implements Generator5
             }
 
             if ($property->isOptional()) {
-                return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+                return "null === \$value || \\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
             } else {
-                return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+                return "\\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
             }
         } else if ($property->isOptional()) {
             return "null === \$value || \$value instanceof \\".$nativeType;
@@ -412,7 +394,7 @@ namespace {$generatedClassNamespace};
 
 {$importsAsString}
 
-use MakinaCorpus\Normalizer as Helper;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 
 final class {$generatedLocalClassName}
 {

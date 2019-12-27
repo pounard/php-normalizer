@@ -2,70 +2,55 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer;
-
-/**
- * Generated class naming strategy
- */
-interface NamingStrategy
-{
-    /**
-     * Generate class name
-     *
-     * @param string $userClassName
-     * @param string $generatedClassNamespace
-     *
-     * @return string
-     *   Fully qualified namespace
-     */
-    public function generateClassName(string $userClassName, string $generatedClassNamespace): string;
-
-    /**
-     * Generate full filename in which the file will be saved
-     *
-     * @param string $realClassName
-     * @param string $generatedClassesTargetDir
-     * @param ?string $namespacePrefix
-     *   When working in a PSR-4 namespace, this is the namespace prefix
-     *
-     * @return string
-     */
-    public function generateFilename(string $realClassName, string $generatedClassesTargetDir, ?string $namespacePrefix = null): string;
-}
+namespace MakinaCorpus\Normalizer\Generator;
 
 /**
  * Image your app is within the following namespace:
  *
- *   MyVendor\MyApp\...
+ *   \MyVendor\MyApp\...
  *
  * And your entity class into:
  *
- *   MyVendor\MyApp\Domain\Model\SomeEntity
+ *   \MyVendor\MyApp\Model\SomeEntity
  *
  * This will attempt to create such target class:
  *
- *   MyVendor\MyApp\Normalizer\Domain\Model\SomeEntityNormalizer
+ *   \MyVendor\MyApp\[NAMESPACE_INFIX]\Model\SomeEntity[CLASS_NAME_SUFFIX]
  *
- * And place it within the associated folder.
+ * Per default, namespace infix and class name suffix are "Normalizer":
  *
- * "\Normalizer\" infix and "Normalizer" class name suffix can be configured
- * If explicitely set null or an empty string, then the previous scenario will
- * generate the following normalizer class name:
+ *   \MyVendor\MyApp\Normalizer\Model\SomeEntityNormalizer
  *
- *   MyVendor\MyApp\Domain\Model\SomeEntity
+ * And place it within the configured generated classes target folder.
+ *
+ * Namespace infix and class name suffix can be configured via the constructor
+ * arguments.
+ *
+ * If explicitely set to null or an empty string, then the previous scenario
+ * will generate the following normalizer class name:
+ *
+ *   \MyVendor\MyApp\Domain\Model\SomeEntity
  *
  * Which conflicts with entity name. File name will always respect PSR-4.
  * If your code base is PSR-0, just write as PSR-4 prefix the full path
  * until the namespace infix, it will work transparently.
  *
- * It seems very specific, I agree, but it fits well in Symfony-like organised
- * applications, and will keep the (de)normalizers outside of your domain.
+ * Default configuration reflect your domain naming strategy, while mirroring
+ * it into its own folder. It allows you to easily add the generated classes
+ * into your distributable packages. This way, you never will have to generate
+ * anything on a production environment.
  */
 final class Psr4AppNamingStrategy implements NamingStrategy
 {
+    /** @var ?string */
     private $classNameSuffix = null;
+
+    /** @var ?string */
     private $namespaceInfix = null;
 
+    /**
+     * Default constructor
+     */
     public function __construct(?string $classNameSuffix = 'Normalizer', ?string $namespaceInfix = 'Normalizer')
     {
         $this->classNameSuffix = $classNameSuffix;

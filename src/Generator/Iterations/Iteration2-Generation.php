@@ -7,54 +7,11 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-
-/**
- * Simple test write
- */
-final class Writer
-{
-    /** @var resource */
-    private $handle;
-
-    /**
-     * Constructor
-     */
-    public function __construct(string $filename)
-    {
-        if (\file_exists($filename)) {
-            if (!@\unlink($filename)) {
-                throw new \RuntimeException(\sprintf("'%s': can not delete file"));
-            }
-        }
-        if (false === ($this->handle = \fopen($filename, "a+"))) {
-            throw new \RuntimeException(\sprintf("'%s': can not open file for writing"));
-        }
-    }
-
-    /**
-     * Append text to generated file
-     */
-    public function write(string $string): void
-    {
-        if (!$this->handle) {
-            throw new \RuntimeException("File was closed");
-        }
-        \fwrite($this->handle, $string);
-    }
-
-    /**
-     * Close file
-     */
-    public function close(): void
-    {
-        if ($this->handle) {
-            @fclose($this->handle);
-        }
-        $this->handle = null;
-    }
-}
+use MakinaCorpus\Normalizer\Generator\Writer;
 
 /**
  * Hydrate object using the generated hydrator
@@ -99,9 +56,9 @@ function generate2_validation(PropertyDefinition $property, Context $context): s
             throw new \LogicException(\sprintf("Cannot dump normalizer: class '%s' for property '%s' does not exist", $nativeType, $property->getNativeName()));
         }
         if ($property->isOptional()) {
-            return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
         } else {
-            return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;
@@ -219,7 +176,7 @@ function generate2_denormalizer_class(string $type, Context $context, Writer $wr
     $localClassName = \array_pop($parts);
     $classNamespace = \implode('\\', $parts);
 
-    $generatedClassName = \generate2_compute_normalizer_name($nativeType);
+    $generatedClassName = generate2_compute_normalizer_name($nativeType);
     $parts = \array_filter(\explode('\\', $generatedClassName));
     $generatedLocalClassName = \array_pop($parts);
     $generatedClassNamespace = \implode('\\', $parts);

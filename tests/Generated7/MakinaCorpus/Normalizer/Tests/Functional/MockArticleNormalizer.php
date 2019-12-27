@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Generated7\MakinaCorpus\Normalizer\Tests\Functional;
 
-use MakinaCorpus\Normalizer as Helper;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;

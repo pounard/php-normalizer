@@ -8,8 +8,11 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\PropertyDefinition;
+use MakinaCorpus\Normalizer\Generator\Writer;
 
 /**
  * Hydrate object using the generated hydrator
@@ -55,9 +58,9 @@ function generate4_validation(PropertyDefinition $property, Context $context): s
         }
 
         if ($property->isOptional()) {
-            return "null === \$value || \\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
         } else {
-            return "\\MakinaCorpus\Normalizer\\gettype_real(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;
@@ -198,7 +201,7 @@ function generate4_denormalizer_class(string $type, Context $context, Writer $wr
     $localClassName = \array_pop($parts);
     $classNamespace = \implode('\\', $parts);
 
-    $generatedClassName = \generate4_compute_normalizer_name($nativeType);
+    $generatedClassName = generate4_compute_normalizer_name($nativeType);
     $parts = \array_filter(\explode('\\', $generatedClassName));
     $generatedLocalClassName = \array_pop($parts);
     $generatedClassNamespace = \implode('\\', $parts);
@@ -224,7 +227,7 @@ namespace {$generatedClassNamespace};
 
 {$importsAsString}
 
-use MakinaCorpus\Normalizer as Helper;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 
 final class {$generatedLocalClassName}
 {

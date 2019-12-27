@@ -7,15 +7,12 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\HydratorOption;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use function MakinaCorpus\Normalizer\find_value;
-use function MakinaCorpus\Normalizer\to_bool;
-use function MakinaCorpus\Normalizer\to_float;
-use function MakinaCorpus\Normalizer\to_int;
-use function MakinaCorpus\Normalizer\to_string;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Create instance and hydrate values
@@ -126,7 +123,7 @@ function hydrator3_external_implementation(string $type, $input, Context $contex
         case 'DateTimeInterface':
         case 'DateTimeImmutable':
             return HydratorOption::ok(new \DateTimeImmutable($input));
-        case Ramsey\Uuid\UuidInterface::class:
+        case UuidInterface::class:
             return HydratorOption::ok(Uuid::fromString($input));
     }
     return HydratorOption::miss();

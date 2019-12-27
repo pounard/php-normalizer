@@ -11,7 +11,10 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer;
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
+use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Option type for hydrator1_external_implementation()
@@ -42,24 +45,6 @@ final class HydratorOption
     {
         return new self;
     }
-}
-
-/**
- * Alias of \gettype() which returns PHP type hints.
- */
-function gettype_real($value): string
-{
-    if (\is_object($value)) {
-        return \get_class($value);
-    }
-    $type = \gettype($value);
-    if ('integer' === $type) {
-        return 'int';
-    }
-    if ('double' === $type) {
-        return 'float';
-    }
-    return $type;
 }
 
 /**
@@ -125,7 +110,7 @@ function find_value(array $input, array $candidates, ?Context $context = null)
  */
 function validate_scalar(string $type, $input, ?Context $context = null): bool
 {
-    if ($type !== ($real = gettype_real($input))) {
+    if ($type !== ($real = Helper::getType($input))) {
         handle_error(\sprintf("Expected value type '%s', got '%s'", $type, $real));
         return false;
     }

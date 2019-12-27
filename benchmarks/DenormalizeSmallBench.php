@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
+use function MakinaCorpus\Normalizer\Generator\Iterations\hydrator1;
+
 /**
  * Benchmark stream denormalization
  *
@@ -32,7 +34,7 @@ final class DenormalizeSmallBench
     public function benchIteration1WithReflection() : void
     {
         foreach ($this->data as $data) {
-            \hydrator1(AddToCartMessage::class, $data, $this->getContextWithReflection());
+            hydrator1(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -43,7 +45,7 @@ final class DenormalizeSmallBench
     public function benchIteration1WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            \hydrator1(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
+            hydrator1(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 

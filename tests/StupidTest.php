@@ -19,6 +19,12 @@ use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat as MockTextWithFormatB
 use MakinaCorpus\Normalizer\Benchmarks\MockWithText as MockWithTextBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle as MockWithTitleBench;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer;
+use MakinaCorpus\Normalizer\Generator\Writer;
+use MakinaCorpus\Normalizer\Generator\Iterations\Generator5Impl;
+use MakinaCorpus\Normalizer\Generator\Iterations\Generator7Impl;
+use MakinaCorpus\Normalizer\Generator\Iterations\Generator8Impl;
+use function MakinaCorpus\Normalizer\Generator\Iterations\generate2_denormalizer_class;
+use function MakinaCorpus\Normalizer\Generator\Iterations\generate4_denormalizer_class;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
 use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
@@ -156,9 +162,9 @@ final class StupidTest extends TestCase
             throw new \RuntimeException(\sprintf("%s: directory is not writable", $directory));
         }
 
-        $writer = new \Writer($filename);
+        $writer = new Writer($filename);
         $context = new Context($this->createCachedTypeDefinitionMap());
-        \generate2_denormalizer_class($className, $context, $writer);
+        generate2_denormalizer_class($className, $context, $writer);
     }
 
     /**
@@ -178,9 +184,9 @@ final class StupidTest extends TestCase
             throw new \RuntimeException(\sprintf("%s: directory is not writable", $directory));
         }
 
-        $writer = new \Writer($filename);
+        $writer = new Writer($filename);
         $context = new Context($this->createCachedTypeDefinitionMap());
-        \generate4_denormalizer_class($className, $context, $writer);
+        generate4_denormalizer_class($className, $context, $writer);
     }
 
     /**
@@ -191,7 +197,7 @@ final class StupidTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
-        $generator = new \Generator5Impl($contextFactory, $basedir);
+        $generator = new Generator5Impl($contextFactory, $basedir);
         $generator->generateNormalizerClass($className);
     }
 
@@ -203,7 +209,7 @@ final class StupidTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
-        $generator = new \Generator7Impl($contextFactory, $basedir);
+        $generator = new Generator7Impl($contextFactory, $basedir);
         $generator->generateNormalizerClass($className);
     }
 
@@ -215,7 +221,7 @@ final class StupidTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());
-        $generator = new \Generator8Impl($contextFactory, $basedir);
+        $generator = new Generator8Impl($contextFactory, $basedir);
         $generator->generateNormalizerClass($className);
     }
 }

@@ -1,19 +1,24 @@
 <?php
-/**
- * Iteration #8 - helpers.
- */
 
 declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
 /**
- * Normalization helper
+ * Normalization runtime helper.
+ *
+ * Defines commonly used code which will be used by normalizers at runtime.
  */
 final class Helper
 {
     /**
      * Alias of \gettype() which returns PHP type hints.
+     *
+     * @param mixed $value
+     *   Any value.
+     *
+     * @return string
+     *   PHP native type name, or FQDN if input is an object.
      */
     public static function getType($value): string
     {
@@ -31,7 +36,15 @@ final class Helper
     }
 
     /**
-     * Format type mismatch error
+     * Format type mismatch error.
+     *
+     * @param string $expected
+     *   Expected native PHP type name or FQDN.
+     * @param mixed $input
+     *   Any value.
+     *
+     * @return string
+     *   Formatted comprehensive error message.
      */
     public static function typeMismatchError(string $expected, $input): string
     {
@@ -39,15 +52,15 @@ final class Helper
     }
 
     /**
-     * Handle error
+     * Handle error.
      *
      * @param string $message
-     *   Error messge
+     *   Error message.
      * @param ?Context $context
-     *   Context if available
+     *   Context if available.
      *
      * @throws \InvalidArgumentException
-     *   If there's not context provided
+     *   If there's not context provided.
      */
     public function error(string $message, ?Context $context = null): void
     {
@@ -59,15 +72,15 @@ final class Helper
     }
 
     /**
-     * Find value in given array
+     * Find a specific value in given array.
      *
      * @param mixed[] $input
-     *   Arbitrary input values
+     *   Arbitrary input values.
      * @param string[] $candidates
      *   Allowed names for the value, first one will be returned, error will be
-     *   raised in case more than one matches the candidates
+     *   raised in case more than one matches the candidates.
      * @param ?Context $context
-     *   Context if available
+     *   Context if available.
      */
     public static function find(array $input, array $candidates, ?Context $context = null): ValueOption
     {
@@ -77,7 +90,7 @@ final class Helper
         foreach ($candidates as $name) {
             if (\array_key_exists($name, $input)) {
                 if ($found) {
-                    self::error(\sprintf("Value found '%s' but was already found in '%s'", $found, $name), $context);
+                    self::error(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name), $context);
                 } else if ($verbose) {
                     $found = $name;
                     $value = $value;
@@ -87,11 +100,7 @@ final class Helper
             }
         }
 
-        if ($found) {
-            return ValueOption::ok($value);
-        }
-
-        return ValueOption::miss();
+        return $found ? ValueOption::ok($value) : ValueOption::miss();
     }
 
     /**
@@ -186,7 +195,7 @@ final class Helper
 }
 
 /**
- * Option type
+ * Option type for Helper::find() return.
  */
 final class ValueOption
 {
@@ -197,7 +206,7 @@ final class ValueOption
     public $value;
 
     /**
-     * Got a value
+     * Found a value.
      */
     public static function ok($value): self
     {
@@ -208,7 +217,7 @@ final class ValueOption
     }
 
     /**
-     * Does not handle type
+     * Could not find value.
      */
     public static function miss(): self
     {

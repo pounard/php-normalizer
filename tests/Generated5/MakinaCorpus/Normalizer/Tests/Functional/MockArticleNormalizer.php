@@ -12,7 +12,7 @@ namespace Generated5\MakinaCorpus\Normalizer\Tests\Functional;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
 
-use MakinaCorpus\Normalizer as Helper;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 
 final class MockArticleNormalizer
 {

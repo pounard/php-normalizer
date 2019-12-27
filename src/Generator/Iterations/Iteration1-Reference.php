@@ -32,11 +32,13 @@
 
 declare(strict_types=1);
 
+namespace MakinaCorpus\Normalizer\Generator\Iterations;
+
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\HydratorOption;
+use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
-use function MakinaCorpus\Normalizer\gettype_real;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Create instance and hydrate values
@@ -110,11 +112,11 @@ function hydrator1_property_validate($value, PropertyDefinition $property, Conte
         return $value;
     }
 
-    $type = gettype_real($value);
+    $type = Helper::getType($value);
     $expected = $context->getNativeType($property->getTypeName());
 
     $isValid = false;
-    if (class_exists($expected) || interface_exists($expected)) {
+    if (\class_exists($expected) || \interface_exists($expected)) {
         $isValid = ($value instanceof $expected);
     } else {
         $isValid = ($type === $expected);
@@ -210,7 +212,7 @@ function hydrator1_external_implementation(string $type, $input, Context $contex
         case 'DateTimeInterface':
         case 'DateTimeImmutable':
             return HydratorOption::ok(new \DateTimeImmutable($input));
-        case Ramsey\Uuid\UuidInterface::class:
+        case UuidInterface::class:
             return HydratorOption::ok(Uuid::fromString($input));
     }
     return HydratorOption::miss();
@@ -359,8 +361,8 @@ function normalizer1_external_implementation(string $type, $input, Context $cont
         case 'DateTimeInterface':
         case 'DateTimeImmutable':
             return HydratorOption::ok($input->format(\DateTime::RFC3339));
-        case Ramsey\Uuid\Uuid::class:
-        case Ramsey\Uuid\UuidInterface::class:
+        case Uuid::class:
+        case UuidInterface::class:
             return HydratorOption::ok($input->__toString());
     }
     return HydratorOption::miss();
@@ -371,7 +373,7 @@ function normalizer1_external_implementation(string $type, $input, Context $cont
  */
 function normalizer1(/* string|array|T */ $object, Context $context) /* : scalar|array */
 {
-    $nativeType = gettype_real($object);
+    $nativeType = Helper::getType($object);
 
     $external = normalizer1_external_implementation($nativeType, $object, $context);
     if ($external->handled) {

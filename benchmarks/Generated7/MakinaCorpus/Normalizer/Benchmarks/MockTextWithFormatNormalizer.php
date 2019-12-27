@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Generated7\MakinaCorpus\Normalizer\Benchmarks;
 
-use MakinaCorpus\Normalizer as Helper;
 use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
 
 /**
  * Public implementation of (de)normalizer for class MockTextWithFormat.

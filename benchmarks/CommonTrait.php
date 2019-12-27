@@ -11,13 +11,17 @@ use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
-use MakinaCorpus\Normalizer\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\UuidNormalizer as CustomUuidNormalizer;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer as SymfonyUuidNormalizer;
+use MakinaCorpus\Normalizer\Generator\GeneratorRuntime;
+use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\Iterations\Normalizer5;
+use MakinaCorpus\Normalizer\Generator\Iterations\Normalizer6;
+use MakinaCorpus\Normalizer\Generator\Iterations\NormalizerChain6;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -178,16 +182,16 @@ trait NormalizerBenchmarkTrait
     /** @var \Symfony\Component\Serializer\Serializer */
     private $symfonyNormalizerProxy;
 
-    /** @var \Normalizer5 */
+    /** @var Normalizer5 */
     private $normalizer5;
 
-    /** @var \Normalizer6 */
+    /** @var Normalizer6 */
     private $normalizer6;
 
-    /** @var \Normalizer6 */
+    /** @var Normalizer6 */
     private $normalizer7;
 
-    /** @var \Normalizer6 */
+    /** @var Normalizer6 */
     private $normalizer8;
 
     private function getContextWithReflection(): Context
@@ -271,10 +275,10 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 5 normalizer
      */
-    private function createNormalizer5(): \Normalizer5
+    private function createNormalizer5(): Normalizer5
     {
-        return new \Normalizer5(
-            new \Generator5Runtime(
+        return new Normalizer5(
+            new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated5')
             )
         );
@@ -283,13 +287,13 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 6 normalizer
      */
-    private function createNormalizer6(): \Normalizer6
+    private function createNormalizer6(): Normalizer6
     {
-        return new \Normalizer6(
-            new \Generator5Runtime(
+        return new Normalizer6(
+            new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated5')
             ),
-            new \NormalizerChain6([
+            new NormalizerChain6([
                 new DateNormalizer(),
                 new CustomUuidNormalizer()
             ]),
@@ -299,13 +303,13 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 7 normalizer
      */
-    private function createNormalizer7(): \Normalizer6
+    private function createNormalizer7(): Normalizer6
     {
-        return new \Normalizer6(
-            new \Generator5Runtime(
+        return new Normalizer6(
+            new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated7')
             ),
-            new \NormalizerChain6([
+            new NormalizerChain6([
                 new DateNormalizer(),
                 new CustomUuidNormalizer()
             ]),
@@ -315,13 +319,13 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 8 normalizer
      */
-    private function createNormalizer8(): \Normalizer6
+    private function createNormalizer8(): Normalizer6
     {
-        return new \Normalizer6(
-            new \Generator5Runtime(
+        return new Normalizer6(
+            new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated8')
             ),
-            new \NormalizerChain6([
+            new NormalizerChain6([
                 new DateNormalizer(),
                 new CustomUuidNormalizer()
             ]),
