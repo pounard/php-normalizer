@@ -97,10 +97,10 @@ final class TheOtherWaySmallBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithReflection() : void
+    public function benchFallbackWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->normalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
+            $this->fallbackNormalizer->normalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -108,10 +108,10 @@ final class TheOtherWaySmallBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithConfigOnly() : void
+    public function benchFallbackWithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->normalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
+            $this->fallbackNormalizer->normalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 

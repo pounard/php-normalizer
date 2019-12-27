@@ -3,7 +3,7 @@
 namespace MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer;
 
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\FallbackNormalizer;
 use MakinaCorpus\Normalizer\Helper;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -19,7 +19,7 @@ final class NormalizerProxy implements NormalizerInterface, DenormalizerInterfac
     /**
      * Default constructor
      */
-    public function __construct(ContextFactory $contextFactory, DefaultNormalizer $normalizer)
+    public function __construct(ContextFactory $contextFactory, FallbackNormalizer $normalizer)
     {
         $this->contextFactory = $contextFactory;
         $this->normalizer = $normalizer;

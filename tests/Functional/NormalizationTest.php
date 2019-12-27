@@ -7,7 +7,7 @@ namespace MakinaCorpus\Normalizer\Tests\Functional;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\FallbackNormalizer;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\UuidNormalizer;
@@ -25,9 +25,9 @@ final class NormalizationTest extends TestCase
         return new ArrayTypeDefinitionMap($data['types'], $data['type_aliases']);
     }
 
-    private function createDefaultNormalizer(): DefaultNormalizer
+    private function createFallbackNormalizer(): FallbackNormalizer
     {
-        return new DefaultNormalizer([
+        return new FallbackNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
             new UuidNormalizer(),
@@ -37,7 +37,7 @@ final class NormalizationTest extends TestCase
     public function testNormalizeSimple()
     {
         $map = $this->createTypeDefinitionMap();
-        $normalizer = $this->createDefaultNormalizer();
+        $normalizer = $this->createFallbackNormalizer();
 
         $data = [
             'value' => "<p>Hello, world!</p>",
@@ -58,7 +58,7 @@ final class NormalizationTest extends TestCase
     public function testNormalizeWithComplexTypes()
     {
         $map = $this->createTypeDefinitionMap();
-        $normalizer = $this->createDefaultNormalizer();
+        $normalizer = $this->createFallbackNormalizer();
 
         $data = [
             'title' => "This is a test",
@@ -83,7 +83,7 @@ final class NormalizationTest extends TestCase
     public function testNormalizeWithArrayCollection()
     {
         $map = $this->createTypeDefinitionMap();
-        $normalizer = $this->createDefaultNormalizer();
+        $normalizer = $this->createFallbackNormalizer();
 
         $id = Uuid::uuid4();
         $createdAt = new \DateTimeImmutable();

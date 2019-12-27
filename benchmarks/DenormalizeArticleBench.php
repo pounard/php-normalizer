@@ -219,10 +219,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithReflection() : void
+    public function benchFallbackWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithReflection());
+            $this->fallbackNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -230,10 +230,10 @@ final class DenormalizeArticleBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithConfigOnly() : void
+    public function benchFallbackWithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly());
+            $this->fallbackNormalizer->denormalize(MockArticle::class, $data, $this->getContextWithConfigOnly());
         }
     }
 

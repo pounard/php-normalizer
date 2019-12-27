@@ -217,10 +217,10 @@ final class DenormalizeSmallBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithReflection() : void
+    public function benchFallbackWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
+            $this->fallbackNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -228,10 +228,10 @@ final class DenormalizeSmallBench
      * @Revs(50)
      * @Iterations(30)
      */
-    public function benchCustomWithConfigOnly() : void
+    public function benchFallbackWithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->defaultNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
+            $this->fallbackNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 

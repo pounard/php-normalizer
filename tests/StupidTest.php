@@ -8,7 +8,7 @@ use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\FallbackNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
@@ -62,9 +62,9 @@ final class StupidTest extends TestCase
     /**
      * Create default normalizer
      */
-    private function createDefaultNormalizer(): DefaultNormalizer
+    private function createFallbackNormalizer(): FallbackNormalizer
     {
-        return $this->defaultNormalizer = new DefaultNormalizer([
+        return $this->fallbackNormalizer = new FallbackNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
             new UuidNormalizer(),

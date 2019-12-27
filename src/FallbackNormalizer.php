@@ -11,7 +11,7 @@ use Goat\Hydrator\HydratorMap;
 /**
  * Object normalizer and denormalizer
  */
-final class DefaultNormalizer implements Normalizer, Denormalizer
+final class FallbackNormalizer implements Normalizer, Denormalizer
 {
     private $denormalizers = [];
     private $denormalizersCache = [];

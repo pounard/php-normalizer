@@ -9,7 +9,7 @@ use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\DefaultNormalizer;
+use MakinaCorpus\Normalizer\FallbackNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\ScalarNormalizer;
@@ -173,8 +173,8 @@ trait NormalizerBenchmarkTrait
     /** @var \MakinaCorpus\Normalizer\Context */
     private $context;
 
-    /** @var \MakinaCorpus\Normalizer\DefaultNormalizer */
-    private $defaultNormalizer;
+    /** @var \MakinaCorpus\Normalizer\FallbackNormalizer */
+    private $fallbackNormalizer;
 
     /** @var \Symfony\Component\Serializer\Serializer */
     private $symfonyNormalizer;
@@ -211,7 +211,7 @@ trait NormalizerBenchmarkTrait
     {
         $this->cachedContext = $this->createCachedContext();
         $this->context = $this->createContext();
-        $this->defaultNormalizer = $this->createDefaultNormalizer();
+        $this->fallbackNormalizer = $this->createFallbackNormalizer();
         $this->normalizer5 = $this->createNormalizer5();
         $this->normalizer6 = $this->createNormalizer6();
         $this->normalizer7 = $this->createNormalizer7();
@@ -245,11 +245,11 @@ trait NormalizerBenchmarkTrait
     }
 
     /**
-     * Create default normalizer
+     * Create fallback normalizer
      */
-    private function createDefaultNormalizer(): DefaultNormalizer
+    private function createFallbackNormalizer(): FallbackNormalizer
     {
-        return new DefaultNormalizer([
+        return new FallbackNormalizer([
             new ScalarNormalizer(),
             new DateNormalizer(),
             new CustomUuidNormalizer()
@@ -388,7 +388,7 @@ trait NormalizerBenchmarkTrait
                 new ContextFactory(
                     $this->createCachedTypeDefinitionMap()
                 ),
-                $this->defaultNormalizer
+                $this->fallbackNormalizer
             ),
         ]);
     }

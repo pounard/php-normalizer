@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Tests\Unit;
 
-use MakinaCorpus\Normalizer\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
 use PHPUnit\Framework\TestCase;
 
 final class Psr4AppNamingStrategyTest extends TestCase
