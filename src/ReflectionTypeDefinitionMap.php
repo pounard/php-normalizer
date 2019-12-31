@@ -158,6 +158,18 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      */
     public function get(string $name): TypeDefinition
     {
+        // Handle gracefully native PHP native types.
+        switch ($name) {
+            case 'array':
+            case 'bool':
+            case 'float':
+            case 'int':
+            case 'null':
+            case 'resource':
+            case 'string':
+                return DefaultTypeDefinition::simple($name);
+        }
+
         if (!\class_exists($name)) {
             throw new ClassDoesNotExistError($name);
         }

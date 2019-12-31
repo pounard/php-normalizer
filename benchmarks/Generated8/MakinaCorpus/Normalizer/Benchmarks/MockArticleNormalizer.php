@@ -109,7 +109,11 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
         $ret['authors'] = [];
         if ($object->authors) {
             foreach ($object->authors as $index => $value) {
-                $ret['authors'][$index] = (string)$value;
+                if (null === $value) {
+                    $ret['authors'][$index] = null;
+                } else {
+                    $ret['authors'][$index] = (string)$value;
+                }
             }
         }
     },
@@ -191,7 +195,12 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
             if ($option->value) {
                 $instance->authors = [];
                 foreach ($option->value as $index => $value) {
-                    $instance->authors[$index] = Helper::toString($value);
+                    if (null === $value) {
+                        Helper::error("Property value in collection cannot be null");
+                        $instance->authors[$index] = null;
+                    } else {
+                        $instance->authors[$index] = Helper::toString($value);
+                    }
                 }
             }
         }

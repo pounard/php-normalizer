@@ -415,9 +415,21 @@ final class DefaultTypeDefinition implements TypeDefinition
     private $properties = [];
 
     /**
+     * For PHP native types that are not objects.
+     */
+    public static function simple(string $name): self
+    {
+        $ret = new self;
+        $ret->name = $name;
+        $ret->normalizedName = $name;
+
+        return $ret;
+    }
+
+    /**
      * Default constructor
      */
-    public static function fromArray(string $name, array $data)
+    public static function fromArray(string $name, array $data): self
     {
         $ret = new self;
         $ret->name = $name;

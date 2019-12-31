@@ -219,9 +219,10 @@ final class Helper
             case 'string':
                 return ValueOption::ok(Helper::toString($input, $context));
             case 'date':
-            case 'DateTime':
-            case 'DateTimeInterface':
-            case 'DateTimeImmutable':
+            case \DateTime::class:
+                return ValueOption::ok(new \DateTime($input));
+            case \DateTimeInterface::class:
+            case \DateTimeImmutable::class:
                 return ValueOption::ok(new \DateTimeImmutable($input));
             case UuidInterface::class:
                 return ValueOption::ok(Uuid::fromString($input));
@@ -248,9 +249,9 @@ final class Helper
             case 'string':
                 return ValueOption::ok(Helper::toString($input, $context));
             case 'date':
-            case 'DateTime':
-            case 'DateTimeInterface':
-            case 'DateTimeImmutable':
+            case \DateTime::class:
+            case \DateTimeInterface::class:
+            case \DateTimeImmutable::class:
                 return ValueOption::ok($input->format(\DateTime::RFC3339));
             case Uuid::class:
             case UuidInterface::class:

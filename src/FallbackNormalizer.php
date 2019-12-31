@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
+use function MakinaCorpus\Normalizer\Generator\Iterations\handle_error;
+
 /**
  * Object (de)normalizer to use whenever the generated variant does not exist.
  */
@@ -61,11 +63,27 @@ final class FallbackNormalizer
     {
         $option = Helper::find($input, $property->getCandidateNames(), $context);
         if ($option->success) {
+
             if (null === $option->value) {
+                if (!$property->isOptional()) {
+                    Helper::error(\sprintf("Property cannot be null"));
+                }
+                // Fallback to null in case partial is allowed.
                 return null;
             }
-            return self::denormalize($property->getTypeName(), $option->value, $context);
+
+            return self::propertyValidate(
+                self::denormalize(
+                    $property->getTypeName(), $option->value, $context
+                ),
+                $property, $context
+            );
         }
+
+        if (!$property->isOptional()) {
+            Helper::error(\sprintf("Property cannot be null yet value could not be found in input"));
+        }
+        // Fallback to null in case partial is allowed.
         return null;
     }
 
@@ -99,38 +117,44 @@ final class FallbackNormalizer
     }
 
     /**
-     * Validate value collection
-     */
-    private static function propertyValidateCollection(iterable $values, PropertyDefinition $property, Context $context): iterable
-    {
-        foreach ($values as $index => $value) {
-            try {
-                $context->enter((string)$index);
-                yield $index => self::propertyValidate($value, $property, $context);
-            } finally {
-                $context->leave();
-            }
-        }
-    }
-
-    /**
      * Extract a single value
      */
     private static function propertyExtractCollection(array $input, PropertyDefinition $property, Context $context)
     {
-        $values = Helper::find($input, $property->getCandidateNames(), $context);
+        $option = Helper::find($input, $property->getCandidateNames(), $context);
+
+        if (!$option->success) {
+            return [];
+        }
+
+        $ret = [];
+
+        $type = $property->getTypeName();
+        $values = $option->value;
 
         if (\is_iterable($values)) {
             foreach ($values as $index => $value) {
                 if (null === $value) {
-                    yield $index => null;
+                    Helper::error(\sprintf("Value in collection cannot be null at index '%s'", $index));
+                    // Let it pass if partial allowed.
+                    $ret[$index] = null;
                 } else {
-                    yield $index => self::denormalize($property->getTypeName(), $value, $context);
+                    // $value, );
+                    $ret[$index] = self::propertyValidate(
+                        self::denormalize($type, $value, $context),
+                        $property, $context
+                    );
                 }
             }
         } else {
-            yield $values;
+            // Wronly not an iterable object, must be a single value.
+            $ret[] = self::propertyValidate(
+                self::denormalize($type, $values, $context),
+                $property, $context
+            );
         }
+
+        return $ret;
     }
 
     /**
@@ -141,18 +165,9 @@ final class FallbackNormalizer
         try {
             $context->enter($property->getNativeName());
             if (!$property->isCollection()) {
-                return self::propertyValidate(
-                    self::propertyExtract($input, $property, $context),
-                    $property,
-                    $context
-                );
+                return self::propertyExtract($input, $property, $context);
             }
-            return \iterator_to_array(
-                self::propertyValidateCollection(
-                    self::propertyExtractCollection($input, $property, $context),
-                    $property, $context
-                )
-            );
+            return self::propertyExtractCollection($input, $property, $context);
         } finally {
             $context->leave($property->getNormalizedName());
         }

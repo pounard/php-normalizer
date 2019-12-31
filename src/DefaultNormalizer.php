@@ -85,7 +85,7 @@ final class DefaultNormalizer implements Normalizer
             if ($this->enableFallback) {
                 return FallbackNormalizer::normalize($object, $context);
             }
-            throw new RuntimeError(\sprintf("Could not find class '%s'", $normalizer));
+            throw new RuntimeError(\sprintf("Could not find class normalizer for type '%s'", $nativeType));
         }
 
         return \call_user_func(
@@ -141,7 +141,7 @@ final class DefaultNormalizer implements Normalizer
             if ($this->enableFallback) {
                 return FallbackNormalizer::denormalize($type, $input, $context);
             }
-            throw new RuntimeError(\sprintf("Could not find class '%s'", $normalizer));
+            throw new RuntimeError(\sprintf("Could not find class denormalizer for type '%s'", $nativeType));
         }
 
         return \call_user_func(

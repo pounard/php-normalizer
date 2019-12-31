@@ -88,13 +88,15 @@ final class DefaultGenerator implements Generator
         $normalizeCall = null;
 
         // Attempt eager related class code generation, if possible.
-        if (\class_exists($type)) {
-            try {
+        try {
+            // If attempt is done with an interface, it will raise an exception.
+            $isTerminal = $context->getType($type)->isTerminal();
+            if (\class_exists($type) && !$isTerminal) {
                 $normalizerClassName = $this->generateNormalizerClass($type);
                 $normalizeCall = "\\{$normalizerClassName}::normalize({$input}, \$context, \$normalizer)";
-            } catch (TypeDoesNotExistError $e) {
-                $context->addWarning($e->getMessage());
             }
+        } catch (TypeDoesNotExistError $e) {
+            $context->addWarning($e->getMessage());
         }
 
         // @todo Here allow custom implementation to write code
@@ -151,7 +153,11 @@ EOT
         {$output} = [];
         if ({$arrayInput}) {
             foreach ({$arrayInput} as \$index => {$input}) {
-                {$output}[\$index] = {$normalizeCall};
+                if (null === {$input}) {
+                    {$output}[\$index] = null;
+                } else {
+                    {$output}[\$index] = {$normalizeCall};
+                }
             }
         }
 EOT
@@ -179,13 +185,15 @@ EOT
         $normalizeCall = null;
 
         // Attempt eager related class code generation, if possible.
-        if (\class_exists($type)) {
-            try {
+        try {
+            // If attempt is done with an interface, it will raise an exception.
+            $isTerminal = $context->getType($type)->isTerminal();
+            if (\class_exists($type) && !$isTerminal) {
                 $normalizerClassName = $this->generateNormalizerClass($type);
                 $normalizeCall = "\\{$normalizerClassName}::denormalize({$input}, \$context, \$denormalizer)";
-            } catch (TypeDoesNotExistError $e) {
-                $context->addWarning($e->getMessage());
             }
+        } catch (TypeDoesNotExistError $e) {
+            $context->addWarning($e->getMessage());
         }
 
         // @todo Here allow custom implementation to write code
@@ -278,7 +286,12 @@ EOT
             if ({$arrayInput}) {
                 {$output} = [];
                 foreach ({$arrayInput} as \$index => {$input}) {
-                    {$output}[\$index] = {$denormalizeCall};
+                    if (null === {$input}) {
+                        Helper::error("Property value in collection cannot be null");
+                        {$output}[\$index] = null;
+                    } else {
+                        {$output}[\$index] = {$denormalizeCall};
+                    }
                 }
             }
         }

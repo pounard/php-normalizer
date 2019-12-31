@@ -6,7 +6,7 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Mock;
 
 class MockClassWithNullableObject
 {
-    /** @var ?MockClassWithNullableObject */
+    /** @var ?MockClassWithNullableInt */
     private $nullableObject;
 
     public function getValue()

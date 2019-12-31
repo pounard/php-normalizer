@@ -7,14 +7,16 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Normalizer;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\RuntimeError;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithFloat;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithInt;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithIntArray;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObject;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObjectArray;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockHelper;
-use MakinaCorpus\Normalizer\Tests\Unit\Mock\Composition\MockClassWithScalars;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractNormalizerTest extends TestCase
@@ -350,32 +352,245 @@ abstract class AbstractNormalizerTest extends TestCase
     }
 
     /**
-     * OK, I'm sorry for this one, it tests pretty much all scalar typess.
-     *
-     * @todo refactor this smart with a data provider for each type.
-     *
      * @dataProvider dataNormalizer()
      */
-    public function testScalarNormalize(Normalizer $normalizer, Context $context): void
+    public function testObjectDeepNormalization(Normalizer $normalizer, Context $context): void
     {
         $object = MockHelper::changeObjectProperties(
-            new MockClassWithScalars,
-            [
-                'nullableInt' => 11,
-                'int' => 29,
-                'intArray' => [1, 3, 5],
-                'nullableFloat' => 12.3,
-                'float' => 29.45,
-                'floatArray' => [4.5, 1.0, 12, 14.5],
-                'nullableBool' => false,
-                'bool' => true,
-                'boolArray' => [false, true, true, false, true],
-                'nullableString' => 'this a nullable string',
-                'string' => 'this is a non nullable string',
-                'stringArray' => ['this', 'is a', 'string'],
+            new MockClassWithObject(), [
+                'object' => MockHelper::changeObjectProperties(
+                    new MockClassWithNullableInt, [
+                        'nullableInt' => 67,
+                    ]
+                ),
             ]
         );
 
-        
+        $reference = [
+            'object' => [
+                'nullableInt' => 67
+            ],
+        ];
+
+        $values = $normalizer->normalize($object, $context);
+        self::assertSame($reference, $values);
     }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectDeepDenormalization(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'object' => [
+                'nullableInt' => 137
+            ],
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithObject::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithObject::class, $object);
+
+        $nested = $object->getValue();
+        self::assertInstanceOf(MockClassWithNullableInt::class, $nested);
+        self::assertSame(137, $nested->getValue());
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testIntCollectionNormalization(Normalizer $normalizer, Context $context): void
+    {
+        $object = MockHelper::changeObjectProperties(new MockClassWithIntArray(), [
+            'intArray' => [1, 2, 3],
+        ]);
+
+        $reference = [
+            'intArray' => [1, 2, 3],
+        ];
+
+        $values = $normalizer->normalize($object, $context);
+        self::assertSame($reference, $values);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testIntCollectionDenormalization(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'intArray' => [5, 1, 9, 7],
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithIntArray::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithIntArray::class, $object);
+        self::assertSame([5, 1, 9, 7], $object->getValue());
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testIntCollectionWithNullDenormalizationRaiseError(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'intArray' => [5, null, 9, 7],
+        ];
+
+        self::expectException(RuntimeError::class);
+
+        $normalizer->denormalize(MockClassWithIntArray::class, $input, $context);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     *
+     * Dates are (de)normalized by a custom implementation, execution path
+     * can be different from scalar and other objects, hence the necessity
+     * to test at least one custom implementation.
+     */
+    public function testDateCollectionNormalization(Normalizer $normalizer, Context $context): void
+    {
+        $object = MockHelper::changeObjectProperties(new MockClassWithDateArray(), [
+            'dateArray' => [
+                'a' => new \DateTime('2019-12-31'),
+                'b' => new \DateTime('2018-10-25'),
+            ],
+        ]);
+
+        $values = $normalizer->normalize($object, $context);
+        self::assertCount(2, $values['dateArray']);
+        // DateTime objects are converted to ISO-8601 strings per default.
+        self::assertRegExp('/2019-12-31/', $values['dateArray']['a']);
+        self::assertRegExp('/2018-10-25/', $values['dateArray']['b']);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     *
+     * Dates are (de)normalized by a custom implementation, execution path
+     * can be different from scalar and other objects, hence the necessity
+     * to test at least one custom implementation.
+     */
+    public function testDateCollectionDenormalization(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'dateArray' => [
+                'foo' => '2019-12-31T16:24:06+01:00',
+                'bar' => '2020-12-31T16:24:06+01:00',
+            ],
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithDateArray::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithDateArray::class, $object);
+        $values = $object->getValue();
+        self::assertCount(2, $values);
+        self::assertInstanceOf(\DateTime::class, $values['foo']);
+        self::assertInstanceOf(\DateTime::class, $values['bar']);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     *
+     * Dates are (de)normalized by a custom implementation, execution path
+     * can be different from scalar and other objects, hence the necessity
+     * to test at least one custom implementation.
+     */
+    public function testDateCollectionWithNullDenormalizationRaiseError(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'dateArray' => [
+                'foo' => '2019-12-31T16:24:06+01:00',
+                'bar' => null,
+            ],
+        ];
+
+        self::expectException(RuntimeError::class);
+
+        $normalizer->denormalize(MockClassWithDateArray::class, $input, $context);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectCollectionNormalization(Normalizer $normalizer, Context $context): void
+    {
+        $object = MockHelper::changeObjectProperties(new MockClassWithObjectArray(), [
+            'objectArray' => [
+                'a' => MockHelper::changeObjectProperties(new MockClassWithNullableInt(), [
+                    'nullableInt' => 11,
+                ]),
+                'b' => MockHelper::changeObjectProperties(new MockClassWithNullableInt(), [
+                    'nullableInt' => 31,
+                ]),
+            ],
+        ]);
+
+        $reference = [
+            'objectArray' => [
+                'a' => [
+                    'nullableInt' => 11,
+                ],
+                'b' => [
+                    'nullableInt' => 31,
+                ],
+            ],
+        ];
+
+        $values = $normalizer->normalize($object, $context);
+        self::assertSame($reference, $values);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectCollectionDenormalization(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'objectArray' => [
+                'foo' => [
+                    'nullableInt' => 12,
+                ],
+                'bar' => [
+                    'nullableInt' => 23,
+                ]
+            ],
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithObjectArray::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithObjectArray::class, $object);
+
+        $values = $object->getValue();
+        self::assertCount(2, $values);
+        self::assertInstanceOf(MockClassWithNullableInt::class, $values['foo']);
+        self::assertInstanceOf(MockClassWithNullableInt::class, $values['bar']);
+
+        self::assertSame(12, $values['foo']->getValue());
+        self::assertSame(23, $values['bar']->getValue());
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectCollectionWithNullDenormalizationRaiseError(Normalizer $normalizer, Context $context): void
+    {
+        $input = [
+            'objectArray' => [
+                'foo' => [
+                    'nullableInt' => 12,
+                ],
+                'bar' => null,
+            ],
+        ];
+
+        self::expectException(RuntimeError::class);
+
+        $normalizer->denormalize(MockClassWithObjectArray::class, $input, $context);
+    }
+
+    // Inheritance private in sub class
+    // Inheritance protecte in sub class
+    // Inheritance public in sub class
 }

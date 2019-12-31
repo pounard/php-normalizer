@@ -16,7 +16,7 @@ interface DataTransformationError extends NormalizerError
 {
 }
 
-final class RuntimeError
+class RuntimeError
     extends \InvalidArgumentException
     implements DataTransformationError
 {
@@ -29,13 +29,13 @@ final class NotImplementedError
 }
 
 final class CircularDependencyDetectedError
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements DataTransformationError
 {
 }
 
 final class UnsupportedTypeError
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements DataTransformationError
 {
     public function __construct($type, $code = 0, $previous = null)
@@ -50,19 +50,19 @@ final class UnsupportedTypeError
 }
 
 final class CouldNotFindTypeInfo
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements ConfigurationError
 {
 }
 
 final class InvalidOptionValueError
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements ConfigurationError
 {
 }
 
 class TypeMismatchError
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements ConfigurationError
 {
     public function __construct($expected, $type = null, $code = 0, $previous = null)
@@ -82,7 +82,7 @@ final class InvalidValueTypeError
 }
 
 class TypeDoesNotExistError
-    extends \InvalidArgumentException
+    extends RuntimeError
     implements ConfigurationError
 {
     public function __construct($type, $code = 0, $previous = null)
