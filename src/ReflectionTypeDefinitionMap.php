@@ -14,7 +14,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
  * chained with a more complete or cached implementation when dynamic
  * type information lookup is required.
  */
-class ReflectionTypeDefinitionMap implements TypeDefinitionMap
+final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 {
     private $typeInfoExtractor;
     private $typeInfoExtractorLoaded = false;
@@ -49,6 +49,19 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
+     * Get type info extractor
+     */
+    protected function getTypeInfoExtractor(): PropertyTypeExtractorInterface
+    {
+        if (!$this->typeInfoExtractorLoaded && !$this->typeInfoExtractor) {
+            $this->typeInfoExtractorLoaded = true;
+            $this->typeInfoExtractor = self::createDefaultTypeInfoExtractor();
+        }
+
+        return $this->typeInfoExtractor;
+    }
+
+    /**
      * Parse property definition
      *
      * Properties types are much harder to get than class details, since
@@ -60,13 +73,10 @@ class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      */
     private function findPropertyDefinition(string $class, \ReflectionProperty $property): array
     {
-        if (!$this->typeInfoExtractorLoaded && !$this->typeInfoExtractor) {
-            $this->typeInfoExtractorLoaded = true;
-            $this->typeInfoExtractor = self::createDefaultTypeInfoExtractor();
-        }
+        $typeInfoExtractor = $this->getTypeInfoExtractor();
 
-        if ($this->typeInfoExtractor) {
-            $types = $this->typeInfoExtractor->getTypes($class, $property->getName());
+        if ($typeInfoExtractor) {
+            $types = $typeInfoExtractor->getTypes($class, $property->getName());
 
             if ($types) {
                 /** @var \Symfony\Component\PropertyInfo\Type $type */

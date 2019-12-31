@@ -21,22 +21,13 @@
         "classmap": [
             "src/Cache.php",
             "src/Context.php",
-            "src/CustomNormalizer.php",
             "src/Error.php",
             "src/Helper.php",
             "src/Normalizer.php",
+            "src/Normalizer/CustomDenormalizer.php",
+            "src/Normalizer/CustomNormalizer.php",
             "src/Options.php",
             "src/TypeDefinition.php"
-        ],
-        "files": [
-            "src/Generator/Iterations/Iteration1-Reference.php",
-            "src/Generator/Iterations/Iteration2-Generation.php",
-            "src/Generator/Iterations/Iteration3-Helper.php",
-            "src/Generator/Iterations/Iteration3-Reference.php",
-            "src/Generator/Iterations/Iteration4-Generation.php",
-            "src/Generator/Iterations/Iteration5-RecursiveGeneration.php",
-            "src/Generator/Iterations/Iteration6-MakeItPluggable.php",
-            "src/Generator/Iterations/Iteration7-GenerateClosures.php"
         ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",
@@ -47,6 +38,15 @@
         "classmap": [
             "benchmarks/CommonTrait.php",
             "benchmarks/Definitions.php"
+        ],
+        "files": [
+            "iterations/Iteration1-Reference.php",
+            "iterations/Iteration2-Generation.php",
+            "iterations/Iteration3-Helper.php",
+            "iterations/Iteration3-Reference.php",
+            "iterations/Iteration4-Generation.php",
+            "iterations/Iteration5-RecursiveGeneration.php",
+            "iterations/Iteration7-GenerateClosures.php"
         ],
         "psr-4": {
             "Generated2\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated2/MakinaCorpus/Normalizer/Benchmarks/",

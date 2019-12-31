@@ -43,18 +43,22 @@ namespace MakinaCorpus\Normalizer\Generator;
 final class Psr4AppNamingStrategy implements NamingStrategy
 {
     /** @var ?string */
-    private $classNameSuffix = null;
+    private $classNameSuffix;
 
     /** @var ?string */
-    private $namespaceInfix = null;
+    private $namespaceInfix;
+
+    /** @var ?string */
+    private $defaultNamespacePrefix;
 
     /**
      * Default constructor
      */
-    public function __construct(?string $classNameSuffix = 'Normalizer', ?string $namespaceInfix = 'Normalizer')
+    public function __construct(?string $classNameSuffix = 'Normalizer', ?string $namespaceInfix = 'Normalizer', ?string $defaultNamespacePrefix = null)
     {
         $this->classNameSuffix = $classNameSuffix;
         $this->namespaceInfix = $namespaceInfix;
+        $this->defaultNamespacePrefix = $defaultNamespacePrefix;
     }
 
     /**
@@ -84,6 +88,8 @@ final class Psr4AppNamingStrategy implements NamingStrategy
     public function generateFilename(string $realClassName, string $generatedClassesTargetDir, ?string $namespacePrefix = null): string
     {
         $realClassName = \trim($realClassName, '\\');
+
+        $namespacePrefix = $namespacePrefix ?? $this->defaultNamespacePrefix;
 
         if ($namespacePrefix) {
             $namespacePrefix = \trim($namespacePrefix, '\\').'\\';

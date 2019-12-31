@@ -6,13 +6,13 @@ namespace MakinaCorpus\Normalizer\Tests\Unit;
 
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\DateNormalizer;
 use MakinaCorpus\Normalizer\InvalidValueTypeError;
 use MakinaCorpus\Normalizer\Option;
 use MakinaCorpus\Normalizer\UnsupportedTypeError;
+use MakinaCorpus\Normalizer\Normalizer\DateTimeNormalizer;
 use PHPUnit\Framework\TestCase;
 
-final class NormalizerDateTest extends TestCase
+final class NormalizerDateTimeTest extends TestCase
 {
     private function createContext(?string $format = null)
     {
@@ -39,7 +39,7 @@ final class NormalizerDateTest extends TestCase
     public function testNormalizeDate(string $type, string $class)
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $object = new \DateTime("2019-06-22");
         $this->assertRegExp('/^2019-06-22T/', $normalizer->normalize($type, $object, $context));
@@ -51,7 +51,7 @@ final class NormalizerDateTest extends TestCase
     public function testNormalizeDateWithFormat(string $type, string $class)
     {
         $context = $this->createContext('d/m/Y');
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $object = new \DateTime("2019-06-22");
         $this->assertSame('22/06/2019', $normalizer->normalize($type, $object, $context));
@@ -60,7 +60,7 @@ final class NormalizerDateTest extends TestCase
     public function testNormalizeRaiseExceptionWithInvalidType()
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $this->expectException(UnsupportedTypeError::class);
         $normalizer->normalize('BWAAAA', new \DateTime(), $context);
@@ -69,7 +69,7 @@ final class NormalizerDateTest extends TestCase
     public function testNormalizeRaiseExceptionWithInvalidValue()
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $this->expectException(InvalidValueTypeError::class);
         $normalizer->normalize(\DateTimeInterface::class, 'BWAAAA', $context);
@@ -81,7 +81,7 @@ final class NormalizerDateTest extends TestCase
     public function testDenormalizeDate(string $type, string $class)
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $object = $normalizer->denormalize($type, '2019-06-22', $context);
         $this->assertInstanceOf($class, $object);
@@ -94,7 +94,7 @@ final class NormalizerDateTest extends TestCase
     public function testDenormalizeDateWithFormat(string $type, string $class)
     {
         $context = $this->createContext('d/m/Y');
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $object = $normalizer->denormalize($type, '22/06/2019', $context);
         $this->assertInstanceOf($class, $object);
@@ -104,7 +104,7 @@ final class NormalizerDateTest extends TestCase
     public function testDenormalizeRaiseExceptionWithInvalidType()
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $this->expectException(UnsupportedTypeError::class);
         $normalizer->denormalize('BWAAAA', '2019-06-22', $context);
@@ -116,7 +116,7 @@ final class NormalizerDateTest extends TestCase
     public function testDenormalizeRaiseExceptionWithInvalidValue(string $type)
     {
         $context = $this->createContext();
-        $normalizer = new DateNormalizer();
+        $normalizer = new DateTimeNormalizer();
 
         $this->expectException(InvalidValueTypeError::class);
         $normalizer->denormalize($type, 'BWAAAA', $context);

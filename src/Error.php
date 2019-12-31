@@ -34,16 +34,19 @@ final class CircularDependencyDetectedError
 {
 }
 
-final class InvalidValueTypeError
-    extends \InvalidArgumentException
-    implements DataTransformationError
-{
-}
-
 final class UnsupportedTypeError
     extends \InvalidArgumentException
     implements DataTransformationError
 {
+    public function __construct($type, $code = 0, $previous = null)
+    {
+        if (\strpos($type, ' ')) {
+            $message = $type;
+        } else {
+            $message = \sprintf("Unsupported type '%s'", $type);
+        }
+        parent::__construct($message, (int)$code, $previous);
+    }
 }
 
 final class CouldNotFindTypeInfo
@@ -62,15 +65,20 @@ class TypeMismatchError
     extends \InvalidArgumentException
     implements ConfigurationError
 {
-    public function __construct($expected, $type, $code = 0, $previous = null)
+    public function __construct($expected, $type = null, $code = 0, $previous = null)
     {
-        if (\strpos($type, ' ')) {
-            $message = $type;
+        if (null === $type) {
+            $message = $expected;
         } else {
             $message = \sprintf("Expected type '%s', got '%s'", $expected, $type);
         }
         parent::__construct($message, (int)$code, $previous);
     }
+}
+
+final class InvalidValueTypeError
+    extends TypeMismatchError
+{
 }
 
 class TypeDoesNotExistError

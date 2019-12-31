@@ -11,6 +11,9 @@ namespace MakinaCorpus\Normalizer\Generator;
  */
 final class GeneratorRuntime implements Generator
 {
+    /** @var ?string */
+    private $generatedClassNamespace;
+
     /** @var NamingStrategy */
     private $namingStrategy;
 
@@ -19,11 +22,10 @@ final class GeneratorRuntime implements Generator
 
     /**
      * Constructor
-     *
-     * @param string $projectSourceRoot
      */
-    public function __construct(?NamingStrategy $namingStrategy)
+    public function __construct(?NamingStrategy $namingStrategy, ?string $generatedClassNamespace = null)
     {
+        $this->generatedClassNamespace = $generatedClassNamespace;
         $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy();
     }
 
@@ -41,7 +43,7 @@ final class GeneratorRuntime implements Generator
             return null;
         }
 
-        $normalizerClass = $this->namingStrategy->generateClassName($className, '\\');
+        $normalizerClass = $this->namingStrategy->generateClassName($className, $this->generatedClassNamespace ?? '\\');
 
         if (!\class_exists($normalizerClass)) {
             // Bool here otherwise upper ?? usage would give false negatives.

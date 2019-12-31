@@ -7,18 +7,14 @@ namespace MakinaCorpus\Normalizer\Tests;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\FallbackNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
-use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage as AddToCartMessageBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockArticle as MockArticleBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat as MockTextWithFormatBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithText as MockWithTextBench;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle as MockWithTitleBench;
-use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer;
 use MakinaCorpus\Normalizer\Generator\DefaultGenerator;
 use MakinaCorpus\Normalizer\Generator\Writer;
 use MakinaCorpus\Normalizer\Generator\Iterations\Generator5Impl;
@@ -56,18 +52,6 @@ final class StupidTest extends TestCase
             $this->createTypeDefinitionMapForBench(),
             $this->createTypeDefinitionMapForTests(),
             new ReflectionTypeDefinitionMap()
-        ]);
-    }
-
-    /**
-     * Create default normalizer
-     */
-    private function createFallbackNormalizer(): FallbackNormalizer
-    {
-        return $this->fallbackNormalizer = new FallbackNormalizer([
-            new ScalarNormalizer(),
-            new DateNormalizer(),
-            new UuidNormalizer(),
         ]);
     }
 

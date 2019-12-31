@@ -4,279 +4,305 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
-use GeneratedHydrator\Configuration;
-use Goat\Hydrator\HydratorInterface;
-use Goat\Hydrator\HydratorMap;
-
 /**
- * Object normalizer and denormalizer
+ * Object (de)normalizer to use whenever the generated variant does not exist.
  */
-final class FallbackNormalizer implements Normalizer, Denormalizer
+final class FallbackNormalizer
 {
-    private $denormalizers = [];
-    private $denormalizersCache = [];
-    private $hydratorMap = [];
-    private $normalizers = [];
-    private $normalizersCache = [];
-
     /**
-     * @param Normalizer[]|Denormalizer[] $implementations
+     * Create a normalizer instance using this implementation.
      */
-    public function __construct(iterable $implementations = [])
+    public static function create(): Normalizer
     {
-        foreach ($implementations as $instance) {
-            $this->register($instance);
-        }
-        if (!$this->hydratorMap) {
-            $this->hydratorMap = new HydratorMap(new Configuration('foo'));
-        }
-    }
-
-    /**
-     * Register a single (de)normalizer
-     *
-     * @param Normalizer|Denormalizer $instance
-     */
-    public function register($instance)
-    {
-        if ($instance instanceof Denormalizer) {
-            $this->denormalizers[] = $instance;
-        }
-        if ($instance instanceof Normalizer) {
-            $this->normalizers[] = $instance;
-        }
-    }
-
-    /**
-     * Find denormalizer for type
-     */
-    private function findDenormalizer(string $type): ?Normalizer
-    {
-        if (\array_key_exists($type, $this->denormalizersCache)) {
-            return $this->denormalizersCache[$type];
-        }
-        /** @var \MakinaCorpus\Normalizer\Denormalizer $instance */
-        foreach ($this->denormalizers as $instance) {
-            if ($instance->supportsDenormalization($type)) {
-                return $this->denormalizersCache[$type] = $instance;
-            }
-        }
-        return $this->denormalizersCache[$type] = null;
-    }
-
-    /**
-     * Find normalizer for type
-     */
-    private function findNormalizer(string $type): ?Normalizer
-    {
-        if (\array_key_exists($type, $this->normalizersCache)) {
-            return $this->normalizersCache[$type];
-        }
-        /** @var \MakinaCorpus\Normalizer\Normalizer $instance */
-        foreach ($this->normalizers as $instance) {
-            if ($instance->supportsNormalization($type)) {
-                return $this->normalizersCache[$type] = $instance;
-            }
-        }
-        return $this->normalizersCache[$type] = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization(string $type): bool
-    {
-        return null !== $this->findNormalizer($type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization(string $type): bool
-    {
-        return null !== $this->findDenormalizer($type);
-    }
-
-    /**
-     * Extract object raw values
-     */
-    private function extract(string $type, $object)
-    {
-        return $this->hydratorMap->getRealHydrator($type)->extractValues($object);
-    }
-
-    /**
-     * Handle collection normalization
-     */
-    private function normalizeCollection(string $type, $collection, Context $context)
-    {
-        $context->enter();
-
-        try {
-            // @todo Going throught this means the object in memory is wrong
-            //    but it's still preferable to be resilient than strict
-            if (!\is_iterable($collection)) {
-                return [$this->normalize($collection, $context, $type)];
+        return new class () implements Normalizer
+        {
+            public function normalize($object, Context $context)
+            {
+                return FallbackNormalizer::normalize($object, $context);
             }
 
-            $ret = [];
-
-            foreach ($collection as $key => $object) {
-                $ret[$key] = $this->normalize($type, $object, $context);
+            public function denormalize(string $type, $input, Context $context)
+            {
+                return FallbackNormalizer::denormalize($type, $input, $context);
             }
+        };
+    }
 
-            return $ret;
-
-        } finally {
-            $context->leave();
+    /**
+     * Create instance and hydrate values
+     */
+    private static function createInstance(string $type, Context $context)
+    {
+        if (!\class_exists($type)) {
+            Helper::error(\sprintf("Class '%s' does not exist", $type));
+            return null;
         }
+        return (new \ReflectionClass($type))->newInstanceWithoutConstructor();
     }
 
     /**
-     * {@inheritdoc}
+     * Create instance and hydrate values
      */
-    public function normalize(string $type, $object, Context $context)
+    private static function propertySet($object, $value, PropertyDefinition $property, Context $context): void
     {
-        $context->enter();
-
-        try {
-            $type = $context->getNativeType($type);
-
-            if ($normalizer = $this->findNormalizer($type)) {
-                return $normalizer->normalize($type, $object, $context);
-            }
-
-            $typeDef = $context->getType($type);
-
-            if ($context->isCircularReference($object)) {
-                return $context->handleCircularReference($type, $object);
-            }
-
-            $ret = [];
-            $data = $this->extract($typeDef->getNativeName(), $object);
-            $properties = $typeDef->getProperties();
-
-            /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
-            foreach ($properties as $property) {
-                $name = $property->getNativeName();
-
-                if (isset($data[$name])) {
-                    if ($property->isCollection()) {
-                        $ret[$property->getNormalizedName()] = $this->normalizeCollection($property->getTypeName(), $data[$name], $context);
-                    } else {
-                        $ret[$property->getNormalizedName()] = $this->normalize($property->getTypeName(), $data[$name], $context);
-                    }
-                }
-            }
-
-            return $ret;
-
-        } finally {
-            $context->leave();
-        }
+        $stealer = \Closure::bind(
+            static function () use ($object, $value, $property) {
+                $object->{$property->getNativeName()} = $value;
+            },
+            null, $property->getDeclaringClass()
+        );
+        $stealer();
     }
 
     /**
-     * Hydrate object instance
+     * Extract a single value
      */
-    private function hydrate(string $type, array $data)
+    private static function propertyExtract(array $input, PropertyDefinition $property, Context $context)
     {
-        return $this->hydratorMap->getRealHydrator($type)->createAndHydrateInstance($data, HydratorInterface::CONSTRUCTOR_SKIP);
-    }
-
-    /**
-     * Handle collection denormalization
-     */
-    private function denormalizeCollection(string $type, $data, Context $context)
-    {
-        $context->enter();
-
-        try {
-            // Automatically fix values not being array while they should be.
-            // @todo should we consider iterator implementations or traversables
-            //   being treated as arrays?
-            if (!\is_array($data)) {
-                return [$this->denormalize($type, $data, $context)];
+        $option = Helper::find($input, $property->getCandidateNames(), $context);
+        if ($option->success) {
+            if (null === $option->value) {
+                return null;
             }
-
-            $ret = [];
-
-            foreach ($data as $key => $value) {
-               $ret[$key] = $this->denormalize($type, $value, $context);
-            }
-
-            return $ret;
-
-        } finally {
-            $context->leave();
-        }
-    }
-
-    /**
-     * Find and extract the property value within the given data array
-     */
-    private function extractPropertyFromNormalizedData(PropertyDefinition $property, $data)
-    {
-        if (\is_array($data)) {
-            foreach ($property->getCandidateNames() as $name) {
-                if (\array_key_exists($name, $data)) {
-                    return $data[$name];
-                }
-            }
+            return self::denormalize($property->getTypeName(), $option->value, $context);
         }
         return null;
     }
 
     /**
-     * {@inheritdoc}
+     * Validate value
      */
-    public function denormalize(string $type, $data, Context $context)
+    private static function propertyValidate($value, PropertyDefinition $property, Context $context)
     {
-        $context->enter();
+        if (null === $value) {
+            if (!$property->isOptional()) {
+                $context->addError("Property cannot be null");
+            }
+            return $value;
+        }
 
+        $type = Helper::getType($value);
+        $expected = $context->getNativeType($property->getTypeName());
+
+        $isValid = false;
+        if (\class_exists($expected) || \interface_exists($expected)) {
+            $isValid = ($value instanceof $expected);
+        } else {
+            $isValid = ($type === $expected);
+        }
+
+        if (!$isValid) {
+            Helper::error(Helper::typeMismatchError($expected, $value));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Validate value collection
+     */
+    private static function propertyValidateCollection(iterable $values, PropertyDefinition $property, Context $context): iterable
+    {
+        foreach ($values as $index => $value) {
+            try {
+                $context->enter((string)$index);
+                yield $index => self::propertyValidate($value, $property, $context);
+            } finally {
+                $context->leave();
+            }
+        }
+    }
+
+    /**
+     * Extract a single value
+     */
+    private static function propertyExtractCollection(array $input, PropertyDefinition $property, Context $context)
+    {
+        $values = Helper::find($input, $property->getCandidateNames(), $context);
+
+        if (\is_iterable($values)) {
+            foreach ($values as $index => $value) {
+                if (null === $value) {
+                    yield $index => null;
+                } else {
+                    yield $index => self::denormalize($property->getTypeName(), $value, $context);
+                }
+            }
+        } else {
+            yield $values;
+        }
+    }
+
+    /**
+     * Handle single value
+     */
+    private static function denormalizeProperty(array $input, PropertyDefinition $property, Context $context)
+    {
         try {
-            $type = $context->getNativeType($type);
+            $context->enter($property->getNativeName());
+            if (!$property->isCollection()) {
+                return self::propertyValidate(
+                    self::propertyExtract($input, $property, $context),
+                    $property,
+                    $context
+                );
+            }
+            return \iterator_to_array(
+                self::propertyValidateCollection(
+                    self::propertyExtractCollection($input, $property, $context),
+                    $property, $context
+                )
+            );
+        } finally {
+            $context->leave($property->getNormalizedName());
+        }
+    }
 
-            if ($normalizer = $this->findDenormalizer($type)) {
-                return $normalizer->denormalize($type, $data, $context);
+    /**
+     * Hydrate object
+     */
+    public static function denormalize(string $type, $input, Context $context)
+    {
+        $nativeType = $context->getNativeType($type);
+
+        $external = Helper::denormalizeScalar($nativeType, $input, $context);
+        if ($external->success) {
+            return $external->value;
+        }
+
+        $typeDef = $context->getType($nativeType);
+
+        if ($typeDef->isTerminal()) {
+            // Custom normalizer
+            $context->addWarning("Definition is terminal, custom processing is not implemented yet");
+
+            return $input;
+        }
+
+        if (!\is_array($input)) {
+            $context->addError("Definition is not terminal, input is not an array");
+
+            return null;
+        }
+
+        $instance = self::createInstance($typeDef->getNativeName(), $context);
+
+        if (null === $instance) {
+            return $instance;
+        }
+
+        /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
+        foreach ($typeDef->getProperties() as $property) {
+            self::propertySet(
+                $instance,
+                self::denormalizeProperty($input, $property, $context),
+                $property,
+                $context
+            );
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Extract property value from object
+     */
+    private static function propertyGet($object, PropertyDefinition $property, Context $context)
+    {
+        $stealer = \Closure::bind(
+            static function () use ($object, $property) {
+                return $object->{$property->getNativeName()};
+            },
+            null, $property->getDeclaringClass()
+        );
+        return $stealer();
+    }
+
+    /**
+     * Handle property
+     */
+    private static function normalizeProperty($object, PropertyDefinition $property, Context $context)
+    {
+        try {
+            $context->enter($property->getNativeName());
+
+            $type = $property->getTypeName();
+            $values = self::propertyGet($object, $property, $context);
+
+            if (!$property->isCollection()) {
+                return self::doNormalize($type, $values, $context);
             }
 
-            $values = [];
-            $typeDef = $context->getType($type);
+            // Check for emptyness, we don't support non nullable collections.
+            if (null === $values || [] === $values) {
+                return [];
+            }
 
-            // Pre-computed properties handle blacklisting.
-            /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
-            foreach ($typeDef->getProperties() as $property) {
-                $name = $property->getNativeName();
-
-                // Extract function handles property name aliasing.
-                $value = $this->extractPropertyFromNormalizedData($property, $data);
-
-                if (null === $value) {
-                    // Error on null properties is actually configurable in more
-                    // than one way, here:
-                    //   - object can be partially hydrated by configuration at
-                    //     type level,
-                    //   - hydration context can be set to non strict mode, case
-                    //     in which all errors are allowed.
-                    if (!$property->isOptional() && $context->isStrict()) {
-                        throw new \InvalidArgumentException(\sprintf(
-                            "Property '%s' of type '%s' cannot be null (candidate aliases: %s)",
-                            $name, $type, \implode(', ', $property->getCandidateNames())
-                        ));
-                    }
-                    $values[$name] = null;
-                } else if ($property->isCollection()) {
-                    $values[$name] = $this->denormalizeCollection($property->getTypeName(), $value, $context);
-                } else {
-                    $values[$name] = $this->denormalize($property->getTypeName(), $value, $context);
+            // If collection was wrongly NOT a collection.
+            if (!\is_iterable($values)) {
+                try {
+                    $context->enter("0");
+                    return [self::doNormalize($type, $values, $context)];
+                } finally {
+                    $context->leave();
                 }
             }
 
-            return $this->hydrate($typeDef->getNativeName(), $values);
+            // Normal collection processing.
+            $ret = [];
+            foreach ($values as $index => $value) {
+                try {
+                    $context->enter((string)$index);
+                    $ret[$index] = self::doNormalize($type, $value, $context);
+                } finally {
+                    $context->leave();
+                }
+            }
+            return $ret;
 
         } finally {
-            $context->leave();
+            $context->leave($property->getNormalizedName());
         }
+    }
+
+    /**
+     * Normalize single value
+     */
+    private static function doNormalize(string $type, $object, Context $context)
+    {
+        // On normalize, we trust the incomming object, and allow null values.
+        if (null === $object) {
+            return null;
+        }
+
+        $option = Helper::normalizeScalar($type, $object, $context);
+        if ($option->success) {
+            return $option->value;
+        }
+
+        $typeDef = $context->getType($type);
+
+        if ($typeDef->isTerminal()) {
+            $context->addWarning("Definition is terminal, custom processing is not implemented yet");
+
+            return $object;
+        }
+
+        $ret = [];
+
+        /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
+        foreach ($typeDef->getProperties() as $property) {
+            $ret[$property->getNormalizedName()] = self::normalizeProperty($object, $property, $context);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Hydrate object
+     */
+    public static function normalize($object, Context $context)
+    {
+        return self::doNormalize(Helper::getType($object), $object, $context);
     }
 }

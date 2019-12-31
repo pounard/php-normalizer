@@ -8,20 +8,21 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\FallbackNormalizer;
+use MakinaCorpus\Normalizer\DefaultNormalizer;
 use MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache;
+use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
-use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
-use MakinaCorpus\Normalizer\UuidNormalizer as CustomUuidNormalizer;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer as SymfonyUuidNormalizer;
+use MakinaCorpus\Normalizer\Generator\Generator;
 use MakinaCorpus\Normalizer\Generator\GeneratorRuntime;
 use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\Generator\Iterations\Normalizer5;
-use MakinaCorpus\Normalizer\Generator\Iterations\Normalizer6;
-use MakinaCorpus\Normalizer\Generator\Iterations\NormalizerChain6;
+use MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain;
+use MakinaCorpus\Normalizer\Normalizer\DateTimeNormalizer as CustomDateTimeNormalizer;
+use MakinaCorpus\Normalizer\Normalizer\ScalarNormalizer;
+use MakinaCorpus\Normalizer\Normalizer\UuidNormalizer as CustomUuidNormalizer;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -185,13 +186,13 @@ trait NormalizerBenchmarkTrait
     /** @var Normalizer5 */
     private $normalizer5;
 
-    /** @var Normalizer6 */
+    /** @var Normalizer */
     private $normalizer6;
 
-    /** @var Normalizer6 */
+    /** @var Normalizer */
     private $normalizer7;
 
-    /** @var Normalizer6 */
+    /** @var Normalizer */
     private $normalizer8;
 
     private function getContextWithReflection(): Context
@@ -247,13 +248,27 @@ trait NormalizerBenchmarkTrait
     /**
      * Create fallback normalizer
      */
-    private function createFallbackNormalizer(): FallbackNormalizer
+    private function createFallbackNormalizer(): Normalizer
     {
-        return new FallbackNormalizer([
-            new ScalarNormalizer(),
-            new DateNormalizer(),
-            new CustomUuidNormalizer()
-        ]);
+        return new DefaultNormalizer(
+            new class implements Generator
+            {
+                public function getNormalizerClass(string $className): ?string
+                {
+                    return null;
+                }
+
+                public function generateNormalizerClass(string $className): string
+                {
+                    throw new \Exception("Not implemeted.");
+                }
+            },
+            new CustomNormalizerChain([
+                new ScalarNormalizer(),
+                new CustomDateTimeNormalizer(),
+                new CustomUuidNormalizer()
+            ])
+        );
     }
 
     /**
@@ -287,14 +302,14 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 6 normalizer
      */
-    private function createNormalizer6(): Normalizer6
+    private function createNormalizer6(): Normalizer
     {
-        return new Normalizer6(
+        return new DefaultNormalizer(
             new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated5')
             ),
-            new NormalizerChain6([
-                new DateNormalizer(),
+            new CustomNormalizerChain([
+                new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()
             ]),
         );
@@ -303,14 +318,14 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 7 normalizer
      */
-    private function createNormalizer7(): Normalizer6
+    private function createNormalizer7(): Normalizer
     {
-        return new Normalizer6(
+        return new DefaultNormalizer(
             new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated7')
             ),
-            new NormalizerChain6([
-                new DateNormalizer(),
+            new CustomNormalizerChain([
+                new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()
             ]),
         );
@@ -319,14 +334,14 @@ trait NormalizerBenchmarkTrait
     /**
      * Create iteration 8 normalizer
      */
-    private function createNormalizer8(): Normalizer6
+    private function createNormalizer8(): Normalizer
     {
-        return new Normalizer6(
+        return new DefaultNormalizer(
             new GeneratorRuntime(
                 new Psr4AppNamingStrategy('Normalizer', 'Generated8')
             ),
-            new NormalizerChain6([
-                new DateNormalizer(),
+            new CustomNormalizerChain([
+                new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()
             ]),
         );

@@ -151,12 +151,12 @@ interface TypeDefinition
 interface TypeDefinitionMap
 {
     /**
-     * Does type exist
+     * Does type exist.
      */
     public function exists(string $name): bool;
 
     /**
-     * Get type definition
+     * Get type definition.
      *
      * User given type aliases overrides native defined types with
      * the same name. On the other hand, aliases that point to real
@@ -165,12 +165,12 @@ interface TypeDefinitionMap
     public function get(string $name): TypeDefinition;
 
     /**
-     * Get native type for
+     * Get native type for given alias or type.
      */
     public function getNativeType(string $name): string;
 
     /**
-     * Get all aliases
+     * Get all known aliases.
      *
      * @return string[]
      *   Keys are aliases, values are target classes
@@ -513,6 +513,7 @@ final class DefaultTypeDefinition implements TypeDefinition
  */
 trait WithBlacklistTypeDefinitionMap
 {
+    /** @var string[] */
     private $blacklist = [];
 
     /**

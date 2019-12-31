@@ -25,8 +25,8 @@ final class DefaultGenerator implements Generator
     /** @var \MakinaCorpus\Normalizer\Generator\NamingStrategy */
     private $namingStrategy;
 
-    /** @var string */
-    private $projectPsr4Namespace;
+    /** @var ?string */
+    private $generatedClassNamespace;
 
     /** @var string */
     private $projectSourceDirectory;
@@ -36,11 +36,16 @@ final class DefaultGenerator implements Generator
      *
      * @param string $projectSourceRoot
      */
-    public function __construct(ContextFactory $contextFactory, string $projectSourceDirectory, ?string $projectPsr4Namespace = null)
-    {
+    public function __construct(
+        ContextFactory $contextFactory,
+        string $projectSourceDirectory,
+        ?string $generatedClassNamespace = null,
+        ?Psr4AppNamingStrategy $namingStrategy = null
+    ) {
         $this->contextFactory = $contextFactory;
-        $this->namingStrategy = new Psr4AppNamingStrategy('Normalizer', 'Generated8');
-        $this->projectPsr4Namespace = $projectPsr4Namespace;
+        $this->generatedClassNamespace = $generatedClassNamespace;
+        // @todo inject this properly and give sensible defaults.
+        $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy('Normalizer', 'Generated8');
         $this->projectSourceDirectory = $projectSourceDirectory;
     }
 
@@ -57,7 +62,7 @@ final class DefaultGenerator implements Generator
      */
     public function generateNormalizerClass(string $className): string
     {
-        $normalizerClassName = $this->namingStrategy->generateClassName($className, '\\');
+        $normalizerClassName = $this->namingStrategy->generateClassName($className, $this->generatedClassNamespace ?? '\\');
         $filename = $this->namingStrategy->generateFilename($className, $this->projectSourceDirectory);
         $directory = \dirname($filename);
 
@@ -240,14 +245,10 @@ EOT
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (\$option->success) {
-            if (null === {$input}) {
-                Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
-            } else if (null === {$input}) {
-                {$output} = null;
-            } else {
-                {$output} = {$denormalizeCall};
-            }
+        if (!\$option->success || null === {$input}) {
+            Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+        } else {
+            {$output} = {$denormalizeCall};
         }
 EOT
             );

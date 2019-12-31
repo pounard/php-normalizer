@@ -102,7 +102,7 @@ final class TheOtherWayArticleBench
     public function benchFallbackWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->fallbackNormalizer->normalize(MockArticle::class, $data, $this->getContextWithReflection());
+            $this->fallbackNormalizer->normalize($data, $this->getContextWithReflection());
         }
     }
 
@@ -113,7 +113,7 @@ final class TheOtherWayArticleBench
     public function benchFallbackWithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->fallbackNormalizer->normalize(MockArticle::class, $data, $this->getContextWithConfigOnly());
+            $this->fallbackNormalizer->normalize($data, $this->getContextWithConfigOnly());
         }
     }
 

@@ -7,7 +7,7 @@ namespace MakinaCorpus\Normalizer\Tests\Unit;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Option;
-use MakinaCorpus\Normalizer\ScalarNormalizer;
+use MakinaCorpus\Normalizer\Normalizer\ScalarNormalizer;
 use PHPUnit\Framework\TestCase;
 
 final class NormalizerScalarTest extends TestCase

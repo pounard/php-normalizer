@@ -124,14 +124,10 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'id' required property
         $option = Helper::find($input, ['id'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
-            } else if (null === $option->value) {
-                $instance->id = null;
-            } else {
-                $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
+        } else {
+            $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'foo' nullable property
@@ -146,50 +142,34 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'bar' required property
         $option = Helper::find($input, ['bar'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
-            } else if (null === $option->value) {
-                $instance->bar = null;
-            } else {
-                $instance->bar = Helper::toInt($option->value);
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
+        } else {
+            $instance->bar = Helper::toInt($option->value);
         }
 
         // Denormalize 'baz' required property
         $option = Helper::find($input, ['baz'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
-            } else if (null === $option->value) {
-                $instance->baz = null;
-            } else {
-                $instance->baz = Helper::toFloat($option->value);
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
+        } else {
+            $instance->baz = Helper::toFloat($option->value);
         }
 
         // Denormalize 'filename' required property
         $option = Helper::find($input, ['filename'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
-            } else if (null === $option->value) {
-                $instance->filename = null;
-            } else {
-                $instance->filename = Helper::toString($option->value);
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
+        } else {
+            $instance->filename = Helper::toString($option->value);
         }
 
         // Denormalize 'createdAt' required property
         $option = Helper::find($input, ['createdAt'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
-            } else if (null === $option->value) {
-                $instance->createdAt = null;
-            } else {
-                $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+        } else {
+            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'updatedAt' nullable property

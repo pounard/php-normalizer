@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
+use Ramsey\Uuid\UuidInterface;
+use Ramsey\Uuid\Uuid;
+
 /**
  * Normalization runtime helper.
  *
@@ -62,12 +65,12 @@ final class Helper
      * @throws \InvalidArgumentException
      *   If there's not context provided.
      */
-    public function error(string $message, ?Context $context = null): void
+    public static function error(string $message, ?Context $context = null): void
     {
         if ($context) {
             $context->addError($message);
         } else {
-            throw new \InvalidArgumentException($message);
+            throw new RuntimeError($message);
         }
     }
 
@@ -115,7 +118,7 @@ final class Helper
     {
         if (\is_string($input)) {
             return $input;
-        } else if (\is_object($input) && \method_exists($input, '__toString()')) {
+        } else if (\is_object($input) && \method_exists($input, '__toString')) {
             return $input->__toString();
         }
         self::error(self::typeMismatchError('string', $input), $context);
@@ -161,6 +164,10 @@ final class Helper
         if (\is_string($input) && \ctype_digit($input)) {
             return (int)$input;
         }
+        // Float, but integer value.
+        if (\is_float($input) && $input == ($cast = (int)$input)) {
+            return $cast;
+        }
         self::error(self::typeMismatchError('int', $input), $context);
         return null;
     }
@@ -191,6 +198,65 @@ final class Helper
         }
         self::error(self::typeMismatchError('float', $input), $context);
         return null;
+    }
+
+    /**
+     * Degradation of re-entring into the generator.
+     *
+     * @todo This is basically cheating in benchmarks.
+     */
+    public static function denormalizeScalar(string $type, $input, Context $context): ValueOption
+    {
+        switch ($type) {
+            case 'bool':
+                return ValueOption::ok(Helper::toBool($input, $context));
+            case 'float':
+                return ValueOption::ok(Helper::toFloat($input, $context));
+            case 'int':
+                return ValueOption::ok(Helper::toInt($input, $context));
+            case 'null':
+                return ValueOption::ok($input);
+            case 'string':
+                return ValueOption::ok(Helper::toString($input, $context));
+            case 'date':
+            case 'DateTime':
+            case 'DateTimeInterface':
+            case 'DateTimeImmutable':
+                return ValueOption::ok(new \DateTimeImmutable($input));
+            case UuidInterface::class:
+                return ValueOption::ok(Uuid::fromString($input));
+        }
+        return ValueOption::miss();
+    }
+
+    /**
+     * Degradation of re-entring into the generator.
+     *
+     * @todo This is basically cheating in benchmarks.
+     */
+    public static function normalizeScalar(string $type, $input, Context $context): ValueOption
+    {
+        switch ($type) {
+            case 'bool':
+                return ValueOption::ok((bool)$input);
+            case 'float':
+                return ValueOption::ok((float)$input);
+            case 'int':
+                return ValueOption::ok((int)$input);
+            case 'null':
+                return ValueOption::ok($input);
+            case 'string':
+                return ValueOption::ok(Helper::toString($input, $context));
+            case 'date':
+            case 'DateTime':
+            case 'DateTimeInterface':
+            case 'DateTimeImmutable':
+                return ValueOption::ok($input->format(\DateTime::RFC3339));
+            case Uuid::class:
+            case UuidInterface::class:
+                return ValueOption::ok($input->__toString());
+        }
+        return ValueOption::miss();
     }
 }
 

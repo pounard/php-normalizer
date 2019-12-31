@@ -7,7 +7,7 @@ services:
 
     php_normalizer.normalizer:
         public: false
-        class: MakinaCorpus\Normalizer\FallbackNormalizer
+        class: MakinaCorpus\Normalizer\Normalizer
         arguments: [[]]
 
     php_normalizer.context_factory:

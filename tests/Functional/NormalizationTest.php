@@ -6,11 +6,8 @@ namespace MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\DateNormalizer;
-use MakinaCorpus\Normalizer\FallbackNormalizer;
-use MakinaCorpus\Normalizer\ScalarNormalizer;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
-use MakinaCorpus\Normalizer\UuidNormalizer;
+use MakinaCorpus\Normalizer\FallbackNormalizer;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -27,11 +24,8 @@ final class NormalizationTest extends TestCase
 
     private function createFallbackNormalizer(): FallbackNormalizer
     {
-        return new FallbackNormalizer([
-            new ScalarNormalizer(),
-            new DateNormalizer(),
-            new UuidNormalizer(),
-        ]);
+        throw new \Exception("Implement me");
+        return new FallbackNormalizer();
     }
 
     public function testNormalizeSimple()

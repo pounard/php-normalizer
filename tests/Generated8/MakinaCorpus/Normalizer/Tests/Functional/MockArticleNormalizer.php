@@ -104,38 +104,26 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'id' required property
         $option = Helper::find($input, ['id'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
-            } else if (null === $option->value) {
-                $instance->id = null;
-            } else {
-                $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
+        } else {
+            $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'createdAt' required property
         $option = Helper::find($input, ['createdAt'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
-            } else if (null === $option->value) {
-                $instance->createdAt = null;
-            } else {
-                $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+        } else {
+            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'updatedAt' required property
         $option = Helper::find($input, ['updatedAt'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                Helper::error(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
-            } else if (null === $option->value) {
-                $instance->updatedAt = null;
-            } else {
-                $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
+        } else {
+            $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
         }
 
         // Denormalize 'authors' collection property
