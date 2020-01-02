@@ -77,14 +77,7 @@ MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithNullableIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'nullableInt' nullable property
-        $option = Helper::find($input, ['nullableInt'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->nullableInt = null;
-            } else {
-                $instance->nullableInt = Helper::toInt($option->value);
-            }
-        }
+        $instance->nullableInt = isset($input['nullableInt']) ? Helper::toInt($input['nullableInt']) : null;
     },
     null, MockClassWithNullableInt::class
 );

@@ -222,9 +222,9 @@ EOT
     }
 
     /**
-     * Generate single value property set
+     * Generate call that find values into the input array when there are more than one candidate.
      */
-    private function generateDenormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyValueWithCandidates(PropertyDefinition $property, Context $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
@@ -264,9 +264,51 @@ EOT
     }
 
     /**
-     * Generate value collection property set
+     * Generate single value property set.
      */
-    private function generateDenormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    {
+        $candidateNames = $property->getCandidateNames();
+        if (1 < \count($candidateNames)) {
+            $this->generateDenormalizerPropertyValueWithCandidates($property, $context, $writer);
+            return;
+        }
+
+        $propName = \addslashes($property->getNativeName());
+        $inputKey = \addslashes(\reset($candidateNames));
+
+        $output = "\$instance->{$propName}";
+        $input = "\$input['{$inputKey}']";
+
+        $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+
+//@todo: si un seul candidate name, directement accéder à la valeur dans le tableau
+        if ($property->isOptional()) {
+            // Nullable properties can have a default value:
+            //   - if we find null, we must ensure there was an explicit null,
+            //   - if there is no explicit null, leave the default value as-is.
+            $writer->write(<<<EOT
+        // Denormalize '{$propName}' nullable property
+        {$output} = isset($input) ? {$denormalizeCall} : null;
+EOT
+            );
+        } else {
+            $writer->write(<<<EOT
+        // Denormalize '{$propName}' required property
+        if (!isset($input)) {
+            Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+        } else {
+            {$output} = {$denormalizeCall};
+        }
+EOT
+            );
+        }
+    }
+
+    /**
+     * Generate value collection property set when there are more than one candidate.
+     */
+    private function generateDenormalizerPropertyCollectionWithCandidates(PropertyDefinition $property, Context $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
@@ -280,6 +322,48 @@ EOT
         // Denormalize '{$propName}' collection property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (\$option->success && {$arrayInput}) {
+            if (!\is_iterable({$arrayInput})) {
+                {$arrayInput} = (array){$arrayInput};
+            }
+            if ({$arrayInput}) {
+                {$output} = [];
+                foreach ({$arrayInput} as \$index => {$input}) {
+                    if (null === {$input}) {
+                        Helper::error("Property value in collection cannot be null");
+                        {$output}[\$index] = null;
+                    } else {
+                        {$output}[\$index] = {$denormalizeCall};
+                    }
+                }
+            }
+        }
+EOT
+        );
+    }
+
+    /**
+     * Generate value collection property set
+     */
+    private function generateDenormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    {
+        $candidateNames = $property->getCandidateNames();
+        if (1 < \count($candidateNames)) {
+            $this->generateDenormalizerPropertyCollectionWithCandidates($property, $context, $writer);
+            return;
+        }
+
+        $propName = \addslashes($property->getNativeName());
+        $inputKey = \addslashes(\reset($candidateNames));
+
+        $output = "\$instance->{$propName}";
+        $input = "\$value";
+        $arrayInput = "\$input['{$inputKey}']";
+
+        $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+
+        $writer->write(<<<EOT
+        // Denormalize '{$propName}' collection property
+        if (isset($arrayInput)) {
             if (!\is_iterable({$arrayInput})) {
                 {$arrayInput} = (array){$arrayInput};
             }

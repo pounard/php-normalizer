@@ -86,14 +86,13 @@ MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithDateArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'dateArray' collection property
-        $option = Helper::find($input, ['dateArray'], $context);
-        if ($option->success && $option->value) {
-            if (!\is_iterable($option->value)) {
-                $option->value = (array)$option->value;
+        if (isset($input['dateArray'])) {
+            if (!\is_iterable($input['dateArray'])) {
+                $input['dateArray'] = (array)$input['dateArray'];
             }
-            if ($option->value) {
+            if ($input['dateArray']) {
                 $instance->dateArray = [];
-                foreach ($option->value as $index => $value) {
+                foreach ($input['dateArray'] as $index => $value) {
                     if (null === $value) {
                         Helper::error("Property value in collection cannot be null");
                         $instance->dateArray[$index] = null;

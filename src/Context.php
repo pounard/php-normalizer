@@ -215,7 +215,7 @@ final class Context implements ValidationResultBuilder
     private $groups = [];
     private $options = [];
     private $strict = false;
-    private $verbose = false;
+    private $verbose = false; // @todo fallabck to false.
     private $symfonyCompatibility = false;
     private $typeMap = [];
     private $validationResult;

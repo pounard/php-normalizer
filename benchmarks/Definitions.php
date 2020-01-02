@@ -21,6 +21,167 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
+ * Generate objects.
+ */
+final class ObjectGenerator
+{
+    /**
+     * Create arbitrary name string list
+     */
+    public static function generateNameList(?int $size = null): array
+    {
+        $ret = [];
+
+        $faker = \Faker\Factory::create();
+        $size = $size ?? \rand(0,5);
+
+        for ($i = 0; $i < $size; $i++) {
+            $ret[] = $faker->name;
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Create single article normalized data
+     */
+    public static function createNormalizedArticle(bool $withId = true): array
+    {
+        $faker = \Faker\Factory::create();
+
+        return [
+            'id' => $withId ? (string)Uuid::uuid4() : null,
+            'createdAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
+            'updatedAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
+            'authors' => self::generateNameList(),
+            'title' => $faker->sentence,
+            'text' => [
+                'text' => $faker->text,
+                'format' => 'application/text+html',
+            ],
+            'foo' => $faker->jobTitle,
+            'bar' => $faker->randomDigitNotNull,
+            'baz' => $faker->randomFloat(),
+            'filename' => $faker->freeEmail,
+        ];
+    }
+
+    /**
+     * Create normalized article data list
+     */
+    public static function createNormalizedArticleList(int $count = 5, bool $withId = true): array
+    {
+        $ret = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = self::createNormalizedArticle($withId);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Create single article instance
+     */
+    public static function createInstanceArticle(bool $withId = true): array
+    {
+        $faker = \Faker\Factory::create();
+
+        $hydrator1 = \Closure::bind(static function (MockArticle $object) use ($faker) {
+            $object->id = Uuid::uuid4();
+            $object->createdAt = $faker->dateTimeThisCentury;
+            $object->updatedAt = $faker->dateTimeThisCentury;
+            $object->authors = ObjectGenerator::generateNameList($faker);
+            $object->foo = $faker->jobTitle;
+            $object->bar = $faker->randomDigitNotNull;
+            $object->baz = $faker->randomFloat();
+            $object->filename = $faker->freeEmail;
+        }, null, MockArticle::class);
+
+        $hydrator2 = \Closure::bind(static function (MockWithTitle $object) use ($faker) {
+            $object->title = $faker->sentence;
+        }, null, MockWithTitle::class);
+
+        $hydrator3 = \Closure::bind(static function (MockWithText $object) use ($faker) {
+            $object->text = new MockTextWithFormat($faker->text, 'application/text+html');
+        }, null, MockWithText::class);
+
+        $ret = new MockArticle();
+        \call_user_func($hydrator1, $ret);
+        \call_user_func($hydrator2, $ret);
+        \call_user_func($hydrator3, $ret);
+
+        return $ret;
+    }
+
+    /**
+     * Create article instance list
+     */
+    public static function createInstanceArticleList(int $count = 5, bool $withId = true): array
+    {
+        $ret = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = self::createInstanceArticle($withId);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Create single message normalized data
+     */
+    public static function createNormalizedMessage(bool $withId = true): array
+    {
+        $faker = \Faker\Factory::create();
+
+        return [
+            'orderId' => (string)Uuid::uuid4(),
+            'productId' => $faker->randomDigitNotNull,
+            'amount' => $faker->randomFloat(),
+        ];
+    }
+
+    /**
+     * Create normalized message data list
+     */
+    public static function createNormalizedMessageList(int $count = 5)
+    {
+        $ret = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = self::createNormalizedMessage();
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Create single article instance
+     */
+    public static function createInstanceMessage(): array
+    {
+        $faker = \Faker\Factory::create();
+
+        return new AddToCartMessage(Uuid::uuid4(), $faker->randomDigitNotNull, $faker->randomDigit);
+    }
+
+    /**
+     * Create arbitrary data
+     */
+    public static function createInstanceMessageList(int $count = 5)
+    {
+        $ret = [];
+
+        for ($i = 0; $i < $count; ++$i) {
+            $ret[] = self::createInstanceMessage();
+        }
+
+        return $ret;
+    }
+}
+
+/**
  * Simpler scenario: all optional scalars
  */
 class MockTextWithFormat
@@ -151,7 +312,7 @@ trait LotsOfProperties
  */
 final class AddToCartMessage
 {
-    /** @var UuidInterface */
+    /** @var ?UuidInterface */
     private $orderId;
 
     /** @var int */
@@ -167,7 +328,7 @@ final class AddToCartMessage
         $this->amount = $amount;
     }
 
-    public function getOrderId(): UuidInterface
+    public function getOrderId(): ?UuidInterface
     {
         return $this->orderId;
     }
@@ -190,43 +351,22 @@ final class MockArticle extends MockWithText
 {
     use LotsOfProperties;
 
-    /** @var UuidInterface */
-    private $id;
+    /** @var null|UuidInterface */
+    private $id = null;
 
-    public function getId(): UuidInterface
-    {
-        return $this->id ?? ($this->id = Uuid::uuid4());
-    }
-
-    public function setId(UuidInterface $value): void
-    {
-        $this->id = $value;
-    }
-
-    /** @var \DateTimeInterface */
+    /** @var \DateTimeImmutable */
     private $createdAt;
 
-    /** @return \DateTimeInterface */
-    public function getCreatedAt(): \DateTimeInterface
-    {
-        return $this->createdAt ?? ($this->createdAt = new \DateTimeImmutable());
-    }
-
-    public function setCreatedAt(/* ?\DateTimeInterface */ $value): void
-    {
-        $this->createdAt = $value;
-    }
-
-    /** @var ?\DateTimeInterface */
+    /** @var ?\DateTimeImmutable */
     private $updatedAt;
 
-    /** @return ?\DateTimeInterface */
-    public function getUpdatedAt(): ?\DateTimeInterface
+    /** @return ?\DateTimeImmutable */
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdateddAt(?\DateTimeInterface $value): void
+    public function setUpdateddAt(?\DateTimeImmutable $value): void
     {
         $this->updatedAt = $value;
     }

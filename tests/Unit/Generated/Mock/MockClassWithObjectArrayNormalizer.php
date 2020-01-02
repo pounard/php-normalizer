@@ -86,14 +86,13 @@ MockClassWithObjectArrayNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithObjectArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObjectArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'objectArray' collection property
-        $option = Helper::find($input, ['objectArray'], $context);
-        if ($option->success && $option->value) {
-            if (!\is_iterable($option->value)) {
-                $option->value = (array)$option->value;
+        if (isset($input['objectArray'])) {
+            if (!\is_iterable($input['objectArray'])) {
+                $input['objectArray'] = (array)$input['objectArray'];
             }
-            if ($option->value) {
+            if ($input['objectArray']) {
                 $instance->objectArray = [];
-                foreach ($option->value as $index => $value) {
+                foreach ($input['objectArray'] as $index => $value) {
                     if (null === $value) {
                         Helper::error("Property value in collection cannot be null");
                         $instance->objectArray[$index] = null;

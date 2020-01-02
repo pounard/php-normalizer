@@ -86,14 +86,13 @@ MockClassWithIntArrayNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithIntArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'intArray' collection property
-        $option = Helper::find($input, ['intArray'], $context);
-        if ($option->success && $option->value) {
-            if (!\is_iterable($option->value)) {
-                $option->value = (array)$option->value;
+        if (isset($input['intArray'])) {
+            if (!\is_iterable($input['intArray'])) {
+                $input['intArray'] = (array)$input['intArray'];
             }
-            if ($option->value) {
+            if ($input['intArray']) {
                 $instance->intArray = [];
-                foreach ($option->value as $index => $value) {
+                foreach ($input['intArray'] as $index => $value) {
                     if (null === $value) {
                         Helper::error("Property value in collection cannot be null");
                         $instance->intArray[$index] = null;

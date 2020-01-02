@@ -7,7 +7,7 @@ namespace MakinaCorpus\Normalizer;
 /**
  * Type cache abstract implementation.
  */
-abstract class TypeDefinitionMapCache implements TypeDefinitionMap
+class TypeDefinitionMapChain implements TypeDefinitionMap
 {
     use WithBlacklistTypeDefinitionMap;
 
@@ -164,6 +164,23 @@ abstract class TypeDefinitionMapCache implements TypeDefinitionMap
 /**
  * In-memory type definition cache.
  */
-final class MemoryTypeDefinitionMapCache extends TypeDefinitionMapCache
+final class MemoryTypeDefinitionMapCache extends TypeDefinitionMapChain
 {
+    private $cache = [];
+
+    /**
+     * Load type from cache
+     */
+    protected function loadFromCache(string $name): ?TypeDefinition
+    {
+        return $this->cache[$name] ?? null;
+    }
+
+    /**
+     * Store into cache
+     */
+    protected function storeIntoCache(string $name, TypeDefinition $type): void
+    {
+        $this->cache[$name] = $type;
+    }
 }

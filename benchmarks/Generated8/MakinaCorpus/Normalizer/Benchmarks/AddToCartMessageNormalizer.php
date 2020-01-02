@@ -84,28 +84,21 @@ AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
 AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'orderId' required property
-        $option = Helper::find($input, ['orderId'], $context);
-        if (!$option->success || null === $option->value) {
-            Helper::error(\sprintf("'%s' cannot be null", 'orderId'), $context);
-        } else {
-            $instance->orderId = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
-        }
+        // Denormalize 'orderId' nullable property
+        $instance->orderId = isset($input['orderId']) ? $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['orderId'], $context, $denormalizer) : $input['orderId'] : null;
 
         // Denormalize 'productId' required property
-        $option = Helper::find($input, ['productId'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['productId'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'productId'), $context);
         } else {
-            $instance->productId = Helper::toInt($option->value);
+            $instance->productId = Helper::toInt($input['productId']);
         }
 
         // Denormalize 'amount' required property
-        $option = Helper::find($input, ['amount'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['amount'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'amount'), $context);
         } else {
-            $instance->amount = Helper::toFloat($option->value);
+            $instance->amount = Helper::toFloat($input['amount']);
         }
     },
     null, AddToCartMessage::class

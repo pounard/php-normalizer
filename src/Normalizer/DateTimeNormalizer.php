@@ -31,7 +31,7 @@ final class DateTimeNormalizer implements CustomNormalizer, CustomDenormalizer
             throw new InvalidValueTypeError(\sprintf(
                 "Could not parse date '%s' with format '%s'",
                 $data, $format
-            ));
+            ), null, $e->getCode(), $e);
         }
     }
 

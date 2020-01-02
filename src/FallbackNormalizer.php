@@ -102,6 +102,10 @@ final class FallbackNormalizer
         $type = Helper::getType($value);
         $expected = $context->getNativeType($property->getTypeName());
 
+        if ('null' === $expected) { // Shortcut.
+            return $value;
+        }
+
         $isValid = false;
         if (\class_exists($expected) || \interface_exists($expected)) {
             $isValid = ($value instanceof $expected);

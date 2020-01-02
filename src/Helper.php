@@ -96,7 +96,7 @@ final class Helper
                     self::error(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name), $context);
                 } else if ($verbose) {
                     $found = $name;
-                    $value = $value;
+                    $value = $input[$name];
                 } else {
                     return ValueOption::ok($input[$name]);
                 }

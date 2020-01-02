@@ -101,7 +101,8 @@ final class Generator7Impl implements Generator
 
         // Attempt eager related class code generation, if possible.
         try {
-            if (\class_exists($type)) {
+            $isTerminal = $context->getType($type)->isTerminal();
+            if (\class_exists($type) && !$isTerminal) {
                 $normalizerClassName = $this->generateNormalizerClass($type);
                 $ret[] = "if (null !== \$value) {";
                 $ret[] = "    \$value = \\".$normalizerClassName."::normalize(\$value, \$context, \$normalizer);";
@@ -246,7 +247,8 @@ EOT
 
         // Attempt eager related class code generation, if possible.
         try {
-            if (\class_exists($type)) {
+            $isTerminal = $context->getType($type)->isTerminal();
+            if (\class_exists($type) && !$isTerminal) {
                 $normalizerClassName = $this->generateNormalizerClass($type);
                 $ret[] = "if (null !== \$value) {";
                 $ret[] = "    \$value = \\".$normalizerClassName."::denormalize(\$value, \$context, \$denormalizer);";

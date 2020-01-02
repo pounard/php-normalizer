@@ -77,11 +77,10 @@ MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithStringNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithString $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'string' required property
-        $option = Helper::find($input, ['string'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['string'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'string'), $context);
         } else {
-            $instance->string = Helper::toString($option->value);
+            $instance->string = Helper::toString($input['string']);
         }
     },
     null, MockClassWithString::class

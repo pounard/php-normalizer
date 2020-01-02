@@ -50,7 +50,7 @@ final class CustomNormalizerChain implements CustomNormalizer, CustomDenormalize
         if (\array_key_exists($type, $this->denormalizersCache)) {
             return $this->denormalizersCache[$type];
         }
-        /** @var \MakinaCorpus\Normalizer\Denormalizer $instance */
+        /** @var \MakinaCorpus\Normalizer\Normalizer\CustomDenormalizer $instance */
         foreach ($this->denormalizers as $instance) {
             if ($instance->supportsDenormalization($type)) {
                 return $this->denormalizersCache[$type] = $instance;

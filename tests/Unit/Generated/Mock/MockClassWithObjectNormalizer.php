@@ -77,11 +77,10 @@ MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'object' required property
-        $option = Helper::find($input, ['object'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['object'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'object'), $context);
         } else {
-            $instance->object = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($option->value, $context, $denormalizer);
+            $instance->object = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer);
         }
     },
     null, MockClassWithObject::class

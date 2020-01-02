@@ -88,9 +88,6 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
         $value = $object->id;
         if (null !== $value && $normalizer) {
             $value = $normalizer($value, $context);
-            if (null === $value) {
-                Helper\handle_error("Property 'id' cannot be null", $context);
-            }
         }
         $ret['id'] = $value;
 
@@ -158,9 +155,7 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
         $value = Helper\find_value($input, ['id'], $context);
         if (null !== $value && $denormalizer) {
             $value = $denormalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
-            if (null === $value) {
-                Helper\handle_error("Property 'id' cannot be null", $context);
-            } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
+            if (!(null === $value || $value instanceof \Ramsey\Uuid\UuidInterface)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
             }
@@ -190,10 +185,10 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
         // Denormalize 'createdAt' property
         $value = Helper\find_value($input, ['createdAt'], $context);
         if (null !== $value && $denormalizer) {
-            $value = $denormalizer('DateTimeInterface', $value, $context);
+            $value = $denormalizer('DateTimeImmutable', $value, $context);
             if (null === $value) {
                 Helper\handle_error("Property 'createdAt' cannot be null", $context);
-            } else if (!($value instanceof \DateTimeInterface)) {
+            } else if (!($value instanceof \DateTimeImmutable)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
             }
@@ -203,8 +198,8 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
         // Denormalize 'updatedAt' property
         $value = Helper\find_value($input, ['updatedAt'], $context);
         if (null !== $value && $denormalizer) {
-            $value = $denormalizer('DateTimeInterface', $value, $context);
-            if (!(null === $value || $value instanceof \DateTimeInterface)) {
+            $value = $denormalizer('DateTimeImmutable', $value, $context);
+            if (!(null === $value || $value instanceof \DateTimeImmutable)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
             }

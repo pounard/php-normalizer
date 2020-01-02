@@ -77,11 +77,10 @@ MockClassWithIntNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'int' required property
-        $option = Helper::find($input, ['int'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['int'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'int'), $context);
         } else {
-            $instance->int = Helper::toInt($option->value);
+            $instance->int = Helper::toInt($input['int']);
         }
     },
     null, MockClassWithInt::class

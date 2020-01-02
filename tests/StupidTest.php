@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Tests;
 
+use const Functional\Functional\true;
 use MakinaCorpus\Normalizer\ArrayTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
@@ -26,6 +27,8 @@ use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
+use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
+use MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage;
 
 final class StupidTest extends TestCase
 {
@@ -127,6 +130,8 @@ final class StupidTest extends TestCase
         $basedir = \dirname(__DIR__).'/benchmarks';
         yield [AddToCartMessageBench::class, $basedir];
         yield [MockArticleBench::class, $basedir];
+        yield [Php74AddToCartMessage::class, $basedir];
+        yield [Php74MockArticle::class, $basedir];
     }
 
     /**
@@ -134,6 +139,7 @@ final class StupidTest extends TestCase
      */
     public function testNormalizerGeneration2(string $className, string $basedir)
     {
+        $this->markTestSkipped();
         $this->expectNotToPerformAssertions();
 
         $filename = $basedir.'/'.\str_replace('\\', '/', \ltrim($className, '\\')).'Normalizer.php';
@@ -156,6 +162,7 @@ final class StupidTest extends TestCase
      */
     public function testNormalizerGeneration4(string $className, string $basedir)
     {
+        $this->markTestSkipped();
         $this->expectNotToPerformAssertions();
 
         $filename = $basedir.'/'.\str_replace('\\', '/', \ltrim($className, '\\')).'Normalizer.php';
@@ -178,6 +185,7 @@ final class StupidTest extends TestCase
      */
     public function testNormalizerGeneration5(string $className, string $basedir)
     {
+        $this->markTestSkipped();
         $this->expectNotToPerformAssertions();
 
         $contextFactory = new ContextFactory($this->createCachedTypeDefinitionMap());

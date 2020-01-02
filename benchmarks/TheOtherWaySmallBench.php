@@ -34,7 +34,7 @@ final class TheOtherWaySmallBench
     public function benchIteration1WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(normalizer1($data, $this->getContextWithReflection()));
+            normalizer1($data, $this->getContextWithReflection());
         }
     }
 
@@ -45,7 +45,7 @@ final class TheOtherWaySmallBench
     public function benchIteration1WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not(normalizer1($data, $this->getContextWithConfigOnly()));
+            normalizer1($data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -56,7 +56,7 @@ final class TheOtherWaySmallBench
     public function benchIteration7WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not($this->normalizer7->normalize($data, $this->getContextWithReflection()));
+            $this->normalizer7->normalize($data, $this->getContextWithReflection());
         }
     }
 
@@ -67,7 +67,7 @@ final class TheOtherWaySmallBench
     public function benchIteration7WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not($this->normalizer7->normalize($data, $this->getContextWithConfigOnly()));
+            $this->normalizer7->normalize($data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -78,7 +78,7 @@ final class TheOtherWaySmallBench
     public function benchIteration8WithReflection() : void
     {
         foreach ($this->data as $data) {
-            display_or_not($this->normalizer8->normalize($data, $this->getContextWithReflection()));
+            $this->normalizer8->normalize($data, $this->getContextWithReflection());
         }
     }
 
@@ -89,7 +89,7 @@ final class TheOtherWaySmallBench
     public function benchIteration8WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            display_or_not($this->normalizer8->normalize($data, $this->getContextWithConfigOnly()));
+            $this->normalizer8->normalize($data, $this->getContextWithConfigOnly());
         }
     }
 

@@ -77,14 +77,7 @@ MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithNullableObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'nullableObject' nullable property
-        $option = Helper::find($input, ['nullableObject'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->nullableObject = null;
-            } else {
-                $instance->nullableObject = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($option->value, $context, $denormalizer);
-            }
-        }
+        $instance->nullableObject = isset($input['nullableObject']) ? \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer) : null;
     },
     null, MockClassWithNullableObject::class
 );

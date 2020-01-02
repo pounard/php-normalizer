@@ -70,9 +70,6 @@ AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
         $value = $object->orderId;
         if (null !== $value && $normalizer) {
             $value = $normalizer($value, $context);
-            if (null === $value) {
-                Helper\handle_error("Property 'orderId' cannot be null", $context);
-            }
         }
         $ret['orderId'] = $value;
 
@@ -99,9 +96,7 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
         $value = Helper\find_value($input, ['orderId'], $context);
         if (null !== $value && $denormalizer) {
             $value = $denormalizer('Ramsey\\Uuid\\UuidInterface', $value, $context);
-            if (null === $value) {
-                Helper\handle_error("Property 'orderId' cannot be null", $context);
-            } else if (!($value instanceof \Ramsey\Uuid\UuidInterface)) {
+            if (!(null === $value || $value instanceof \Ramsey\Uuid\UuidInterface)) {
                 Helper\handle_error("Type mismatch", $context);
                 $value = null;
             }

@@ -1,4 +1,12 @@
 {
     "bootstrap": "vendor/autoload.php",
-    "path": "benchmarks"
+    "path": "benchmarks/DenormalizationPhp74",
+    "reports": {
+        "bench": {
+            "extends": "aggregate",
+            "break": ["params"],
+            "cols": [ "benchmark", "mean", "diff", "worst", "best", "mem_real" ],
+            "sort": {"mean": "asc"}
+        }
+    }
 }

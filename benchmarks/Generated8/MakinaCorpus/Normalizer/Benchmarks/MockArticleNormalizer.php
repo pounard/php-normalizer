@@ -126,75 +126,51 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
 MockArticleNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'id' required property
-        $option = Helper::find($input, ['id'], $context);
-        if (!$option->success || null === $option->value) {
-            Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
-        } else {
-            $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $option->value, $context, $denormalizer) : $option->value;
-        }
+        // Denormalize 'id' nullable property
+        $instance->id = isset($input['id']) ? $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['id'], $context, $denormalizer) : $input['id'] : null;
 
         // Denormalize 'foo' nullable property
-        $option = Helper::find($input, ['foo'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->foo = null;
-            } else {
-                $instance->foo = Helper::toString($option->value);
-            }
-        }
+        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo']) : null;
 
         // Denormalize 'bar' required property
-        $option = Helper::find($input, ['bar'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['bar'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
         } else {
-            $instance->bar = Helper::toInt($option->value);
+            $instance->bar = Helper::toInt($input['bar']);
         }
 
         // Denormalize 'baz' required property
-        $option = Helper::find($input, ['baz'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['baz'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
         } else {
-            $instance->baz = Helper::toFloat($option->value);
+            $instance->baz = Helper::toFloat($input['baz']);
         }
 
         // Denormalize 'filename' required property
-        $option = Helper::find($input, ['filename'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['filename'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
         } else {
-            $instance->filename = Helper::toString($option->value);
+            $instance->filename = Helper::toString($input['filename']);
         }
 
         // Denormalize 'createdAt' required property
-        $option = Helper::find($input, ['createdAt'], $context);
-        if (!$option->success || null === $option->value) {
+        if (!isset($input['createdAt'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
         } else {
-            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
+            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
         }
 
         // Denormalize 'updatedAt' nullable property
-        $option = Helper::find($input, ['updatedAt'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->updatedAt = null;
-            } else {
-                $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $option->value, $context, $denormalizer) : $option->value;
-            }
-        }
+        $instance->updatedAt = isset($input['updatedAt']) ? $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'] : null;
 
         // Denormalize 'authors' collection property
-        $option = Helper::find($input, ['authors'], $context);
-        if ($option->success && $option->value) {
-            if (!\is_iterable($option->value)) {
-                $option->value = (array)$option->value;
+        if (isset($input['authors'])) {
+            if (!\is_iterable($input['authors'])) {
+                $input['authors'] = (array)$input['authors'];
             }
-            if ($option->value) {
+            if ($input['authors']) {
                 $instance->authors = [];
-                foreach ($option->value as $index => $value) {
+                foreach ($input['authors'] as $index => $value) {
                     if (null === $value) {
                         Helper::error("Property value in collection cannot be null");
                         $instance->authors[$index] = null;
@@ -225,14 +201,7 @@ MockArticleNormalizer::$normalizer1 = \Closure::bind(
 MockArticleNormalizer::$denormalizer1 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'title' nullable property
-        $option = Helper::find($input, ['title'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->title = null;
-            } else {
-                $instance->title = Helper::toString($option->value);
-            }
-        }
+        $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
     },
     null, MockWithTitle::class
 );
@@ -254,14 +223,7 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
 MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'text' nullable property
-        $option = Helper::find($input, ['text'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->text = null;
-            } else {
-                $instance->text = \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($option->value, $context, $denormalizer);
-            }
-        }
+        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
     },
     null, MockWithText::class
 );

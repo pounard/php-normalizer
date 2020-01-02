@@ -36,8 +36,8 @@
     },
     "autoload-dev": {
         "classmap": [
-            "benchmarks/CommonTrait.php",
-            "benchmarks/Definitions.php"
+            "benchmarks/Definitions.php",
+            "benchmarks/DefinitionsPhp74.php"
         ],
         "files": [
             "iterations/Iteration1-Reference.php",
@@ -79,7 +79,8 @@
         "symfony/serializer": "^4.4 || ^5.0",
         "symfony/yaml": "^4.3 || ^5.0",
         "symfony/config": "^4.3 || ^5.0",
-        "symfony/http-kernel": "^4.3 || ^5.0"
+        "symfony/http-kernel": "^4.3 || ^5.0",
+        "jane-php/automapper": "5.x-dev"
     },
     "suggest": {
         "ramsey/uuid": "For UUID database column type support",

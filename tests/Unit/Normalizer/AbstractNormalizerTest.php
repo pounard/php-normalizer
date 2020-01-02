@@ -590,6 +590,9 @@ abstract class AbstractNormalizerTest extends TestCase
         $normalizer->denormalize(MockClassWithObjectArray::class, $input, $context);
     }
 
+    // PHP 7.4 types properties
+    // Errors when context let them pass (partial hydration)
+    // Collections not iterable (single value) must be denormalized as an array
     // Inheritance private in sub class
     // Inheritance protecte in sub class
     // Inheritance public in sub class

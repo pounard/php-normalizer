@@ -4,7 +4,7 @@ types:
         properties:
             orderId:
                 type: uuid
-                optional: false
+                optional: true
             productId:
                 type: int
                 optional: false
@@ -36,7 +36,7 @@ types:
         properties:
             id:
                 type: uuid
-                optional: false
+                optional: true
             foo:
                 type: string
                 optional: true

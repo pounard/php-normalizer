@@ -16,6 +16,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
  */
 final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 {
+    private $propertiesAreTyped = false;
     private $typeInfoExtractor;
     private $typeInfoExtractorLoaded = false;
 
@@ -37,6 +38,14 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
             );
         }
         return null;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public function __construct()
+    {
+        $this->propertiesAreTyped = (\version_compare(PHP_VERSION, '7.4.0') >= 0);
     }
 
     /**
@@ -62,6 +71,59 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
+     * Attempt using only reflection (no property-info).
+     */
+    private function findPropertyWithReflection(string $class, \ReflectionProperty $property): ?array
+    {
+        // Attempt using typed properties, thus avoiding to use the property-info
+        // component, which is really slow.
+        if (!$property->hasType()) {
+            return null;
+        }
+
+        $refType = $property->getType();
+        $typeName = $refType->getName();
+
+        // If it's not builtin, it's a class, and that's great for us.
+        if (!$refType->isBuiltIn()) {
+            return [
+                'collection' => false,
+                'optional' => $refType->allowsNull(),
+                'type' => $typeName,
+            ];
+        }
+
+        switch ($typeName) {
+
+            case 'array':
+            case 'iterable':
+                // We cannot have the real value type, just let this pass and
+                // proceed with property info.
+                return null;
+
+            case 'callable':
+            case 'object':
+            case 'resource':
+                // All those types are not and will not be supported
+                // by this hydrator, so just let it return a 'null'
+                // type, which will disable all validations.
+                return [
+                    'collection' => false,
+                    'optional' => true,
+                    'type' => 'null', // Ignore this type.
+                ];
+
+            default:
+                // OK this is all the internal types we support (scalars pretty much).
+                return [
+                    'collection' => false,
+                    'optional' => $refType->allowsNull(),
+                    'type' => $typeName,
+                ];
+        }
+    }
+
+    /**
      * Parse property definition
      *
      * Properties types are much harder to get than class details, since
@@ -73,6 +135,12 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      */
     private function findPropertyDefinition(string $class, \ReflectionProperty $property): array
     {
+        if ($this->propertiesAreTyped) {
+            if ($ret = $this->findPropertyWithReflection($class, $property)) {
+                return $ret;
+            }
+        }
+
         $typeInfoExtractor = $this->getTypeInfoExtractor();
 
         if ($typeInfoExtractor) {
