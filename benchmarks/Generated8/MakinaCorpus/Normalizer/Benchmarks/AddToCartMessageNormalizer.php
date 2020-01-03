@@ -67,7 +67,7 @@ AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'orderId' property
-        $ret['orderId'] = null === $object->orderId ? null : $normalizer ? $normalizer($object->orderId, $context, $normalizer) : $object->orderId;
+        $ret['orderId'] = null === $object->orderId ? null : $object->orderId->__toString();
 
         // Normalize 'productId' property
         $ret['productId'] = null === $object->productId ? null : (int)$object->productId;
@@ -85,7 +85,7 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'orderId' nullable property
-        $instance->orderId = isset($input['orderId']) ? $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['orderId'], $context, $denormalizer) : $input['orderId'] : null;
+        $instance->orderId = isset($input['orderId']) ? \Ramsey\Uuid\Uuid::fromString($input['orderId']) : null;
 
         // Denormalize 'productId' required property
         if (!isset($input['productId'])) {

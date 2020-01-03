@@ -77,7 +77,7 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
-        $ret['id'] = null === $object->id ? null : $normalizer ? $normalizer($object->id, $context, $normalizer) : $object->id;
+        $ret['id'] = null === $object->id ? null : $object->id->__toString();
 
         // Normalize 'createdAt' property
         $ret['createdAt'] = null === $object->createdAt ? null : $normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt;
@@ -110,7 +110,7 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
         if (!isset($input['id'])) {
             Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
         } else {
-            $instance->id = $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['id'], $context, $denormalizer) : $input['id'];
+            $instance->id = \Ramsey\Uuid\Uuid::fromString($input['id']);
         }
 
         // Denormalize 'createdAt' required property
@@ -158,7 +158,7 @@ MockArticleNormalizer::$normalizer1 = \Closure::bind(
         $ret['title'] = null === $object->title ? null : (string)$object->title;
 
         // Normalize 'text' property
-        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
+        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
     },
     null, MockWithText::class
 );
@@ -173,7 +173,7 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
         $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
 
         // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
+        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
     },
     null, MockWithText::class
 );

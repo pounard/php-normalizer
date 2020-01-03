@@ -12,6 +12,12 @@ interface ConfigurationError extends NormalizerError
 {
 }
 
+class ServiceConfigurationError
+    extends \LogicException
+    implements ConfigurationError
+{
+}
+
 interface DataTransformationError extends NormalizerError
 {
 }

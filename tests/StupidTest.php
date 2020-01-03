@@ -41,9 +41,7 @@ final class StupidTest extends TestCase
 
     private function createTypeDefinitionMapForBench(): TypeDefinitionMap
     {
-        $data = Yaml::parseFile(\dirname(__DIR__).'/benchmarks/definitions.yaml');
-
-        return new ArrayTypeDefinitionMap($data['types'], $data['type_aliases']);
+        return new ArrayTypeDefinitionMap([], []);
     }
 
     /**

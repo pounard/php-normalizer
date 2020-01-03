@@ -67,7 +67,7 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'text' property
-        $ret['value'] = null === $object->text ? null : (string)$object->text;
+        $ret['text'] = null === $object->text ? null : (string)$object->text;
 
         // Normalize 'format' property
         $ret['format'] = null === $object->format ? null : (string)$object->format;
@@ -82,14 +82,7 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'text' nullable property
-        $option = Helper::find($input, ['text', 'value'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->text = null;
-            } else {
-                $instance->text = Helper::toString($option->value);
-            }
-        }
+        $instance->text = isset($input['text']) ? Helper::toString($input['text']) : null;
 
         // Denormalize 'format' required property
         if (!isset($input['format'])) {

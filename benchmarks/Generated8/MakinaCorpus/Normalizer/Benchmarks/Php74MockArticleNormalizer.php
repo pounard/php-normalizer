@@ -129,7 +129,7 @@ Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, Php74MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
-        $ret['id'] = null === $object->id ? null : $normalizer ? $normalizer($object->id, $context, $normalizer) : $object->id;
+        $ret['id'] = null === $object->id ? null : $object->id->__toString();
 
         // Normalize 'createdAt' property
         $ret['createdAt'] = null === $object->createdAt ? null : $normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt;
@@ -171,7 +171,7 @@ Php74MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (Php74MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'id' nullable property
-        $instance->id = isset($input['id']) ? $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['id'], $context, $denormalizer) : $input['id'] : null;
+        $instance->id = isset($input['id']) ? \Ramsey\Uuid\Uuid::fromString($input['id']) : null;
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {

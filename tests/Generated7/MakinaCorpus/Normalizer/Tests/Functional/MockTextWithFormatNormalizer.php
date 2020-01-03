@@ -1,17 +1,17 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Generated7\MakinaCorpus\Normalizer\Benchmarks;
+namespace Generated7\MakinaCorpus\Normalizer\Tests\Functional;
 
-use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
+use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 
 /**
  * Public implementation of (de)normalizer for class MockTextWithFormat.
@@ -25,7 +25,7 @@ final class MockTextWithFormatNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Create and normalize MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat instances.
      *
      * @param callable $normalizer
      *   A callback that will normalize externally handled values, parameters are:
@@ -42,7 +42,7 @@ final class MockTextWithFormatNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Create and denormalize MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat instances.
      *
      * @param callable $normalizer
      *   A callback that will denormalize externally handled values, parameters are:
@@ -69,7 +69,7 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
         // Denormalize 'text' property
         $value = $object->text;
         $value = Helper\to_string($value, $context);
-        $ret['text'] = $value;
+        $ret['value'] = $value;
 
         // Denormalize 'format' property
         $value = $object->format;
@@ -86,7 +86,7 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'text' property
-        $value = Helper\find_value($input, ['text'], $context);
+        $value = Helper\find_value($input, ['text', 'value'], $context);
         $value = Helper\to_string($value, $context);
         $instance->text = $value;
 

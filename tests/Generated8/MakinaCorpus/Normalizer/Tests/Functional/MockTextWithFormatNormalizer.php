@@ -1,17 +1,17 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Generated7\MakinaCorpus\Normalizer\Benchmarks;
+namespace Generated8\MakinaCorpus\Normalizer\Tests\Functional;
 
-use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
+use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 
 /**
  * Public implementation of (de)normalizer for class MockTextWithFormat.
@@ -25,7 +25,7 @@ final class MockTextWithFormatNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Create and normalize MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat instances.
      *
      * @param callable $normalizer
      *   A callback that will normalize externally handled values, parameters are:
@@ -42,7 +42,7 @@ final class MockTextWithFormatNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Create and denormalize MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat instances.
      *
      * @param callable $normalizer
      *   A callback that will denormalize externally handled values, parameters are:
@@ -66,15 +66,11 @@ final class MockTextWithFormatNormalizer
 MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
-        // Denormalize 'text' property
-        $value = $object->text;
-        $value = Helper\to_string($value, $context);
-        $ret['text'] = $value;
+        // Normalize 'text' property
+        $ret['value'] = null === $object->text ? null : (string)$object->text;
 
-        // Denormalize 'format' property
-        $value = $object->format;
-        $value = Helper\to_string($value, $context);
-        $ret['format'] = $value;
+        // Normalize 'format' property
+        $ret['format'] = null === $object->format ? null : (string)$object->format;
     },
     null, MockTextWithFormat::class
 );
@@ -85,15 +81,20 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
 MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'text' property
-        $value = Helper\find_value($input, ['text'], $context);
-        $value = Helper\to_string($value, $context);
-        $instance->text = $value;
+        // Denormalize 'text' required property
+        $option = Helper::find($input, ['text', 'value'], $context);
+        if (!$option->success || null === $option->value) {
+            Helper::error(\sprintf("'%s' cannot be null", 'text'), $context);
+        } else {
+            $instance->text = Helper::toString($option->value);
+        }
 
-        // Denormalize 'format' property
-        $value = Helper\find_value($input, ['format'], $context);
-        $value = Helper\to_string($value, $context);
-        $instance->format = $value;
+        // Denormalize 'format' required property
+        if (!isset($input['format'])) {
+            Helper::error(\sprintf("'%s' cannot be null", 'format'), $context);
+        } else {
+            $instance->format = Helper::toString($input['format']);
+        }
     },
     null, MockTextWithFormat::class
 );

@@ -79,25 +79,57 @@ final class MockArticleNormalizer
 }
 
 /**
- * Normalizer for properties of MockArticle.
+ * Normalizer for properties of MockWithTitle.
  */
 MockArticleNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
+        // Normalize 'title' property
+        $ret['title'] = null === $object->title ? null : (string)$object->title;
+    },
+    null, MockWithTitle::class
+);
+
+/**
+ * Denormalizer for properties of MockWithTitle.
+ */
+MockArticleNormalizer::$denormalizer0 = \Closure::bind(
+    static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+        // Denormalize 'title' nullable property
+        $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
+    },
+    null, MockWithTitle::class
+);
+
+/**
+ * Normalizer for properties of MockWithText.
+ */
+MockArticleNormalizer::$normalizer1 = \Closure::bind(
+    static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
+        // Normalize 'text' property
+        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
+    },
+    null, MockWithText::class
+);
+
+/**
+ * Denormalizer for properties of MockWithText.
+ */
+MockArticleNormalizer::$denormalizer1 = \Closure::bind(
+    static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+        // Denormalize 'text' nullable property
+        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
+    },
+    null, MockWithText::class
+);
+
+/**
+ * Normalizer for properties of MockArticle.
+ */
+MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
-        $ret['id'] = null === $object->id ? null : $normalizer ? $normalizer($object->id, $context, $normalizer) : $object->id;
-
-        // Normalize 'foo' property
-        $ret['foo'] = null === $object->foo ? null : (string)$object->foo;
-
-        // Normalize 'bar' property
-        $ret['bar'] = null === $object->bar ? null : (int)$object->bar;
-
-        // Normalize 'baz' property
-        $ret['baz'] = null === $object->baz ? null : (float)$object->baz;
-
-        // Normalize 'filename' property
-        $ret['filename'] = null === $object->filename ? null : (string)$object->filename;
+        $ret['id'] = null === $object->id ? null : $object->id->__toString();
 
         // Normalize 'createdAt' property
         $ret['createdAt'] = null === $object->createdAt ? null : $normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt;
@@ -116,6 +148,18 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
                 }
             }
         }
+
+        // Normalize 'foo' property
+        $ret['foo'] = null === $object->foo ? null : (string)$object->foo;
+
+        // Normalize 'bar' property
+        $ret['bar'] = null === $object->bar ? null : (int)$object->bar;
+
+        // Normalize 'baz' property
+        $ret['baz'] = null === $object->baz ? null : (float)$object->baz;
+
+        // Normalize 'filename' property
+        $ret['filename'] = null === $object->filename ? null : (string)$object->filename;
     },
     null, MockArticle::class
 );
@@ -123,35 +167,11 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
 /**
  * Denormalizer for properties of MockArticle.
  */
-MockArticleNormalizer::$denormalizer0 = \Closure::bind(
+MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'id' nullable property
-        $instance->id = isset($input['id']) ? $denormalizer ? $denormalizer(\Ramsey\Uuid\UuidInterface::class, $input['id'], $context, $denormalizer) : $input['id'] : null;
-
-        // Denormalize 'foo' nullable property
-        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo']) : null;
-
-        // Denormalize 'bar' required property
-        if (!isset($input['bar'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
-        } else {
-            $instance->bar = Helper::toInt($input['bar']);
-        }
-
-        // Denormalize 'baz' required property
-        if (!isset($input['baz'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
-        } else {
-            $instance->baz = Helper::toFloat($input['baz']);
-        }
-
-        // Denormalize 'filename' required property
-        if (!isset($input['filename'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
-        } else {
-            $instance->filename = Helper::toString($input['filename']);
-        }
+        $instance->id = isset($input['id']) ? \Ramsey\Uuid\Uuid::fromString($input['id']) : null;
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
@@ -180,50 +200,30 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
                 }
             }
         }
+
+        // Denormalize 'foo' nullable property
+        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo']) : null;
+
+        // Denormalize 'bar' required property
+        if (!isset($input['bar'])) {
+            Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
+        } else {
+            $instance->bar = Helper::toInt($input['bar']);
+        }
+
+        // Denormalize 'baz' required property
+        if (!isset($input['baz'])) {
+            Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
+        } else {
+            $instance->baz = Helper::toFloat($input['baz']);
+        }
+
+        // Denormalize 'filename' required property
+        if (!isset($input['filename'])) {
+            Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
+        } else {
+            $instance->filename = Helper::toString($input['filename']);
+        }
     },
     null, MockArticle::class
-);
-
-/**
- * Normalizer for properties of MockWithTitle.
- */
-MockArticleNormalizer::$normalizer1 = \Closure::bind(
-    static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'title' property
-        $ret['title'] = null === $object->title ? null : (string)$object->title;
-    },
-    null, MockWithTitle::class
-);
-
-/**
- * Denormalizer for properties of MockWithTitle.
- */
-MockArticleNormalizer::$denormalizer1 = \Closure::bind(
-    static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' nullable property
-        $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
-    },
-    null, MockWithTitle::class
-);
-
-/**
- * Normalizer for properties of MockWithText.
- */
-MockArticleNormalizer::$normalizer2 = \Closure::bind(
-    static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'text' property
-        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
-    },
-    null, MockWithText::class
-);
-
-/**
- * Denormalizer for properties of MockWithText.
- */
-MockArticleNormalizer::$denormalizer2 = \Closure::bind(
-    static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
-    },
-    null, MockWithText::class
 );

@@ -8,6 +8,7 @@ use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
+use MakinaCorpus\Normalizer\Generator\Plugin\GeneratorPluginChain;
 
 /**
  * Default normalizer generator.
@@ -31,6 +32,9 @@ final class DefaultGenerator implements Generator
     /** @var string */
     private $projectSourceDirectory;
 
+    /** @var GeneratorPluginChain */
+    private $generatorPluginChain;
+
     /**
      * Constructor
      *
@@ -40,13 +44,15 @@ final class DefaultGenerator implements Generator
         ContextFactory $contextFactory,
         string $projectSourceDirectory,
         ?string $generatedClassNamespace = null,
-        ?Psr4AppNamingStrategy $namingStrategy = null
+        ?Psr4AppNamingStrategy $namingStrategy = null,
+        ?GeneratorPluginChain $generatorPluginChain = null
     ) {
         $this->contextFactory = $contextFactory;
         $this->generatedClassNamespace = $generatedClassNamespace;
         // @todo inject this properly and give sensible defaults.
         $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy('Normalizer', 'Generated8');
         $this->projectSourceDirectory = $projectSourceDirectory;
+        $this->generatorPluginChain = $generatorPluginChain ?? new GeneratorPluginChain();
     }
 
     /**
@@ -99,16 +105,8 @@ final class DefaultGenerator implements Generator
             $context->addWarning($e->getMessage());
         }
 
-        // @todo Here allow custom implementation to write code
-        switch ($property->getTypeName()) {
-            // When generating normalization (model to norm) from an object
-            // we do trust the incomming value type and just copy the value.
-            case 'bool':
-            case 'float':
-            case 'int':
-            case 'string':
-                $normalizeCall = "({$type}){$input}";
-                break;
+        if ($this->generatorPluginChain->supports($property, $context)) {
+            $normalizeCall = $this->generatorPluginChain->generateNormalizeCode($property, $context, $input);
         }
 
         if (!$normalizeCall) {
@@ -196,17 +194,8 @@ EOT
             $context->addWarning($e->getMessage());
         }
 
-        // @todo Here allow custom implementation to write code
-        switch ($property->getTypeName()) {
-            // When generating normalization (model to norm) from an object
-            // we do trust the incomming value type and just copy the value.
-            case 'bool':
-            case 'float':
-            case 'int':
-            case 'string':
-                $methodName = "to".\ucfirst($type);
-                $normalizeCall = "Helper::{$methodName}({$input})";
-                break;
+        if ($this->generatorPluginChain->supports($property, $context)) {
+            $normalizeCall = $this->generatorPluginChain->generateDenormalizeCode($property, $context, $input);
         }
 
         if (!$normalizeCall) {

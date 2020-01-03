@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
-use function MakinaCorpus\Normalizer\Generator\Iterations\handle_error;
-
 /**
  * Object (de)normalizer to use whenever the generated variant does not exist.
  */
