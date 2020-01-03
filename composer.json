@@ -81,7 +81,8 @@
         "symfony/yaml": "^4.3 || ^5.0",
         "symfony/config": "^4.3 || ^5.0",
         "symfony/http-kernel": "^4.3 || ^5.0",
-        "jane-php/automapper": "5.x-dev"
+        "jane-php/automapper": "5.x-dev",
+        "jms/serializer": "^3.4"
     },
     "suggest": {
         "ramsey/uuid": "For UUID database column type support",

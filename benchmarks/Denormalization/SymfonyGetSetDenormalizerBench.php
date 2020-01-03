@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks\DenormalizationPhp74;
+namespace MakinaCorpus\Normalizer\Benchmarks\Denormalization;
 
-use MakinaCorpus\Normalizer\Benchmarks\WithSymfonyNormalizerTrait;
+use MakinaCorpus\Normalizer\Benchmarks\WithSymfonyGetSetNormalizerTrait;
 
-final class SymfonyDenormalizerBench extends AbstractDenormalizeBench
+final class SymfonyObjectDenormalizerBench extends AbstractDenormalizeBench
 {
-    use WithSymfonyNormalizerTrait;
+    use WithSymfonyGetSetNormalizerTrait;
 
     /**
      * {@inheritdoc}
@@ -23,7 +23,7 @@ final class SymfonyDenormalizerBench extends AbstractDenormalizeBench
      */
     public function getPackageName(): string
     {
-        return "symfony/serializer (uncached)";
+        return "symfony/serializer (get-set normalizer)";
     }
 
     /**

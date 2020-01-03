@@ -2,7 +2,7 @@
 
 final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_Php74MockArticle extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1578041871';
+    protected $hash = '1578062859';
     public function __construct()
     {
     }
@@ -16,12 +16,12 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_Php74MockArticle ext
             $result = new \MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle();
         }
         $context = $context->withIncrementedDepth();
-        if (array_key_exists('updateddAt', $value) && $context->isAllowedAttribute('updateddAt')) {
+        if (array_key_exists('updatedAt', $value) && $context->isAllowedAttribute('updatedAt')) {
             $value_1 = null;
-            if (null !== $value['updateddAt']) {
-                $value_1 = \DateTimeImmutable::createFromFormat('Y-m-d\\TH:i:sP', $value['updateddAt']);
+            if (null !== $value['updatedAt']) {
+                $value_1 = \DateTimeImmutable::createFromFormat('Y-m-d\\TH:i:sP', $value['updatedAt']);
             }
-            $result->setupdateddAt($value_1);
+            $result->setupdatedAt($value_1);
         }
         if (array_key_exists('authors', $value) && $context->isAllowedAttribute('authors')) {
             $values = array();

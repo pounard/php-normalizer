@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\UuidNormalizer;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * In benchmarks using this, I'm not sure I gave the Symfony serializer enough
@@ -33,11 +30,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  * Also, you have to note that we tuned our test class so that it won't crash
  * because yes, there's a few corner cases it is unable to handle, sadly.
  */
-trait WithSymfonyNormalizerTrait
+trait WithSymfonyClassMetadataTrait
 {
-    /** @var Serializer */
-    private $serializer;
-
     /**
      * Prepare some Symfony stuff
      */
@@ -51,7 +45,8 @@ trait WithSymfonyNormalizerTrait
         $classMetadataFactory = new ClassMetadataFactory(
             new LoaderChain([
                 new AnnotationLoader(new AnnotationReader()),
-            ])
+            ]),
+            new ApcuAdapter('SymfonyMetadata')
         );
 
         $serializerExtracor = new SerializerExtractor($classMetadataFactory);
@@ -65,25 +60,5 @@ trait WithSymfonyNormalizerTrait
         );
 
         return [$classMetadataFactory, $propertyTypeExtractor];
-    }
-
-    /**
-     * Create Symfony serializer
-     */
-    private function createSymfonyNormalizer(): Serializer
-    {
-        list($classMetadataFactory, $propertyTypeExtractor) = $this->prepareSymfonyInternals();
-
-        return new Serializer([
-            new DateTimeNormalizer(),
-            new UuidNormalizer(),
-            new ObjectNormalizer(
-                $classMetadataFactory,
-                /* NameConverterInterface $nameConverter = */ null,
-                /* PropertyAccessorInterface $propertyAccessor */ null,
-                $propertyTypeExtractor,
-                /* ClassDiscriminatorResolverInterface $classDiscriminatorResolver = */ null
-            ),
-        ]);
     }
 }

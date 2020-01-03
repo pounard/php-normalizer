@@ -2,7 +2,7 @@
 
 final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_Php74MockTextWithFormat extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1578041871';
+    protected $hash = '1578062859';
     public function __construct()
     {
     }

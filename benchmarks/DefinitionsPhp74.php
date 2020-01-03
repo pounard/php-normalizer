@@ -363,7 +363,7 @@ final class Php74MockArticle extends Php74MockWithText
         return $this->updatedAt;
     }
 
-    public function setUpdateddAt(?\DateTimeImmutable $value): void
+    public function setUpdatedAt(?\DateTimeImmutable $value): void
     {
         $this->updatedAt = $value;
     }
