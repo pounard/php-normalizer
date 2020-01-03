@@ -110,7 +110,7 @@ final class DefaultGenerator implements Generator
         }
 
         if (!$normalizeCall) {
-            $normalizeCall = "\$normalizer ? \$normalizer({$input}, \$context, \$normalizer) : {$input}";
+            $normalizeCall = "(\$normalizer ? \$normalizer({$input}, \$context, \$normalizer) : {$input})";
         }
 
         return $normalizeCall;
@@ -129,7 +129,7 @@ final class DefaultGenerator implements Generator
 
         $writer->write(<<<EOT
         // Normalize '{$propName}' property
-        {$output} = null === {$input} ? null : {$normalizeCall};
+        {$output} = (null === {$input} ? null : {$normalizeCall});
 EOT
         );
     }
@@ -200,11 +200,11 @@ EOT
 
         if (!$normalizeCall) {
             if (\class_exists($type) || \interface_exists($type)) {
-                $typeString = '\\'.$type.'::class';
+                $typeString = '\\'.\ltrim($type, '\\').'::class';
             } else {
                 $typeString = "'{$type}'";
             }
-            $normalizeCall = "\$denormalizer ? \$denormalizer({$typeString}, {$input}, \$context, \$denormalizer) : {$input}";
+            $normalizeCall = "(\$denormalizer ? \$denormalizer({$typeString}, {$input}, \$context, \$denormalizer) : {$input})";
         }
 
         return $normalizeCall;
@@ -415,7 +415,7 @@ EOT
         $generatedLocalClassName = \array_pop($parts);
         $generatedClassNamespace = \implode('\\', $parts);
 
-        $imports = [Context::class, 'MakinaCorpus\Normalizer\\Helper'];
+        $imports = [Context::class];
         if ($generatedClassNamespace !== $classNamespace) {
             $imports[] = $nativeType;
         }

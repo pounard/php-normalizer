@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Generated8\MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormat;
 
 /**
@@ -67,10 +66,10 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'text' property
-        $ret['value'] = null === $object->text ? null : (string)$object->text;
+        $ret['value'] = (null === $object->text ? null : (string)$object->text);
 
         // Normalize 'format' property
-        $ret['format'] = null === $object->format ? null : (string)$object->format;
+        $ret['format'] = (null === $object->format ? null : (string)$object->format);
     },
     null, MockTextWithFormat::class
 );

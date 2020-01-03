@@ -177,7 +177,6 @@ final class Helper
                 return ValueOption::ok($input);
             case 'string':
                 return ValueOption::ok(Helper::toString($input, $context));
-            case 'date':
             case \DateTime::class:
                 return ValueOption::ok(new \DateTime($input));
             case \DateTimeInterface::class:
@@ -207,7 +206,6 @@ final class Helper
                 return ValueOption::ok($input);
             case 'string':
                 return ValueOption::ok(Helper::toString($input, $context));
-            case 'date':
             case \DateTime::class:
             case \DateTimeInterface::class:
             case \DateTimeImmutable::class:

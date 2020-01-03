@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
 
 /**
@@ -72,7 +71,7 @@ MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
                 if (null === $value) {
                     $ret['dateArray'][$index] = null;
                 } else {
-                    $ret['dateArray'][$index] = $normalizer ? $normalizer($value, $context, $normalizer) : $value;
+                    $ret['dateArray'][$index] = ($normalizer ? $normalizer($value, $context, $normalizer) : $value);
                 }
             }
         }
@@ -97,7 +96,7 @@ MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
                         $context->nullValueError('DateTime');
                         $instance->dateArray[$index] = null;
                     } else {
-                        $instance->dateArray[$index] = $denormalizer ? $denormalizer(\DateTime::class, $value, $context, $denormalizer) : $value;
+                        $instance->dateArray[$index] = ($denormalizer ? $denormalizer(\DateTime::class, $value, $context, $denormalizer) : $value);
                     }
                 }
             }

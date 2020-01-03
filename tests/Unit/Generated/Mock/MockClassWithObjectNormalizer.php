@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObject;
 
 /**
@@ -66,7 +65,7 @@ final class MockClassWithObjectNormalizer
 MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithObject $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'object' property
-        $ret['object'] = null === $object->object ? null : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer);
+        $ret['object'] = (null === $object->object ? null : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer));
     },
     null, MockClassWithObject::class
 );

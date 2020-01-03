@@ -11,7 +11,6 @@ namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Public implementation of (de)normalizer for class Php74AddToCartMessage.
@@ -67,13 +66,13 @@ Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'orderId' property
-        $ret['orderId'] = null === $object->orderId ? null : $object->orderId->__toString();
+        $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
 
         // Normalize 'productId' property
-        $ret['productId'] = null === $object->productId ? null : (int)$object->productId;
+        $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
 
         // Normalize 'amount' property
-        $ret['amount'] = null === $object->amount ? null : (float)$object->amount;
+        $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
     },
     null, Php74AddToCartMessage::class
 );

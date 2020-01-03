@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString;
 
 /**
@@ -66,7 +65,7 @@ final class MockClassWithStringNormalizer
 MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithString $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'string' property
-        $ret['string'] = null === $object->string ? null : (string)$object->string;
+        $ret['string'] = (null === $object->string ? null : (string)$object->string);
     },
     null, MockClassWithString::class
 );

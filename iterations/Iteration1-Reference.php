@@ -207,7 +207,6 @@ function hydrator1_external_implementation(string $type, $input, Context $contex
             return HydratorOption::ok($input);
         case 'string':
             return HydratorOption::ok($input);
-        case 'date':
         case 'DateTime':
         case 'DateTimeInterface':
         case 'DateTimeImmutable':
@@ -356,7 +355,6 @@ function normalizer1_external_implementation(string $type, $input, Context $cont
             return HydratorOption::ok($input);
         case 'string':
             return HydratorOption::ok($input);
-        case 'date':
         case 'DateTime':
         case 'DateTimeInterface':
         case 'DateTimeImmutable':

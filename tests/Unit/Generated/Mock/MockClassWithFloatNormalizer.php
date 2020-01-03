@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithFloat;
 
 /**
@@ -66,7 +65,7 @@ final class MockClassWithFloatNormalizer
 MockClassWithFloatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithFloat $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'float' property
-        $ret['float'] = null === $object->float ? null : (float)$object->float;
+        $ret['float'] = (null === $object->float ? null : (float)$object->float);
     },
     null, MockClassWithFloat::class
 );

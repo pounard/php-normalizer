@@ -13,7 +13,6 @@ use MakinaCorpus\Normalizer\Benchmarks\MockArticle;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithText;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Public implementation of (de)normalizer for class MockArticle.
@@ -84,7 +83,7 @@ final class MockArticleNormalizer
 MockArticleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'title' property
-        $ret['title'] = null === $object->title ? null : (string)$object->title;
+        $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
     null, MockWithTitle::class
 );
@@ -106,7 +105,7 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 MockArticleNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'text' property
-        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
+        $ret['text'] = (null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
     null, MockWithText::class
 );
@@ -129,13 +128,13 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
-        $ret['id'] = null === $object->id ? null : $object->id->__toString();
+        $ret['id'] = (null === $object->id ? null : $object->id->__toString());
 
         // Normalize 'createdAt' property
-        $ret['createdAt'] = null === $object->createdAt ? null : $normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt;
+        $ret['createdAt'] = (null === $object->createdAt ? null : ($normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt));
 
         // Normalize 'updatedAt' property
-        $ret['updatedAt'] = null === $object->updatedAt ? null : $normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt;
+        $ret['updatedAt'] = (null === $object->updatedAt ? null : ($normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt));
 
         // Normalize 'authors' property
         $ret['authors'] = [];
@@ -150,16 +149,16 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
         }
 
         // Normalize 'foo' property
-        $ret['foo'] = null === $object->foo ? null : (string)$object->foo;
+        $ret['foo'] = (null === $object->foo ? null : (string)$object->foo);
 
         // Normalize 'bar' property
-        $ret['bar'] = null === $object->bar ? null : (int)$object->bar;
+        $ret['bar'] = (null === $object->bar ? null : (int)$object->bar);
 
         // Normalize 'baz' property
-        $ret['baz'] = null === $object->baz ? null : (float)$object->baz;
+        $ret['baz'] = (null === $object->baz ? null : (float)$object->baz);
 
         // Normalize 'filename' property
-        $ret['filename'] = null === $object->filename ? null : (string)$object->filename;
+        $ret['filename'] = (null === $object->filename ? null : (string)$object->filename);
     },
     null, MockArticle::class
 );
@@ -177,11 +176,11 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
         if (!isset($input['createdAt'])) {
             $context->nullValueError('DateTimeImmutable');
         } else {
-            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
+            $instance->createdAt = ($denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt']);
         }
 
         // Denormalize 'updatedAt' nullable property
-        $instance->updatedAt = isset($input['updatedAt']) ? $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'] : null;
+        $instance->updatedAt = isset($input['updatedAt']) ? ($denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt']) : null;
 
         // Denormalize 'authors' collection property
         if (isset($input['authors'])) {

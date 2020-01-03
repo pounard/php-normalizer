@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Generated8\MakinaCorpus\Normalizer\Tests\Functional;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Functional\MockArticle;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
 use MakinaCorpus\Normalizer\Tests\Functional\MockWithText;
@@ -77,13 +76,13 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
-        $ret['id'] = null === $object->id ? null : $object->id->__toString();
+        $ret['id'] = (null === $object->id ? null : $object->id->__toString());
 
         // Normalize 'createdAt' property
-        $ret['createdAt'] = null === $object->createdAt ? null : $normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt;
+        $ret['createdAt'] = (null === $object->createdAt ? null : ($normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt));
 
         // Normalize 'updatedAt' property
-        $ret['updatedAt'] = null === $object->updatedAt ? null : $normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt;
+        $ret['updatedAt'] = (null === $object->updatedAt ? null : ($normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt));
 
         // Normalize 'authors' property
         $ret['authors'] = [];
@@ -117,14 +116,14 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
         if (!isset($input['createdAt'])) {
             $context->nullValueError('DateTimeInterface');
         } else {
-            $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
+            $instance->createdAt = ($denormalizer ? $denormalizer(\DateTimeInterface::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt']);
         }
 
         // Denormalize 'updatedAt' required property
         if (!isset($input['updatedAt'])) {
             $context->nullValueError('DateTimeInterface');
         } else {
-            $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'];
+            $instance->updatedAt = ($denormalizer ? $denormalizer(\DateTimeInterface::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt']);
         }
 
         // Denormalize 'authors' collection property
@@ -155,10 +154,10 @@ MockArticleNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'title' property
-        $ret['title'] = null === $object->title ? null : (string)$object->title;
+        $ret['title'] = (null === $object->title ? null : (string)$object->title);
 
         // Normalize 'text' property
-        $ret['text'] = null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer);
+        $ret['text'] = (null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
     null, MockWithText::class
 );

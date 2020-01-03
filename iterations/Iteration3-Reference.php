@@ -118,7 +118,6 @@ function hydrator3_external_implementation(string $type, $input, Context $contex
         case 'string':
             return HydratorOption::ok(to_string($input, $context));
         // Those must be externalised.
-        case 'date':
         case 'DateTime':
         case 'DateTimeInterface':
         case 'DateTimeImmutable':

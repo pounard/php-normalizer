@@ -62,7 +62,7 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      */
     public static function isTypeSupported(string $type): bool
     {
-        return 'resource' !== $type && 'callable' !== $type && (\interface_exists($type) || \class_exists($type));
+        return \in_array($type, ['bool', 'float', 'int', 'null', 'string', 'array']) || \class_exists($type) || \interface_exists($type);
     }
 
     /**

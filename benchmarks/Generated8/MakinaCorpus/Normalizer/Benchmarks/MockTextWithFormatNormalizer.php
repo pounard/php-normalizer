@@ -11,7 +11,6 @@ namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Public implementation of (de)normalizer for class MockTextWithFormat.
@@ -67,10 +66,10 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'text' property
-        $ret['text'] = null === $object->text ? null : (string)$object->text;
+        $ret['text'] = (null === $object->text ? null : (string)$object->text);
 
         // Normalize 'format' property
-        $ret['format'] = null === $object->format ? null : (string)$object->format;
+        $ret['format'] = (null === $object->format ? null : (string)$object->format);
     },
     null, MockTextWithFormat::class
 );
