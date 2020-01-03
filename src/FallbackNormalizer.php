@@ -61,30 +61,14 @@ final class FallbackNormalizer
      */
     private static function propertyExtract(array $input, PropertyDefinition $property, Context $context)
     {
-        $option = Helper::find($input, $property->getCandidateNames(), $context);
+        if (1 === \count($candidateNames = $property->getCandidateNames())) {
+            return $input[\reset($candidateNames)] ?? null;
+        }
+
+        $option = Helper::find($input, $candidateNames, $context);
         if ($option->success) {
-
-            if (null === $option->value) {
-                if (!$property->isOptional()) {
-                    Helper::error(\sprintf("Property cannot be null"));
-                }
-                // Fallback to null in case partial is allowed.
-                return null;
-            }
-
-            return self::propertyValidate(
-                self::denormalize(
-                    $property->getTypeName(), $option->value, $context
-                ),
-                $property, $context
-            );
+            return $option->value;
         }
-
-        if (!$property->isOptional()) {
-            Helper::error(\sprintf("Property cannot be null yet value could not be found in input"));
-        }
-        // Fallback to null in case partial is allowed.
-        return null;
     }
 
     /**
@@ -123,18 +107,11 @@ final class FallbackNormalizer
     /**
      * Extract a single value
      */
-    private static function propertyExtractCollection(array $input, PropertyDefinition $property, Context $context)
+    private static function propertyDenormalizeCollection(array $input, PropertyDefinition $property, Context $context)
     {
-        $option = Helper::find($input, $property->getCandidateNames(), $context);
-
-        if (!$option->success) {
-            return [];
-        }
-
         $ret = [];
-
+        $values = self::propertyExtract($input, $property, $context);
         $type = $property->getTypeName();
-        $values = $option->value;
 
         if (\is_iterable($values)) {
             foreach ($values as $index => $value) {
@@ -168,10 +145,27 @@ final class FallbackNormalizer
     {
         try {
             $context->enter($property->getNativeName());
-            if (!$property->isCollection()) {
-                return self::propertyExtract($input, $property, $context);
+
+            if ($property->isCollection()) {
+                return self::propertyDenormalizeCollection($input, $property, $context);
             }
-            return self::propertyExtractCollection($input, $property, $context);
+
+            $value = self::propertyExtract($input, $property, $context);
+
+            if (null === $value) {
+                if (!$property->isOptional()) {
+                    Helper::error(\sprintf("Property cannot be null"));
+                }
+                // Fallback to null in case partial is allowed.
+                return null;
+            }
+
+            return self::propertyValidate(
+                self::denormalize(
+                    $property->getTypeName(), $value, $context
+                ),
+                $property, $context
+            );
         } finally {
             $context->leave($property->getNormalizedName());
         }
