@@ -243,7 +243,7 @@ EOT
         // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (!\$option->success || null === {$input}) {
-            Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            \$context->addError(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
         } else {
             {$output} = {$denormalizeCall};
         }
@@ -285,7 +285,7 @@ EOT
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         if (!isset($input)) {
-            Helper::error(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            \$context->addError(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
         } else {
             {$output} = {$denormalizeCall};
         }
@@ -318,7 +318,7 @@ EOT
                 {$output} = [];
                 foreach ({$arrayInput} as \$index => {$input}) {
                     if (null === {$input}) {
-                        Helper::error("Property value in collection cannot be null");
+                        \$context->addError("Property value in collection cannot be null");
                         {$output}[\$index] = null;
                     } else {
                         {$output}[\$index] = {$denormalizeCall};
@@ -360,7 +360,7 @@ EOT
                 {$output} = [];
                 foreach ({$arrayInput} as \$index => {$input}) {
                     if (null === {$input}) {
-                        Helper::error("Property value in collection cannot be null");
+                        \$context->addError("Property value in collection cannot be null");
                         {$output}[\$index] = null;
                     } else {
                         {$output}[\$index] = {$denormalizeCall};

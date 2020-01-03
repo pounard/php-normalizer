@@ -78,7 +78,7 @@ MockClassWithFloatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithFloat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'float' required property
         if (!isset($input['float'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'float'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'float'), $context);
         } else {
             $instance->float = Helper::toFloat($input['float']);
         }

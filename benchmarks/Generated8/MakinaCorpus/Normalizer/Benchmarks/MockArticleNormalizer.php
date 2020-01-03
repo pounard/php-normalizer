@@ -175,7 +175,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'createdAt'), $context);
         } else {
             $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
         }
@@ -192,7 +192,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
                 $instance->authors = [];
                 foreach ($input['authors'] as $index => $value) {
                     if (null === $value) {
-                        Helper::error("Property value in collection cannot be null");
+                        $context->addError("Property value in collection cannot be null");
                         $instance->authors[$index] = null;
                     } else {
                         $instance->authors[$index] = Helper::toString($value);
@@ -206,21 +206,21 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
 
         // Denormalize 'bar' required property
         if (!isset($input['bar'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'bar'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'bar'), $context);
         } else {
             $instance->bar = Helper::toInt($input['bar']);
         }
 
         // Denormalize 'baz' required property
         if (!isset($input['baz'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'baz'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'baz'), $context);
         } else {
             $instance->baz = Helper::toFloat($input['baz']);
         }
 
         // Denormalize 'filename' required property
         if (!isset($input['filename'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'filename'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'filename'), $context);
         } else {
             $instance->filename = Helper::toString($input['filename']);
         }

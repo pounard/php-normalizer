@@ -90,7 +90,7 @@ final class Helper
      * @param ?Context $context
      *   Context if available.
      */
-    public static function find(array $input, array $candidates, ?Context $context = null): ValueOption
+    public static function find(array $input, array $candidates, Context $context): ValueOption
     {
         $verbose = $context ? $context->isVerbose() : false;
         $found = $value = null;
@@ -98,7 +98,7 @@ final class Helper
         foreach ($candidates as $name) {
             if (\array_key_exists($name, $input)) {
                 if ($found) {
-                    self::error(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name), $context);
+                    $context->addError(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name), $context);
                 } else if ($verbose) {
                     $found = $name;
                     $value = $input[$name];
@@ -119,14 +119,14 @@ final class Helper
      * @param ?Context $context
      *   Context if available
      */
-    public static function toString($input, ?Context $context = null): ?string
+    public static function toString($input, Context $context): ?string
     {
         if (\is_string($input)) {
             return $input;
         } else if (\is_object($input) && \method_exists($input, '__toString')) {
             return $input->__toString();
         }
-        self::error(self::typeMismatchError('string', $input), $context);
+        $context->addError(self::typeMismatchError('string', $input), $context);
         return null;
     }
 
@@ -138,7 +138,7 @@ final class Helper
      * @param ?Context $context
      *   Context if available
      */
-    public static function toBool($input, ?Context $context = null): ?bool
+    public static function toBool($input, Context $context): ?bool
     {
         if (\is_bool($input)) {
             return $input;
@@ -149,7 +149,7 @@ final class Helper
         if (\is_string($input) && \ctype_digit($input)) {
             return (bool)(int)$input;
         }
-        self::error(self::typeMismatchError('bool', $input), $context);
+        $context->addError(self::typeMismatchError('bool', $input), $context);
         return null;
     }
 
@@ -173,7 +173,7 @@ final class Helper
         if (\is_float($input) && $input == ($cast = (int)$input)) {
             return $cast;
         }
-        self::error(self::typeMismatchError('int', $input), $context);
+        $context->addError(self::typeMismatchError('int', $input), $context);
         return null;
     }
 
@@ -201,7 +201,7 @@ final class Helper
                 return (float)$input;
             }
         }
-        self::error(self::typeMismatchError('float', $input), $context);
+        $context->addError(self::typeMismatchError('float', $input), $context);
         return null;
     }
 

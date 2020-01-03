@@ -94,7 +94,7 @@ MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
                 $instance->dateArray = [];
                 foreach ($input['dateArray'] as $index => $value) {
                     if (null === $value) {
-                        Helper::error("Property value in collection cannot be null");
+                        $context->addError("Property value in collection cannot be null");
                         $instance->dateArray[$index] = null;
                     } else {
                         $instance->dateArray[$index] = $denormalizer ? $denormalizer(\DateTime::class, $value, $context, $denormalizer) : $value;

@@ -84,14 +84,14 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
         // Denormalize 'text' required property
         $option = Helper::find($input, ['text', 'value'], $context);
         if (!$option->success || null === $option->value) {
-            Helper::error(\sprintf("'%s' cannot be null", 'text'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'text'), $context);
         } else {
             $instance->text = Helper::toString($option->value);
         }
 
         // Denormalize 'format' required property
         if (!isset($input['format'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'format'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'format'), $context);
         } else {
             $instance->format = Helper::toString($input['format']);
         }

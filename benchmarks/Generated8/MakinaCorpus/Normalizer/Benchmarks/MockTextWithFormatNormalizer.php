@@ -86,7 +86,7 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'format' required property
         if (!isset($input['format'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'format'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'format'), $context);
         } else {
             $instance->format = Helper::toString($input['format']);
         }

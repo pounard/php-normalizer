@@ -108,21 +108,21 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'id' required property
         if (!isset($input['id'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'id'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'id'), $context);
         } else {
             $instance->id = \Ramsey\Uuid\Uuid::fromString($input['id']);
         }
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'createdAt'), $context);
         } else {
             $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
         }
 
         // Denormalize 'updatedAt' required property
         if (!isset($input['updatedAt'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
         } else {
             $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'];
         }
@@ -136,7 +136,7 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
                 $instance->authors = [];
                 foreach ($input['authors'] as $index => $value) {
                     if (null === $value) {
-                        Helper::error("Property value in collection cannot be null");
+                        $context->addError("Property value in collection cannot be null");
                         $instance->authors[$index] = null;
                     } else {
                         $instance->authors[$index] = Helper::toString($value);

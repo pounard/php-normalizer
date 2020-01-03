@@ -34,7 +34,7 @@ final class FallbackNormalizer
     private static function createInstance(string $type, Context $context)
     {
         if (!\class_exists($type)) {
-            Helper::error(\sprintf("Class '%s' does not exist", $type));
+            $context->addError(\sprintf("Class '%s' does not exist", $type));
             return null;
         }
         return (new \ReflectionClass($type))->newInstanceWithoutConstructor();
@@ -96,7 +96,7 @@ final class FallbackNormalizer
         }
 
         if (!$isValid) {
-            Helper::error(Helper::typeMismatchError($expected, $value));
+            $context->addError(Helper::typeMismatchError($expected, $value));
         }
 
         return $value;
@@ -114,7 +114,7 @@ final class FallbackNormalizer
         if (\is_iterable($values)) {
             foreach ($values as $index => $value) {
                 if (null === $value) {
-                    Helper::error(\sprintf("Value in collection cannot be null at index '%s'", $index));
+                    $context->addError(\sprintf("Value in collection cannot be null at index '%s'", $index));
                     // Let it pass if partial allowed.
                     $ret[$index] = null;
                 } else {
@@ -152,7 +152,7 @@ final class FallbackNormalizer
 
             if (null === $value) {
                 if (!$property->isOptional()) {
-                    Helper::error(\sprintf("Property cannot be null"));
+                    $context->addError(\sprintf("Property cannot be null"));
                 }
                 // Fallback to null in case partial is allowed.
                 return null;

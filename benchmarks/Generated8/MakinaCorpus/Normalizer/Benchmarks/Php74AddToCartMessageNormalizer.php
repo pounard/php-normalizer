@@ -89,14 +89,14 @@ Php74AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'productId' required property
         if (!isset($input['productId'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'productId'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'productId'), $context);
         } else {
             $instance->productId = Helper::toInt($input['productId']);
         }
 
         // Denormalize 'amount' required property
         if (!isset($input['amount'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'amount'), $context);
+            $context->addError(\sprintf("'%s' cannot be null", 'amount'), $context);
         } else {
             $instance->amount = Helper::toFloat($input['amount']);
         }
