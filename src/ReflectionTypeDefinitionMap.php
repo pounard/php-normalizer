@@ -285,20 +285,21 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 
         /** @var \Symfony\Component\PropertyInfo\Type $type */
         foreach ($types as $type) {
+            $typeName = $type->getClassName() ?? $type->getBuiltinType();
             if ($type->isCollection()) {
                 $valueType = $type->getCollectionValueType();
                 return [
                     'collection' => true,
-                    'collection_type' => $type->getClassName() ?? $type->getBuiltinType(),
+                    'collection_type' => ($valueType ? $typeName : 'null'),
                     'optional' => $type->isNullable(),
-                    'type' => $valueType->getClassName() ?? $valueType->getBuiltinType(),
+                    'type' => ($valueType ? ($valueType->getClassName() ?? $valueType->getBuiltinType()) : 'null'),
                 ];
             }
             return [
                 'collection' => false,
                 'collection_type' => $type->getBuiltinType(),
                 'optional' => $type->isNullable(),
-                'type' => $type->getClassName() ?? $type->getBuiltinType(),
+                'type' => $typeName,
             ];
         }
     }
