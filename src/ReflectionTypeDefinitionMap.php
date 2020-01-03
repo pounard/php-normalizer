@@ -137,6 +137,141 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
+     * From a class name, resolve a class alias.
+     *
+     * Basically, what we want to achieve here, is to resolve a use statement.
+     */
+    private static function resolveTypeFromClass(string $class, string $type, bool $allowUnsafeClassResolution = false): ?string
+    {
+        $class = new \ReflectionClass($class);
+
+        if ($type === $class->getShortName()) {
+            return $class->getName();
+        }
+
+        if ($allowUnsafeClassResolution) {
+            if ($namespace = $class->getNamespaceName()) {
+                // This is wrong because we don't have file use statements.
+                // Local classes could be aliased and hidden.
+                $candidate = '\\'.$namespace.'\\'.$type;
+                if (\class_exists($candidate) || \interface_exists($candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return null;
+
+        /*
+        if (!$filename = $class->getFileName()) {
+            return null;
+        }
+
+        // Resolver::resolveUseStatements($filename);
+         */
+
+        return null;
+    }
+
+    /**
+     * From a reflection property, resolve a class alias.
+     *
+     * Basically, what we want to achieve here, is to resolve a use statement.
+     */
+    public static function resolveTypeFromClassProperty(string $class, \ReflectionProperty $property, string $type, bool $allowUnsafeClassResolution = false): ?string
+    {
+        if (!$type) {
+            return null; // Empty type.
+        }
+        if ('\\' === $type[0]) {
+            return $type; // FQDN
+        }
+        return self::resolveTypeFromClass($class, $type, $allowUnsafeClassResolution);
+    }
+
+    /**
+     * Return an array of type definition arrays from an arbitrary doc block
+     */
+    public static function extractTypesFromDocBlock(string $docBlock): ?array
+    {
+        // This is where it becomes really ulgy.
+        $matches = [];
+        if (!\preg_match('/@var\s+([^\s\n@]+)/ums', $docBlock, $matches)) {
+            return null;
+        }
+
+        $typeStrings = \array_unique(
+            \array_filter(
+                \array_map(
+                    '\trim',
+                    \explode('|', $matches[1])
+                )
+            )
+        );
+
+        // If one occurence of 'null' or an unsupported type is found, we can
+        // consider the whole as optional, because we will not be able to
+        // normalize some variants of it.
+        $allAreOptional = false;
+        foreach ($typeStrings as $index => $type) {
+            if ('null' === $type || 'callable' === $type || 'resource' === $type) {
+                unset($typeStrings[$index]);
+                $allAreOptional = true;
+            }
+        }
+
+        $ret = [];
+        foreach ($typeStrings as $type) {
+            if ($optional = '?' === $type[0]) {
+                $type = \substr($type, 1);
+            }
+            if ($collection = '[]' === \substr($type, -2)) {
+                $type = \substr($type, 0, -2);
+            }
+
+            // Proceed to a second removal pass now that '[]' and '?' have
+            // been stripped.
+            if (!self::isTypeSupported($type)) {
+                continue;
+            }
+
+            // Internal type reprensentation with uses a QDN which must be
+            // absolute, and unprefixed with '\\'. Else custom class resolver
+            // will fail when using CLASS::class constant.
+            $type = \trim($type, '\\');
+
+            $ret[] = [
+                'collection' => $collection,
+                'collection_type' => $type,
+                'optional' => $optional || $allAreOptional,
+                'type' => $type,
+            ];
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Find property type with raw doc block from reflexion
+     */
+    private function findPropertyWithRawDocBlock(string $class, \ReflectionProperty $property): ?array
+    {
+        if (!$docBlock = $property->getDocComment()) {
+            return null;
+        }
+
+        // Arbitrary take the first, sorry.
+        // We don't support union types yet.
+        foreach (self::extractTypesFromDocBlock($docBlock) as $array) {
+            if ($realType = self::resolveTypeFromClass($class, $array['type'])) {
+                $array['type'] = $realType;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Find property type using symfony/property-info.
      */
     private function findPropertyWithPropertyInfo(string $class, \ReflectionProperty $property): ?array
@@ -181,6 +316,9 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     private function findPropertyDefinition(string $class, \ReflectionProperty $property): ?array
     {
         if ($ret = $this->findPropertyWithReflection($class, $property)) {
+            return $ret;
+        }
+        if ($ret = $this->findPropertyWithRawDocBlock($class, $property)) {
             return $ret;
         }
         // @todo write here a custom docblock parser for speed.
