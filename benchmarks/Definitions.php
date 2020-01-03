@@ -241,12 +241,12 @@ class MockWithText extends MockWithTitle
     private $text;
 
     /** @return null|MockTextWithFormat */
-    public function getMarkup()/*: ?MockTextWithFormat */
+    public function getMarkup(): ?MockTextWithFormat
     {
         return $this->text;
     }
 
-    public function setText(/* ?MockTextWithFormat */ $value): void
+    public function setText(?MockTextWithFormat $value): void
     {
         $this->text = $value;
     }

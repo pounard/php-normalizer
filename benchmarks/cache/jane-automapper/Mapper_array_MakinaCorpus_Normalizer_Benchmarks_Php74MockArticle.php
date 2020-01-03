@@ -1,8 +1,8 @@
 <?php
 
-final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends \Jane\AutoMapper\Mapper
+final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_Php74MockArticle extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1578041530';
+    protected $hash = '1578041871';
     public function __construct()
     {
     }
@@ -13,7 +13,7 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
         }
         $result = $context->getObjectToPopulate();
         if (null === $result) {
-            $result = new \MakinaCorpus\Normalizer\Benchmarks\MockArticle();
+            $result = new \MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle();
         }
         $context = $context->withIncrementedDepth();
         if (array_key_exists('updateddAt', $value) && $context->isAllowedAttribute('updateddAt')) {
@@ -33,7 +33,7 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
         if (array_key_exists('text', $value) && $context->isAllowedAttribute('text')) {
             $value_3 = null;
             if (null !== $value['text']) {
-                $value_3 =& $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat']->map($value['text'], $context->withNewContext('text'));
+                $value_3 =& $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\Php74MockTextWithFormat']->map($value['text'], $context->withNewContext('text'));
             }
             $result->settext($value_3);
         }
@@ -64,6 +64,6 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
     }
     public function injectMappers(\Jane\AutoMapper\AutoMapperInterface $autoMapper)
     {
-        $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat'] = $autoMapper->getMapper('array', 'MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat');
+        $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\Php74MockTextWithFormat'] = $autoMapper->getMapper('array', 'MakinaCorpus\\Normalizer\\Benchmarks\\Php74MockTextWithFormat');
     }
 }

@@ -1,6 +1,6 @@
 {
     "bootstrap": "vendor/autoload.php",
-    "path": "benchmarks/DenormalizationPhp74",
+    "path": "benchmarks/Denormalization",
     "reports": {
         "bench": {
             "extends": "aggregate",

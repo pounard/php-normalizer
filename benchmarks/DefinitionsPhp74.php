@@ -106,7 +106,7 @@ final class Php74ObjectGenerator
             $object->text = new Php74MockTextWithFormat($faker->text, 'application/text+html');
         }, null, Php74MockWithText::class);
 
-        $ret = new MockArticle();
+        $ret = new Php74MockArticle();
         \call_user_func($hydrator1, $ret);
         \call_user_func($hydrator2, $ret);
         \call_user_func($hydrator3, $ret);
@@ -203,7 +203,7 @@ class Php74MockTextWithFormat
     public function __construct(?string $text = null, ?string $format = null)
     {
         $this->text = $text;
-        $this->format = $format;
+        $this->format = $format ?? 'html';
     }
 }
 
@@ -234,16 +234,29 @@ class Php74MockWithTitle
  */
 class Php74MockWithText extends Php74MockWithTitle
 {
-    /** @var ?MockTextWithFormat */
-    private ?MockTextWithFormat $text;
+    /** @var null|Php74MockTextWithFormat */
+    private ?Php74MockTextWithFormat $text;
 
-    /** @return null|MockTextWithFormat */
-    public function getMarkup()/*: ?MockTextWithFormat */
+    /** @return null|Php74MockTextWithFormat */
+    public function getMarkup(): ?Php74MockTextWithFormat
     {
         return $this->text;
     }
 
-    public function setText(/* ?MockTextWithFormat */ $value): void
+    /**
+     * Fun thing, without the type hint here, because symfony/serializer
+     * attempt to normalize based upon setter injection instead of property
+     * injection, this cannot work and will raise exception.
+     *
+     * This is silent in the benchmarks targetting previous PHP versions
+     * because PHP wasn't raising TypeError exceptions, but now we see them:
+     * Symfony's serializer is very fragile and silently give invalid data.
+     *
+     * As soon as we properly typed setters, Syfmony's normalizer had a more
+     * than 2x performance penalty. It is extremely slow, with or without
+     * metadata cache.
+     */
+    public function setText(?Php74MockTextWithFormat $value): void
     {
         $this->text = $value;
     }
