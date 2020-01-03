@@ -16,12 +16,29 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
  */
 final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 {
+    /** @var bool */
     private $propertiesAreTyped = false;
+
+    /** @var ?PropertyTypeExtractorInterface */
     private $typeInfoExtractor;
+
+    /** @var bool */
     private $typeInfoExtractorLoaded = false;
 
     /**
-     * Attempt to create a type info extractor if Symfony component is enabled
+     * Default constructor.
+     */
+    public function __construct()
+    {
+        $this->propertiesAreTyped = (\version_compare(PHP_VERSION, '7.4.0') >= 0);
+    }
+
+    /**
+     * Attempt to create a type info extractor if Symfony component is present.
+     *
+     * This can return null if the dependency was not installed, hence the
+     * self::$typeInfoExtractorLoaded boolean to avoid redundant class and
+     * interface existence checks.
      */
     public static function createDefaultTypeInfoExtractor(): ?PropertyTypeExtractorInterface
     {
@@ -41,11 +58,19 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
-     * Default constructor.
+     * Is type supported by this normalizer API.
      */
-    public function __construct()
+    public static function isTypeSupported(string $type): bool
     {
-        $this->propertiesAreTyped = (\version_compare(PHP_VERSION, '7.4.0') >= 0);
+        return 'resource' !== $type && 'callable' !== $type && (\interface_exists($type) || \class_exists($type));
+    }
+
+    /**
+     * @internal For unit testing purpose only.
+     */
+    public function disablePropertyTypeReflection(): void
+    {
+        $this->propertiesAreTyped = false;
     }
 
     /**
@@ -71,21 +96,23 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     }
 
     /**
-     * Attempt using only reflection (no property-info).
+     * Find property type using PHP 7.4+ reflection and property type.
      */
     private function findPropertyWithReflection(string $class, \ReflectionProperty $property): ?array
     {
-        // Attempt using typed properties, thus avoiding to use the property-info
-        // component, which is really slow.
-        if (!$property->hasType()) {
+        if (!$this->propertiesAreTyped || !$property->hasType()) {
             return null;
         }
 
         $refType = $property->getType();
         $typeName = $refType->getName();
 
-        // If it's not builtin, it's a class, and that's great for us.
+        if (!self::isTypeSupported($typeName)) {
+            return null;
+        }
+
         if (!$refType->isBuiltIn()) {
+            // If it's not built-in, it's a class or interface.
             return [
                 'collection' => false,
                 'optional' => $refType->allowsNull(),
@@ -93,33 +120,51 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
             ];
         }
 
-        switch ($typeName) {
+        if ('array' === $typeName || 'iterable' === $typeName) {
+            // We cannot have the real value type, just let this pass and
+            // proceed with other property reflections, such as doc block
+            // or property info component.
+            return null;
+        }
 
-            case 'array':
-            case 'iterable':
-                // We cannot have the real value type, just let this pass and
-                // proceed with property info.
-                return null;
+        // All other types, we already ignored 'callable' and 'resource'
+        // types upper, so everything remaining here are scalar types.
+        return [
+            'collection' => false,
+            'optional' => $refType->allowsNull(),
+            'type' => $typeName,
+        ];
+    }
 
-            case 'callable':
-            case 'object':
-            case 'resource':
-                // All those types are not and will not be supported
-                // by this hydrator, so just let it return a 'null'
-                // type, which will disable all validations.
+    /**
+     * Find property type using symfony/property-info.
+     */
+    private function findPropertyWithPropertyInfo(string $class, \ReflectionProperty $property): ?array
+    {
+        if (!$typeInfoExtractor = $this->getTypeInfoExtractor()) {
+            return null;
+        }
+        if (!$types = $typeInfoExtractor->getTypes($class, $property->getName())) {
+            return null;
+        }
+
+        /** @var \Symfony\Component\PropertyInfo\Type $type */
+        foreach ($types as $type) {
+            if ($type->isCollection()) {
+                $valueType = $type->getCollectionValueType();
                 return [
-                    'collection' => false,
-                    'optional' => true,
-                    'type' => 'null', // Ignore this type.
+                    'collection' => true,
+                    'collection_type' => $type->getClassName() ?? $type->getBuiltinType(),
+                    'optional' => $type->isNullable(),
+                    'type' => $valueType->getClassName() ?? $valueType->getBuiltinType(),
                 ];
-
-            default:
-                // OK this is all the internal types we support (scalars pretty much).
-                return [
-                    'collection' => false,
-                    'optional' => $refType->allowsNull(),
-                    'type' => $typeName,
-                ];
+            }
+            return [
+                'collection' => false,
+                'collection_type' => $type->getBuiltinType(),
+                'optional' => $type->isNullable(),
+                'type' => $type->getClassName() ?? $type->getBuiltinType(),
+            ];
         }
     }
 
@@ -133,45 +178,22 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      * For this, we don't have many other choice than using the
      * symfony/property-info component, that does the job pretty well.
      */
-    private function findPropertyDefinition(string $class, \ReflectionProperty $property): array
+    private function findPropertyDefinition(string $class, \ReflectionProperty $property): ?array
     {
-        if ($this->propertiesAreTyped) {
-            if ($ret = $this->findPropertyWithReflection($class, $property)) {
-                return $ret;
-            }
+        if ($ret = $this->findPropertyWithReflection($class, $property)) {
+            return $ret;
+        }
+        // @todo write here a custom docblock parser for speed.
+        if ($ret = $this->findPropertyWithPropertyInfo($class, $property)) {
+            return $ret;
         }
 
-        $typeInfoExtractor = $this->getTypeInfoExtractor();
-
-        if ($typeInfoExtractor) {
-            $types = $typeInfoExtractor->getTypes($class, $property->getName());
-
-            if ($types) {
-                /** @var \Symfony\Component\PropertyInfo\Type $type */
-                foreach ($types as $type) {
-                    if ($type->isCollection()) {
-                        $valueType = $type->getCollectionValueType();
-                        return [
-                            'collection' => true,
-                            'collection_type' => $type->getClassName() ?? $type->getBuiltinType(),
-                            'optional' => $type->isNullable(),
-                            'type' => $valueType->getClassName() ?? $valueType->getBuiltinType(),
-                        ];
-                    }
-                    return [
-                        'collection' => false,
-                        'collection_type' => $type->getBuiltinType(),
-                        'optional' => $type->isNullable(),
-                        'type' => $type->getClassName() ?? $type->getBuiltinType(),
-                    ];
-                }
-            }
-        }
-
+        // Default is to propagate a 'null' type, which means allow anything
+        // hydration without type validation or normalization.
         return [
             'collection' => false,
             'optional' => true,
-            'type' => null,
+            'type' => 'null',
         ];
     }
 
@@ -183,6 +205,7 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
         if (null === $class) {
             return [];
         }
+        // Recursive algorithm that lookup into the whole class hierarchy.
         return \array_values(\array_merge(
             $this->findAllProperties($class->getParentClass() ?: null),
             \array_values(\array_filter(
@@ -204,10 +227,12 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
 
         /** @var \ReflectionProperty $propDef */
         foreach ($this->findAllProperties($ref) as $propDef) {
-            $def = $this->findPropertyDefinition($class, $propDef);
-            $def['declared_scope'] = $propDef->isProtected() ? 'protected' : ($propDef->isPrivate() ? 'private' : 'public');
-            $def['declaring_class'] = $propDef->getDeclaringClass()->name;
-            $data['properties'][$propDef->getName()] = $def;
+            // Properties can be ignored (eg. 'resource' or 'callable').
+            if ($def = $this->findPropertyDefinition($class, $propDef)) {
+                $def['declared_scope'] = $propDef->isProtected() ? 'protected' : ($propDef->isPrivate() ? 'private' : 'public');
+                $def['declaring_class'] = $propDef->getDeclaringClass()->name;
+                $data['properties'][$propDef->getName()] = $def;
+            }
         }
 
         return DefaultTypeDefinition::fromArray($class, $data);
@@ -238,6 +263,9 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
                 return DefaultTypeDefinition::simple($name);
         }
 
+        if (\interface_exists($name)) {
+            throw new RuntimeError(\sprintf("'%s': interfaces cannot be (de)normalized", $name));
+        }
         if (!\class_exists($name)) {
             throw new ClassDoesNotExistError($name);
         }

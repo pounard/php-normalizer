@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
-use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Normalization runtime helper.
@@ -22,6 +22,7 @@ final class Helper
      *
      * @return string
      *   PHP native type name, or FQDN if input is an object.
+     *   It may return 'array' as well.
      */
     public static function getType($value): string
     {
@@ -34,6 +35,10 @@ final class Helper
         }
         if ('double' === $type) {
             return 'float';
+        }
+        // https://www.php.net/manual/en/function.gettype.php - as of PHP 7.2.0.
+        if ('resource (closed)' === $type) {
+            return 'resource';
         }
         return $type;
     }
