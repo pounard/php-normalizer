@@ -60,26 +60,6 @@ final class Helper
     }
 
     /**
-     * Handle error.
-     *
-     * @param string $message
-     *   Error message.
-     * @param ?Context $context
-     *   Context if available.
-     *
-     * @throws \InvalidArgumentException
-     *   If there's not context provided.
-     */
-    public static function error(string $message, ?Context $context = null): void
-    {
-        if ($context) {
-            $context->addError($message);
-        } else {
-            throw new RuntimeError($message);
-        }
-    }
-
-    /**
      * Find a specific value in given array.
      *
      * @param mixed[] $input
@@ -263,36 +243,5 @@ final class Helper
                 return ValueOption::ok($input->__toString());
         }
         return ValueOption::miss();
-    }
-}
-
-/**
- * Option type for Helper::find() return.
- */
-final class ValueOption
-{
-    /** @var bool */
-    public $success = false;
-
-    /** @var mixed */
-    public $value;
-
-    /**
-     * Found a value.
-     */
-    public static function ok($value): self
-    {
-        $ret = new self;
-        $ret->value = $value;
-        $ret->success = true;
-        return $ret;
-    }
-
-    /**
-     * Could not find value.
-     */
-    public static function miss(): self
-    {
-        return new self;
     }
 }

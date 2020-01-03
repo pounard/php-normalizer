@@ -26,7 +26,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
     {
         foreach ($plugins as $index => $plugin) {
             if (!$plugin instanceof GeneratorPlugin) {
-                throw new \LogicException(\sprintf(
+                throw new ServiceConfigurationError(\sprintf(
                     "Expected an implementation of '%s' got '%s' at index %s",
                     GeneratorPlugin::class, Helper::getType($plugin), $index
                 ));
