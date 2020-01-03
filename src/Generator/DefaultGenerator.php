@@ -222,6 +222,8 @@ EOT
         $input = "\$option->value";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
+        $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
+
         if ($property->isOptional()) {
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
@@ -243,7 +245,7 @@ EOT
         // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (!\$option->success || null === {$input}) {
-            \$context->addError(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            \$context->nullValueError('{$escapedNativeType}');
         } else {
             {$output} = {$denormalizeCall};
         }
@@ -268,10 +270,10 @@ EOT
 
         $output = "\$instance->{$propName}";
         $input = "\$input['{$inputKey}']";
-
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
-//@todo: si un seul candidate name, directement accéder à la valeur dans le tableau
+        $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
+
         if ($property->isOptional()) {
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
@@ -285,7 +287,7 @@ EOT
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         if (!isset($input)) {
-            \$context->addError(\sprintf("'%s' cannot be null", '{$propName}'), \$context);
+            \$context->nullValueError('{$escapedNativeType}');
         } else {
             {$output} = {$denormalizeCall};
         }
@@ -307,6 +309,8 @@ EOT
         $arrayInput = "\$option->value";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
+        $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
+
         $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
@@ -318,7 +322,7 @@ EOT
                 {$output} = [];
                 foreach ({$arrayInput} as \$index => {$input}) {
                     if (null === {$input}) {
-                        \$context->addError("Property value in collection cannot be null");
+                        \$context->nullValueError('{$escapedNativeType}');
                         {$output}[\$index] = null;
                     } else {
                         {$output}[\$index] = {$denormalizeCall};
@@ -347,8 +351,9 @@ EOT
         $output = "\$instance->{$propName}";
         $input = "\$value";
         $arrayInput = "\$input['{$inputKey}']";
-
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+
+        $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
@@ -360,7 +365,7 @@ EOT
                 {$output} = [];
                 foreach ({$arrayInput} as \$index => {$input}) {
                     if (null === {$input}) {
-                        \$context->addError("Property value in collection cannot be null");
+                        \$context->nullValueError('{$escapedNativeType}');
                         {$output}[\$index] = null;
                     } else {
                         {$output}[\$index] = {$denormalizeCall};

@@ -44,22 +44,6 @@ final class Helper
     }
 
     /**
-     * Format type mismatch error.
-     *
-     * @param string $expected
-     *   Expected native PHP type name or FQDN.
-     * @param mixed $input
-     *   Any value.
-     *
-     * @return string
-     *   Formatted comprehensive error message.
-     */
-    public static function typeMismatchError(string $expected, $input): string
-    {
-        return \sprintf("Type mismatch, expected '%s', got '%s'", $expected, self::getType($input));
-    }
-
-    /**
      * Find a specific value in given array.
      *
      * @param mixed[] $input
@@ -67,8 +51,6 @@ final class Helper
      * @param string[] $candidates
      *   Allowed names for the value, first one will be returned, error will be
      *   raised in case more than one matches the candidates.
-     * @param ?Context $context
-     *   Context if available.
      */
     public static function find(array $input, array $candidates, Context $context): ValueOption
     {
@@ -78,7 +60,7 @@ final class Helper
         foreach ($candidates as $name) {
             if (\array_key_exists($name, $input)) {
                 if ($found) {
-                    $context->addError(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name), $context);
+                    $context->addError(\sprintf("Duplicate value found: '%s' was already found in '%s'", $found, $name));
                 } else if ($verbose) {
                     $found = $name;
                     $value = $input[$name];
@@ -96,8 +78,6 @@ final class Helper
      *
      * @param mixed $input
      *   Arbitrary input value
-     * @param ?Context $context
-     *   Context if available
      */
     public static function toString($input, Context $context): ?string
     {
@@ -106,7 +86,7 @@ final class Helper
         } else if (\is_object($input) && \method_exists($input, '__toString')) {
             return $input->__toString();
         }
-        $context->addError(self::typeMismatchError('string', $input), $context);
+        $context->typeMismatchError('string', self::getType($input));
         return null;
     }
 
@@ -115,8 +95,6 @@ final class Helper
      *
      * @param mixed $input
      *   Arbitrary input value
-     * @param ?Context $context
-     *   Context if available
      */
     public static function toBool($input, Context $context): ?bool
     {
@@ -129,7 +107,7 @@ final class Helper
         if (\is_string($input) && \ctype_digit($input)) {
             return (bool)(int)$input;
         }
-        $context->addError(self::typeMismatchError('bool', $input), $context);
+        $context->typeMismatchError('bool', self::getType($input));
         return null;
     }
 
@@ -138,10 +116,8 @@ final class Helper
      *
      * @param mixed $input
      *   Arbitrary input value
-     * @param ?Context $context
-     *   Context if available
      */
-    public static function toInt($input, ?Context $context = null): ?int
+    public static function toInt($input, Context $context): ?int
     {
         if (\is_int($input)) {
             return $input;
@@ -153,7 +129,7 @@ final class Helper
         if (\is_float($input) && $input == ($cast = (int)$input)) {
             return $cast;
         }
-        $context->addError(self::typeMismatchError('int', $input), $context);
+        $context->typeMismatchError('int', self::getType($input));
         return null;
     }
 
@@ -162,10 +138,8 @@ final class Helper
      *
      * @param mixed $input
      *   Arbitrary input value
-     * @param ?Context $context
-     *   Context if available
      */
-    public static function toFloat($input, ?Context $context = null): ?float
+    public static function toFloat($input, Context $context): ?float
     {
         if (\is_float($input)) {
             return $input;
@@ -181,7 +155,7 @@ final class Helper
                 return (float)$input;
             }
         }
-        $context->addError(self::typeMismatchError('float', $input), $context);
+        $context->typeMismatchError('float', self::getType($input));
         return null;
     }
 

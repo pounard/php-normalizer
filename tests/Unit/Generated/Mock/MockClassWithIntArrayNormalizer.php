@@ -94,10 +94,10 @@ MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
                 $instance->intArray = [];
                 foreach ($input['intArray'] as $index => $value) {
                     if (null === $value) {
-                        $context->addError("Property value in collection cannot be null");
+                        $context->nullValueError('int');
                         $instance->intArray[$index] = null;
                     } else {
-                        $instance->intArray[$index] = Helper::toInt($value);
+                        $instance->intArray[$index] = \MakinaCorpus\Normalizer\Helper::toInt($value, $context);
                     }
                 }
             }

@@ -5,201 +5,6 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer;
 
 /**
- * Front access point for the API
- */
-final class ContextFactory
-{
-    /** @var TypeDefinitionMap */
-    private $typeMap;
-
-    /**
-     * Default constructor
-     */
-    public function __construct(TypeDefinitionMap $typeMap)
-    {
-        $this->typeMap = $typeMap;
-    }
-
-    /**
-     * Create context instance
-     */
-    public function createContext(array $options = [], bool $symfonyCompatibility = false): Context
-    {
-        return new Context($this->typeMap, $options, $symfonyCompatibility);
-    }
-}
-
-/**
- * (de)normalization validation result
- */
-interface ValidationResult
-{
-    /**
-     * @return bool
-     */
-    public function isValid(): bool;
-
-    /**
-     * @return string[][]
-     *   Keys are property path, values are error messages
-     */
-    public function getErrors(): array;
-
-    /**
-     * @return string[][]
-     *   Keys are property path, values are error messages
-     */
-    public function getWarnings(): array;
-}
-
-/**
- * (de)normalization validation result builder
- */
-interface ValidationResultBuilder
-{
-    /**
-     * Add error
-     */
-    public function addError(string $message): void;
-
-    /**
-     * Add warning
-     */
-    public function addWarning(string $message): void;
-
-    /**
-     * Get current depth
-     */
-    public function getDepth(): int;
-
-    /**
-     * Get current path
-     */
-    public function getPath(): string;
-
-    /**
-     * Enter property in current context
-     */
-    public function enter(string $propName): void;
-
-    /**
-     * Leave current context
-     *
-     * @throws \LogicException
-     *   A fatal error when trying to leave the first level
-     */
-    public function leave(): void;
-}
-
-/**
- * Default implementation for ValidationResultBuilder
- */
-final class DefaultValidationResultBuilder implements ValidationResultBuilder, ValidationResult
-{
-    const PATH_SEP = '.';
-    const UNKNOW_PROP_NAME = 'unknown';
-
-    /** @var int */
-    private $depth = 0;
-
-    /** @var string[] */
-    private $currentContext = [];
-
-    /** @var string[][] */
-    private $errors = [];
-
-    /** @var string[][] */
-    private $warnings = [];
-
-    /** @var string */
-    private $currentPath;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDepth(): int
-    {
-        return $this->depth;
-    }
-
-    /**
-     * Get current path
-     */
-    public function getPath(): string
-    {
-        if (!$this->currentPath && $this->currentContext) {
-            return $this->currentPath = \implode(self::PATH_SEP, $this->currentContext);
-        }
-        return $this->currentPath ?? '(none)';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enter(?string $propName = null): void
-    {
-        $this->currentContext[] = $propName ?? self::UNKNOW_PROP_NAME;
-        $this->currentPath = null;
-        $this->depth++;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function leave(): void
-    {
-        if (0 === $this->depth) {
-            throw new \LogicException("Cannot leave when depth is already 0");
-        }
-
-        \array_pop($this->currentContext);
-
-        $this->currentPath = null;
-        $this->depth--;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addError(string $message): void
-    {
-        $this->errors[$this->getPath()][] = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addWarning(string $message): void
-    {
-        $this->warnings[$this->getPath()][] = $message;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isValid(): bool
-    {
-        return !$this->errors;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWarnings(): array
-    {
-        return $this->warnings;
-    }
-}
-
-/**
  * (De)normalization and (de)serialization context.
  *
  * It carries configuration, classes and types definitions and it handles
@@ -351,15 +156,6 @@ final class Context implements ValidationResultBuilder
     }
 
     /**
-     * When in strict mode, missing non nullable properties will raise
-     * errors upon (de)normalization.
-     */
-    public function isStrict(): bool
-    {
-        return $this->strict;
-    }
-
-    /**
      * Verbose mode means that we try to analyse everything at the cost
      * of performances when normalizing or denormalizing, it also means
      * that we give much more meaningful errors to end user.
@@ -394,11 +190,59 @@ final class Context implements ValidationResultBuilder
     }
 
     /**
+     * Property can not be null
+     */
+    public function nullValueError(string $expected): void
+    {
+        $expected = $this->getNativeType($expected);
+        if ($path = $this->getPath()) {
+            $message = \sprintf("'%s' property cannot be null, expected '%s'", $path, $expected);
+        } else {
+            $message = \sprintf("property cannot be null, expected '%s'", $expected);
+        }
+        if (!$this->verbose) {
+            throw new NullValueTypeError($message);
+        }
+        $this->addError($message, true); // Do not raise exception.
+    }
+
+    /**
+     * Unexpected type error
+     */
+    public function typeMismatchError(string $expected, string $real)
+    {
+        $expected = $this->getNativeType($expected);
+        $real = $this->getNativeType($real);
+        if ($path = $this->getPath()) {
+            $message = \sprintf("'%s': type mismatch, expected '%s' got '%s'", $path, $expected, $real);
+        } else {
+            $message = \sprintf("type mismatch: expected '%s' got '%s'", $expected, $real);
+        }
+        if (!$this->verbose) {
+            throw new NullValueTypeError($message);
+        }
+        $this->addError($message, false); // This is NOT recoverable.
+    }
+
+    /**
+     * Property can not be null
+     */
+    public function classDoesNotExistError(string $className): void
+    {
+        if ($path = $this->getPath()) {
+            $message = \sprintf("'%s': '%s' class does not exist", $path, $className);
+        } else {
+            $message = \sprintf("'%s' class does not exist", $className);
+        }
+        $this->addError($message, false); // This is NOT recoverable.
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function addError(string $message): void
+    public function addError(string $message, bool $recoverable = false): void
     {
-        if (!$this->verbose) {
+        if (!$this->verbose && !$recoverable) {
             throw new RuntimeError(\sprintf("%s: %s", $this->validationResult->getPath(), $message));
         }
         $this->validationResult->addError($message);
@@ -415,9 +259,9 @@ final class Context implements ValidationResultBuilder
     /**
      * Get current path
      */
-    public function getPath(): string
+    public function getPath(): ?string
     {
-        $this->validationResult->getPath();
+        return $this->validationResult->getPath();
     }
 
     /**
@@ -442,5 +286,30 @@ final class Context implements ValidationResultBuilder
     public function enter(?string $propName = null): void
     {
         $this->validationResult->enter($propName);
+    }
+}
+
+/**
+ * Front access point for the API
+ */
+final class ContextFactory
+{
+    /** @var TypeDefinitionMap */
+    private $typeMap;
+
+    /**
+     * Default constructor
+     */
+    public function __construct(TypeDefinitionMap $typeMap)
+    {
+        $this->typeMap = $typeMap;
+    }
+
+    /**
+     * Create context instance
+     */
+    public function createContext(array $options = [], bool $symfonyCompatibility = false): Context
+    {
+        return new Context($this->typeMap, $options, $symfonyCompatibility);
     }
 }

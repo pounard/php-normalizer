@@ -27,7 +27,8 @@
             "src/Normalizer/CustomDenormalizer.php",
             "src/Normalizer/CustomNormalizer.php",
             "src/Options.php",
-            "src/TypeDefinition.php"
+            "src/TypeDefinition.php",
+            "src/Validation.php"
         ],
         "psr-4": {
             "MakinaCorpus\\Normalizer\\": "src/",

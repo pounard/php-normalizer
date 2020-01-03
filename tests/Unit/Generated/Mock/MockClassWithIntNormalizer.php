@@ -78,9 +78,9 @@ MockClassWithIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'int' required property
         if (!isset($input['int'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'int'), $context);
+            $context->nullValueError('int');
         } else {
-            $instance->int = Helper::toInt($input['int']);
+            $instance->int = \MakinaCorpus\Normalizer\Helper::toInt($input['int'], $context);
         }
     },
     null, MockClassWithInt::class

@@ -78,7 +78,7 @@ MockClassWithObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'object' required property
         if (!isset($input['object'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'object'), $context);
+            $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
         } else {
             $instance->object = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer);
         }

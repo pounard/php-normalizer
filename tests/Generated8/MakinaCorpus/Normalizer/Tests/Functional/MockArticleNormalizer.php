@@ -108,21 +108,21 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'id' required property
         if (!isset($input['id'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'id'), $context);
+            $context->nullValueError('Ramsey\\Uuid\\UuidInterface');
         } else {
             $instance->id = \Ramsey\Uuid\Uuid::fromString($input['id']);
         }
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+            $context->nullValueError('DateTimeInterface');
         } else {
             $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
         }
 
         // Denormalize 'updatedAt' required property
         if (!isset($input['updatedAt'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'updatedAt'), $context);
+            $context->nullValueError('DateTimeInterface');
         } else {
             $instance->updatedAt = $denormalizer ? $denormalizer(\DateTimeInterface::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'];
         }
@@ -136,10 +136,10 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
                 $instance->authors = [];
                 foreach ($input['authors'] as $index => $value) {
                     if (null === $value) {
-                        $context->addError("Property value in collection cannot be null");
+                        $context->nullValueError('string');
                         $instance->authors[$index] = null;
                     } else {
-                        $instance->authors[$index] = Helper::toString($value);
+                        $instance->authors[$index] = \MakinaCorpus\Normalizer\Helper::toString($value, $context);
                     }
                 }
             }
@@ -170,7 +170,7 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
     static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'title' nullable property
-        $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
+        $instance->title = isset($input['title']) ? \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context) : null;
 
         // Denormalize 'text' nullable property
         $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Tests\Functional\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;

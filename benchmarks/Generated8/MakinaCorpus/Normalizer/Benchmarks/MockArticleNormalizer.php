@@ -95,7 +95,7 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
 MockArticleNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'title' nullable property
-        $instance->title = isset($input['title']) ? Helper::toString($input['title']) : null;
+        $instance->title = isset($input['title']) ? \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context) : null;
     },
     null, MockWithTitle::class
 );
@@ -175,7 +175,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'createdAt'), $context);
+            $context->nullValueError('DateTimeImmutable');
         } else {
             $instance->createdAt = $denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt'];
         }
@@ -192,37 +192,37 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
                 $instance->authors = [];
                 foreach ($input['authors'] as $index => $value) {
                     if (null === $value) {
-                        $context->addError("Property value in collection cannot be null");
+                        $context->nullValueError('string');
                         $instance->authors[$index] = null;
                     } else {
-                        $instance->authors[$index] = Helper::toString($value);
+                        $instance->authors[$index] = \MakinaCorpus\Normalizer\Helper::toString($value, $context);
                     }
                 }
             }
         }
 
         // Denormalize 'foo' nullable property
-        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo']) : null;
+        $instance->foo = isset($input['foo']) ? \MakinaCorpus\Normalizer\Helper::toString($input['foo'], $context) : null;
 
         // Denormalize 'bar' required property
         if (!isset($input['bar'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'bar'), $context);
+            $context->nullValueError('int');
         } else {
-            $instance->bar = Helper::toInt($input['bar']);
+            $instance->bar = \MakinaCorpus\Normalizer\Helper::toInt($input['bar'], $context);
         }
 
         // Denormalize 'baz' required property
         if (!isset($input['baz'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'baz'), $context);
+            $context->nullValueError('float');
         } else {
-            $instance->baz = Helper::toFloat($input['baz']);
+            $instance->baz = \MakinaCorpus\Normalizer\Helper::toFloat($input['baz'], $context);
         }
 
         // Denormalize 'filename' required property
         if (!isset($input['filename'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'filename'), $context);
+            $context->nullValueError('string');
         } else {
-            $instance->filename = Helper::toString($input['filename']);
+            $instance->filename = \MakinaCorpus\Normalizer\Helper::toString($input['filename'], $context);
         }
     },
     null, MockArticle::class

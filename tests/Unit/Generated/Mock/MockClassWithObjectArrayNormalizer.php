@@ -94,7 +94,7 @@ MockClassWithObjectArrayNormalizer::$denormalizer0 = \Closure::bind(
                 $instance->objectArray = [];
                 foreach ($input['objectArray'] as $index => $value) {
                     if (null === $value) {
-                        $context->addError("Property value in collection cannot be null");
+                        $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
                         $instance->objectArray[$index] = null;
                     } else {
                         $instance->objectArray[$index] = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($value, $context, $denormalizer);

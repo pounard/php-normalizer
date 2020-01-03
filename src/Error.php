@@ -82,9 +82,18 @@ class TypeMismatchError
     }
 }
 
-final class InvalidValueTypeError
+class InvalidValueTypeError
     extends TypeMismatchError
 {
+}
+
+final class NullValueTypeError
+    extends InvalidValueTypeError
+{
+    public function __construct($message = null, $code = 0, $previous = null)
+    {
+        RuntimeError::__construct($message, (int)$code, $previous);
+    }
 }
 
 class TypeDoesNotExistError

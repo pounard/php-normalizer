@@ -89,16 +89,16 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
 
         // Denormalize 'productId' required property
         if (!isset($input['productId'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'productId'), $context);
+            $context->nullValueError('int');
         } else {
-            $instance->productId = Helper::toInt($input['productId']);
+            $instance->productId = \MakinaCorpus\Normalizer\Helper::toInt($input['productId'], $context);
         }
 
         // Denormalize 'amount' required property
         if (!isset($input['amount'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'amount'), $context);
+            $context->nullValueError('float');
         } else {
-            $instance->amount = Helper::toFloat($input['amount']);
+            $instance->amount = \MakinaCorpus\Normalizer\Helper::toFloat($input['amount'], $context);
         }
     },
     null, AddToCartMessage::class

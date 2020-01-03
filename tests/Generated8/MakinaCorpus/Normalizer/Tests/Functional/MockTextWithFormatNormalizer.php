@@ -84,16 +84,16 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
         // Denormalize 'text' required property
         $option = Helper::find($input, ['text', 'value'], $context);
         if (!$option->success || null === $option->value) {
-            $context->addError(\sprintf("'%s' cannot be null", 'text'), $context);
+            $context->nullValueError('string');
         } else {
-            $instance->text = Helper::toString($option->value);
+            $instance->text = \MakinaCorpus\Normalizer\Helper::toString($option->value, $context);
         }
 
         // Denormalize 'format' required property
         if (!isset($input['format'])) {
-            $context->addError(\sprintf("'%s' cannot be null", 'format'), $context);
+            $context->nullValueError('string');
         } else {
-            $instance->format = Helper::toString($input['format']);
+            $instance->format = \MakinaCorpus\Normalizer\Helper::toString($input['format'], $context);
         }
     },
     null, MockTextWithFormat::class

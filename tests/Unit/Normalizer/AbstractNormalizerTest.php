@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Normalizer;
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\InvalidValueTypeError;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\RuntimeError;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
@@ -88,7 +89,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testIntAsFloatDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(InvalidValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithInt::class, ['int' => 12.76], $context);
     }
@@ -98,7 +99,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testInvalidIntAsStringDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(InvalidValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithInt::class, ['int' => 'this is not an int'], $context);
     }
@@ -161,7 +162,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testInvalidFloatAsStringDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(InvalidValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithFloat::class, ['float' => 'wrong!'], $context);
     }
@@ -208,7 +209,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testNonToStringObjectDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(InvalidValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithString::class, ['string' => new \DateTime()], $context);
     }

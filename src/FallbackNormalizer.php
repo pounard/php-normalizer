@@ -34,7 +34,7 @@ final class FallbackNormalizer
     private static function createInstance(string $type, Context $context)
     {
         if (!\class_exists($type)) {
-            $context->addError(\sprintf("Class '%s' does not exist", $type));
+            $context->classDoesNotExistError($type);
             return null;
         }
         return (new \ReflectionClass($type))->newInstanceWithoutConstructor();
@@ -74,29 +74,21 @@ final class FallbackNormalizer
      */
     private static function propertyValidate($value, PropertyDefinition $property, Context $context)
     {
+        $propType = $property->getTypeName();
+
         if (null === $value) {
             if (!$property->isOptional()) {
-                $context->addError("Property cannot be null");
+                $context->nullValueError($propType);
             }
+            return $value; // Shortcut.
+        }
+
+        if ('null' === ($expected = $context->getNativeType($propType))) { // Shortcut.
             return $value;
         }
 
-        $type = Helper::getType($value);
-        $expected = $context->getNativeType($property->getTypeName());
-
-        if ('null' === $expected) { // Shortcut.
-            return $value;
-        }
-
-        $isValid = false;
-        if (\class_exists($expected) || \interface_exists($expected)) {
-            $isValid = ($value instanceof $expected);
-        } else {
-            $isValid = ($type === $expected);
-        }
-
-        if (!$isValid) {
-            $context->addError(Helper::typeMismatchError($expected, $value));
+        if (($type = Helper::getType($value)) !== $expected) {
+            $context->typeMismatchError($expected, $type);
         }
 
         return $value;
@@ -114,7 +106,7 @@ final class FallbackNormalizer
         if (\is_iterable($values)) {
             foreach ($values as $index => $value) {
                 if (null === $value) {
-                    $context->addError(\sprintf("Value in collection cannot be null at index '%s'", $index));
+                    $context->nullValueError($type);
                     // Let it pass if partial allowed.
                     $ret[$index] = null;
                 } else {
@@ -152,10 +144,9 @@ final class FallbackNormalizer
 
             if (null === $value) {
                 if (!$property->isOptional()) {
-                    $context->addError(\sprintf("Property cannot be null"));
+                    $context->nullValueError($property->getTypeName());
                 }
-                // Fallback to null in case partial is allowed.
-                return null;
+                return null; // Fallback to null in case partial is allowed.
             }
 
             return self::propertyValidate(

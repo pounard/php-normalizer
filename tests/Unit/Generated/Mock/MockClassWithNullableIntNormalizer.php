@@ -77,7 +77,7 @@ MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithNullableIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'nullableInt' nullable property
-        $instance->nullableInt = isset($input['nullableInt']) ? Helper::toInt($input['nullableInt']) : null;
+        $instance->nullableInt = isset($input['nullableInt']) ? \MakinaCorpus\Normalizer\Helper::toInt($input['nullableInt'], $context) : null;
     },
     null, MockClassWithNullableInt::class
 );

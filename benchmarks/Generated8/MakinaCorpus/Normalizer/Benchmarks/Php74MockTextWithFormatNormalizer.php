@@ -82,10 +82,10 @@ Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? Helper::toString($input['text']) : null;
+        $instance->text = isset($input['text']) ? \MakinaCorpus\Normalizer\Helper::toString($input['text'], $context) : null;
 
         // Denormalize 'format' nullable property
-        $instance->format = isset($input['format']) ? Helper::toString($input['format']) : null;
+        $instance->format = isset($input['format']) ? \MakinaCorpus\Normalizer\Helper::toString($input['format'], $context) : null;
     },
     null, Php74MockTextWithFormat::class
 );
