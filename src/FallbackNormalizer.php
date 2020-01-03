@@ -87,7 +87,7 @@ final class FallbackNormalizer
             return $value;
         }
 
-        if (($type = Helper::getType($value)) !== $expected) {
+        if (($type = Helper::getType($value)) !== $expected && !$value instanceof $expected) {
             $context->typeMismatchError($expected, $type);
         }
 
@@ -133,8 +133,9 @@ final class FallbackNormalizer
      */
     private static function denormalizeProperty(array $input, PropertyDefinition $property, Context $context)
     {
+        $propName = $property->getNativeName();
         try {
-            $context->enter($property->getNativeName());
+            $context->enter($propName);
 
             if ($property->isCollection()) {
                 return self::propertyDenormalizeCollection($input, $property, $context);
@@ -156,7 +157,7 @@ final class FallbackNormalizer
                 $property, $context
             );
         } finally {
-            $context->leave($property->getNormalizedName());
+            $context->leave($propName);
         }
     }
 
