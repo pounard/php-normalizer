@@ -12,9 +12,6 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject;
 
-/**
- * Public implementation of (de)normalizer for class MockClassWithNullableObject.
- */
 final class MockClassWithNullableObjectNormalizer
 {
     /** @var callable */
@@ -24,12 +21,10 @@ final class MockClassWithNullableObjectNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject instances.
+     * Normalize \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -41,13 +36,10 @@ final class MockClassWithNullableObjectNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithNullableObject
     {
@@ -76,7 +68,10 @@ MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
 MockClassWithNullableObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'nullableObject' nullable property
-        $instance->nullableObject = isset($input['nullableObject']) ? \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer) : null;
+        $instance->nullableObject = isset($input['nullableObject']) ? ($input['nullableObject'] instanceof \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt
+            ? $input['nullableObject']
+            : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer)
+        ) : null;
     },
     null, MockClassWithNullableObject::class
 );

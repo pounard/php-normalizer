@@ -20,6 +20,6 @@ final class DefaultTypeDefinitionTest extends TestCase
 
     public function testTypeOverride()
     {
-        
+        self::markTestIncomplete();
     }
 }

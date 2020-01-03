@@ -12,9 +12,6 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString;
 
-/**
- * Public implementation of (de)normalizer for class MockClassWithString.
- */
 final class MockClassWithStringNormalizer
 {
     /** @var callable */
@@ -24,12 +21,10 @@ final class MockClassWithStringNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString instances.
+     * Normalize \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -41,13 +36,10 @@ final class MockClassWithStringNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithString
     {

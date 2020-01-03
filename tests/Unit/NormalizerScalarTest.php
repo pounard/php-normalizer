@@ -44,7 +44,7 @@ final class NormalizerScalarTest extends TestCase
         $context = $this->createContext();
         $normalizer = new ScalarNormalizer();
 
-        $this->assertSame($targetValue, $normalizer->normalize($type, $rawValue, $context));
+        self::assertSame($targetValue, $normalizer->normalize($type, $rawValue, $context));
     }
 
     /**
@@ -55,6 +55,6 @@ final class NormalizerScalarTest extends TestCase
         $context = $this->createContext('d/m/Y');
         $normalizer = new ScalarNormalizer();
 
-        $this->assertSame($targetValue, $normalizer->denormalize($type, $rawValue, $context));
+        self::assertSame($targetValue, $normalizer->denormalize($type, $rawValue, $context));
     }
 }

@@ -300,9 +300,9 @@ final class ContextFactory
     /**
      * Default constructor
      */
-    public function __construct(TypeDefinitionMap $typeMap)
+    public function __construct(?TypeDefinitionMap $typeMap = null)
     {
-        $this->typeMap = $typeMap;
+        $this->typeMap = $typeMap ?? new ReflectionTypeDefinitionMap();
     }
 
     /**

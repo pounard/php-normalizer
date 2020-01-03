@@ -9,6 +9,8 @@ namespace MakinaCorpus\Normalizer\Generator;
  */
 final class Writer
 {
+    const INDENT_SIZE = 4;
+
     /** @var resource */
     private $handle;
 
@@ -25,6 +27,18 @@ final class Writer
         if (false === ($this->handle = \fopen($filename, "a+"))) {
             throw new \RuntimeException(\sprintf("'%s': can not open file for writing"));
         }
+    }
+
+    /**
+     * Force indentation of given lines (one tab = 4 spaces).
+     */
+    public function indent(string $input, int $tabs, bool $skipFirstList = false): string
+    {
+        $indentString = \str_repeat(" ", $tabs * self::INDENT_SIZE);
+        if ($skipFirstList) {
+            return \preg_replace('/[\n\r]+/', "$0".$indentString, $input);
+        }
+        return $indentString.\preg_replace('/[\n\r]+/', "$0".$indentString, $input);
     }
 
     /**

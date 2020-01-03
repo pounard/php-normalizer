@@ -7,15 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
+namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 
-/**
- * Public implementation of (de)normalizer for class MockTextWithFormat.
- */
 final class MockTextWithFormatNormalizer
 {
     /** @var callable */
@@ -25,12 +21,10 @@ final class MockTextWithFormatNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Normalize \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -42,13 +36,10 @@ final class MockTextWithFormatNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockTextWithFormat
     {
@@ -67,10 +58,10 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'text' property
-        $ret['value'] = null === $object->text ? null : (string)$object->text;
+        $ret['text'] = (null === $object->text ? null : (string)$object->text);
 
         // Normalize 'format' property
-        $ret['format'] = null === $object->format ? null : (string)$object->format;
+        $ret['format'] = (null === $object->format ? null : (string)$object->format);
     },
     null, MockTextWithFormat::class
 );
@@ -82,20 +73,13 @@ MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'text' nullable property
-        $option = Helper::find($input, ['text', 'value'], $context);
-        if ($option->success) {
-            if (null === $option->value) {
-                $instance->text = null;
-            } else {
-                $instance->text = Helper::toString($option->value);
-            }
-        }
+        $instance->text = isset($input['text']) ? \MakinaCorpus\Normalizer\Helper::toString($input['text'], $context) : null;
 
         // Denormalize 'format' required property
         if (!isset($input['format'])) {
-            Helper::error(\sprintf("'%s' cannot be null", 'format'), $context);
+            $context->nullValueError('string');
         } else {
-            $instance->format = Helper::toString($input['format']);
+            $instance->format = \MakinaCorpus\Normalizer\Helper::toString($input['format'], $context);
         }
     },
     null, MockTextWithFormat::class

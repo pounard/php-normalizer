@@ -7,14 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
+namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage;
 use MakinaCorpus\Normalizer\Context;
 
-/**
- * Public implementation of (de)normalizer for class AddToCartMessage.
- */
 final class AddToCartMessageNormalizer
 {
     /** @var callable */
@@ -24,12 +21,10 @@ final class AddToCartMessageNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage instances.
+     * Normalize \MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -41,13 +36,10 @@ final class AddToCartMessageNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): AddToCartMessage
     {
@@ -84,7 +76,10 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'orderId' nullable property
-        $instance->orderId = isset($input['orderId']) ? \Ramsey\Uuid\Uuid::fromString($input['orderId']) : null;
+        $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof \Ramsey\Uuid\UuidInterface
+            ? $input['orderId']
+            : \Ramsey\Uuid\Uuid::fromString($input['orderId'])
+        ) : null;
 
         // Denormalize 'productId' required property
         if (!isset($input['productId'])) {

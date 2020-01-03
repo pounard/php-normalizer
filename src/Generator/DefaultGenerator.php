@@ -49,8 +49,7 @@ final class DefaultGenerator implements Generator
     ) {
         $this->contextFactory = $contextFactory;
         $this->generatedClassNamespace = $generatedClassNamespace;
-        // @todo inject this properly and give sensible defaults.
-        $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy('Normalizer', 'Generated8');
+        $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy();
         $this->projectSourceDirectory = $projectSourceDirectory;
         $this->generatorPluginChain = $generatorPluginChain ?? new GeneratorPluginChain();
     }
@@ -93,20 +92,22 @@ final class DefaultGenerator implements Generator
         $type = $context->getNativeType($property->getTypeName());
         $normalizeCall = null;
 
-        // Attempt eager related class code generation, if possible.
-        try {
-            // If attempt is done with an interface, it will raise an exception.
-            $isTerminal = $context->getType($type)->isTerminal();
-            if (\class_exists($type) && !$isTerminal) {
-                $normalizerClassName = $this->generateNormalizerClass($type);
-                $normalizeCall = "\\{$normalizerClassName}::normalize({$input}, \$context, \$normalizer)";
-            }
-        } catch (TypeDoesNotExistError $e) {
-            $context->addWarning($e->getMessage());
-        }
-
         if ($this->generatorPluginChain->supports($property, $context)) {
             $normalizeCall = $this->generatorPluginChain->generateNormalizeCode($property, $context, $input);
+        }
+
+        // Attempt eager related class code generation, if possible.
+        if (!$normalizeCall) {
+            try {
+                // If attempt is done with an interface, it will raise an exception.
+                $isTerminal = $context->getType($type)->isTerminal();
+                if (\class_exists($type) && !$isTerminal) {
+                    $normalizerClassName = $this->generateNormalizerClass($type);
+                    $normalizeCall = "\\{$normalizerClassName}::normalize({$input}, \$context, \$normalizer)";
+                }
+            } catch (TypeDoesNotExistError $e) {
+                $context->addWarning($e->getMessage());
+            }
         }
 
         if (!$normalizeCall) {
@@ -182,29 +183,44 @@ EOT
         $type = $context->getNativeType($property->getTypeName());
         $normalizeCall = null;
 
-        // Attempt eager related class code generation, if possible.
-        try {
-            // If attempt is done with an interface, it will raise an exception.
-            $isTerminal = $context->getType($type)->isTerminal();
-            if (\class_exists($type) && !$isTerminal) {
-                $normalizerClassName = $this->generateNormalizerClass($type);
-                $normalizeCall = "\\{$normalizerClassName}::denormalize({$input}, \$context, \$denormalizer)";
-            }
-        } catch (TypeDoesNotExistError $e) {
-            $context->addWarning($e->getMessage());
-        }
-
         if ($this->generatorPluginChain->supports($property, $context)) {
             $normalizeCall = $this->generatorPluginChain->generateDenormalizeCode($property, $context, $input);
         }
 
+        // Attempt eager related class code generation, if possible.
         if (!$normalizeCall) {
-            if (\class_exists($type) || \interface_exists($type)) {
-                $typeString = '\\'.\ltrim($type, '\\').'::class';
-            } else {
+            try {
+                // If attempt is done with an interface, it will raise an exception.
+                $isTerminal = $context->getType($type)->isTerminal();
+                if (\class_exists($type) && !$isTerminal) {
+                    $normalizerClassName = $this->generateNormalizerClass($type);
+                    $normalizeCall = "\\{$normalizerClassName}::denormalize({$input}, \$context, \$denormalizer)";
+                }
+            } catch (TypeDoesNotExistError $e) {
+                $context->addWarning($e->getMessage());
+            }
+        }
+
+        $isBuiltIn = !\class_exists($type) && !\interface_exists($type);
+        $classFqdn = $isBuiltIn ? null : '\\'.\ltrim($type, '\\');
+
+        if (!$normalizeCall) {
+            if (!$isBuiltIn) {
                 $typeString = "'{$type}'";
+            } else {
+                $typeString = $classFqdn.'::class';
             }
             $normalizeCall = "(\$denormalizer ? \$denormalizer({$typeString}, {$input}, \$context, \$denormalizer) : {$input})";
+        }
+
+        // Allow already denormalized objects to pass through.
+        if (!$isBuiltIn) {
+            return <<<EOT
+({$input} instanceof $classFqdn
+    ? {$input}
+    : {$normalizeCall}
+)
+EOT;
         }
 
         return $normalizeCall;
@@ -219,12 +235,13 @@ EOT
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
 
         $output = "\$instance->{$propName}";
-        $input = "\$option->value";
+        $input = "\$value";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         if ($property->isOptional()) {
+            $denormalizeCall = $writer->indent($denormalizeCall, 4, true);
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
@@ -232,6 +249,7 @@ EOT
         // Denormalize '{$propName}' nullable property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (\$option->success) {
+            {$input} = \$option->value;
             if (null === {$input}) {
                 {$output} = null;
             } else {
@@ -241,9 +259,11 @@ EOT
 EOT
             );
         } else {
+            $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
+        {$input} = \$option->value;
         if (!\$option->success || null === {$input}) {
             \$context->nullValueError('{$escapedNativeType}');
         } else {
@@ -275,6 +295,7 @@ EOT
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         if ($property->isOptional()) {
+            $denormalizeCall = $writer->indent($denormalizeCall, 2, true);
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
@@ -284,6 +305,7 @@ EOT
 EOT
             );
         } else {
+            $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
             $writer->write(<<<EOT
         // Denormalize '{$propName}' required property
         if (!isset($input)) {
@@ -306,15 +328,16 @@ EOT
 
         $output = "\$instance->{$propName}";
         $input = "\$value";
-        $arrayInput = "\$option->value";
+        $arrayInput = "\$values";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+        $denormalizeCall = $writer->indent($denormalizeCall, 6, true);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (\$option->success && {$arrayInput}) {
+        if (\$option->success && ({$arrayInput} = \$option->value)) {
             if (!\is_iterable({$arrayInput})) {
                 {$arrayInput} = (array){$arrayInput};
             }
@@ -352,6 +375,7 @@ EOT
         $input = "\$value";
         $arrayInput = "\$input['{$inputKey}']";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
+        $denormalizeCall = $writer->indent($denormalizeCall, 6, true);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
@@ -458,9 +482,6 @@ namespace {$generatedClassNamespace};
 
 {$importsAsString}
 
-/**
- * Public implementation of (de)normalizer for class {$localClassName}.
- */
 final class {$generatedLocalClassName}
 {
 EOT
@@ -481,12 +502,10 @@ EOT
 
         $writer->write(<<<EOT
     /**
-     * Create and normalize {$nativeType} instances.
+     * Normalize \\{$nativeType} instance into an array.
      *
      * @param callable \$normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed \$input raw value from denormalized data
-     *      - Context \$context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize(\$object, Context \$context, ?callable \$normalizer = null): array
     {
@@ -509,13 +528,10 @@ EOT
     }
 
     /**
-     * Create and denormalize {$nativeType} instances.
+     * Create and denormalize an \\{$nativeType} instance.
      *
      * @param callable \$normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string \$type PHP native type
-     *      - mixed \$input raw value from normalized data
-     *      - Context \$context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array \$input, Context \$context, ?callable \$denormalizer = null): {$localClassName}
     {

@@ -24,8 +24,8 @@ final class ArrayTypeDefinitionTest extends TestCase
     {
         $map = $this->createTypeDefinitionMap();
 
-        $this->expectException(TypeDoesNotExistError::class);
-        $this->expectExceptionMessageRegExp("/not find.*'non_existing'/");
+        self::expectException(TypeDoesNotExistError::class);
+        self::expectExceptionMessageRegExp("/not find.*'non_existing'/");
         $map->get('non_existing');
     }
 
@@ -33,8 +33,8 @@ final class ArrayTypeDefinitionTest extends TestCase
     {
         $map = $this->createTypeDefinitionMap();
 
-        $this->expectException(TypeDoesNotExistError::class);
-        $this->expectExceptionMessageRegExp("/'wrong_alias' maps.*non existing.*'non_existing_type/");
+        self::expectException(TypeDoesNotExistError::class);
+        self::expectExceptionMessageRegExp("/'wrong_alias' maps.*non existing.*'non_existing_type/");
         $map->get('wrong_alias');
     }
 
@@ -43,21 +43,21 @@ final class ArrayTypeDefinitionTest extends TestCase
         $map = $this->createTypeDefinitionMap();
 
         $type = $map->get('tag');
-        $this->assertSame('App\Example\Tag', $type->getNativeName());
+        self::assertSame('App\Example\Tag', $type->getNativeName());
     }
 
     public function testAliasOverridesTypes()
     {
         $type = $this->createTypeDefinitionMap()->get('ConflictingType');
 
-        $this->assertSame('App\Example\Tag', $type->getNativeName());
+        self::assertSame('App\Example\Tag', $type->getNativeName());
     }
 
     public function testAliasAlwaysMapToNativeType()
     {
         $type = $this->createTypeDefinitionMap()->get('conflicting_type');
 
-        $this->assertSame('ConflictingType', $type->getNativeName());
+        self::assertSame('ConflictingType', $type->getNativeName());
     }
 
     public function testIsTerminal()
@@ -65,26 +65,26 @@ final class ArrayTypeDefinitionTest extends TestCase
         $map = $this->createTypeDefinitionMap();
 
         $type = $map->get('article');
-        $this->assertFalse($type->isTerminal());
+        self::assertFalse($type->isTerminal());
 
         $type = $map->get('date');
-        $this->assertTrue($type->isTerminal());
+        self::assertTrue($type->isTerminal());
     }
 
     public function testNormalizedName()
     {
         $type = $this->createTypeDefinitionMap()->get('article');
 
-        $this->assertSame('App\Example\Article', $type->getNativeName());
-        $this->assertSame('example.app.article', $type->getNormalizedName());
+        self::assertSame('App\Example\Article', $type->getNativeName());
+        self::assertSame('example.app.article', $type->getNormalizedName());
     }
 
     public function testNormalizeNameFallbackOnNativeName()
     {
         $type = $this->createTypeDefinitionMap()->get('tag');
 
-        $this->assertSame('App\Example\Tag', $type->getNativeName());
-        $this->assertSame('App\Example\Tag', $type->getNormalizedName());
+        self::assertSame('App\Example\Tag', $type->getNativeName());
+        self::assertSame('App\Example\Tag', $type->getNormalizedName());
     }
 
     public function testPropertyGet()
@@ -92,13 +92,13 @@ final class ArrayTypeDefinitionTest extends TestCase
         $type = $this->createTypeDefinitionMap()->get('article');
         $properties = $type->getProperties();
 
-        $this->assertSame(['id', 'title', 'author', 'tags', 'content', 'date'], \array_keys($properties));
+        self::assertSame(['id', 'title', 'author', 'tags', 'content', 'date'], \array_keys($properties));
 
         /** @var \MakinaCorpus\Normalizer\PropertyDefinition $prop */
         foreach ($properties as $key => $prop) {
-            $this->assertInstanceOf(PropertyDefinition::class, $prop);
-            $this->assertSame($key, $prop->getNativeName());
-            $this->assertSame('App\Example\Article', $prop->getOwnerType());
+            self::assertInstanceOf(PropertyDefinition::class, $prop);
+            self::assertSame($key, $prop->getNativeName());
+            self::assertSame('App\Example\Article', $prop->getOwnerType());
         }
     }
 
@@ -107,23 +107,23 @@ final class ArrayTypeDefinitionTest extends TestCase
         $type = $this->createTypeDefinitionMap()->get('article');
         $properties = $type->getProperties();
 
-        $this->assertSame(['id', 'title', 'author', 'tags', 'content', 'date'], \array_keys($properties));
+        self::assertSame(['id', 'title', 'author', 'tags', 'content', 'date'], \array_keys($properties));
 
         /** @var \MakinaCorpus\Normalizer\PropertyDefinition $prop */
         $prop = $properties['id'];
 
         // Defaults
-        $this->assertSame('id', $prop->getNormalizedName(), "Normalized name defaults to native name");
-        $this->assertSame([], $prop->getAliases(), "Aliases defaults to empty");
-        $this->assertSame([], $prop->getGroups(), "Groups defaults to empty");
-        $this->assertFalse($prop->isOptional(), "Optional defaults to false");
-        $this->assertFalse($prop->isCollection(), "Collection defaults to false");
-        $this->assertNull($prop->getCollectionType(), "Collection type defaults to null");
+        self::assertSame('id', $prop->getNormalizedName(), "Normalized name defaults to native name");
+        self::assertSame([], $prop->getAliases(), "Aliases defaults to empty");
+        self::assertSame([], $prop->getGroups(), "Groups defaults to empty");
+        self::assertFalse($prop->isOptional(), "Optional defaults to false");
+        self::assertFalse($prop->isCollection(), "Collection defaults to false");
+        self::assertNull($prop->getCollectionType(), "Collection type defaults to null");
 
         /** @var \MakinaCorpus\Normalizer\PropertyDefinition $prop */
         $prop = $properties['author'];
-        $this->assertTrue($prop->isCollection());
-        $this->assertSame('array', $prop->getCollectionType(), "Collection type defaults to array when collection");
+        self::assertTrue($prop->isCollection());
+        self::assertSame('array', $prop->getCollectionType(), "Collection type defaults to array when collection");
     }
 
     public function testPropertyValueSet()
@@ -135,14 +135,14 @@ final class ArrayTypeDefinitionTest extends TestCase
         $prop = $properties['tags'];
 
         // Required values are here
-        $this->assertSame('example.app.tag', $prop->getTypeName());
+        self::assertSame('example.app.tag', $prop->getTypeName());
 
         // All values are set in YAML
-        $this->assertSame('tag_collection', $prop->getNormalizedName());
-        $this->assertSame(['labels'], $prop->getAliases());
-        $this->assertSame(['editorial', 'triage'], $prop->getGroups());
-        $this->assertTrue($prop->isOptional());
-        $this->assertTrue($prop->isCollection());
-        $this->assertSame('array', $prop->getCollectionType());
+        self::assertSame('tag_collection', $prop->getNormalizedName());
+        self::assertSame(['labels'], $prop->getAliases());
+        self::assertSame(['editorial', 'triage'], $prop->getGroups());
+        self::assertTrue($prop->isOptional());
+        self::assertTrue($prop->isCollection());
+        self::assertSame('array', $prop->getCollectionType());
     }
 }

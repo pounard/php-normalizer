@@ -26,12 +26,12 @@ final class ContextTest extends TestCase
     {
         $context = new Context($this->createTypeDefinitionMap());
 
-        $this->assertSame('App\Example\Tag', $context->getType('tag')->getNativeName());
+        self::assertSame('App\Example\Tag', $context->getType('tag')->getNativeName());
     }
 
     public function testInvalidCircularDependencyHandlerRaiseError()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new Context(new ArrayTypeDefinitionMap([]), [
             NormalizeOption::CIRCULAR_REFERENCE_HANDLER => 'not a callable'
         ]);
@@ -44,8 +44,8 @@ final class ContextTest extends TestCase
             Option::SERIALIATION_FORMAT => 'application/stupid-format',
         ]);
 
-        $this->assertIsArray($context->toSymfonyContext());
-        $this->assertSame('application/stupid-format', $context->getFormat());
+        self::assertIsArray($context->toSymfonyContext());
+        self::assertSame('application/stupid-format', $context->getFormat());
     }
 
     public function testCircularReferenceHandling()
@@ -55,13 +55,13 @@ final class ContextTest extends TestCase
         $object1 = new \DateTimeImmutable();
         $object2 = new \DateTimeImmutable();
 
-        $this->assertFalse($context->isCircularReference($object1));
-        $this->assertTrue($context->isCircularReference($object1));
+        self::assertFalse($context->isCircularReference($object1));
+        self::assertTrue($context->isCircularReference($object1));
 
-        $this->assertFalse($context->isCircularReference($object2));
-        $this->assertTrue($context->isCircularReference($object2));
+        self::assertFalse($context->isCircularReference($object2));
+        self::assertTrue($context->isCircularReference($object2));
 
-        $this->assertFalse($context->isCircularReference('booh'));
+        self::assertFalse($context->isCircularReference('booh'));
     }
 
     public function testCircularReferenceHandlingWithNoLimit()
@@ -72,9 +72,9 @@ final class ContextTest extends TestCase
 
         $object1 = new \DateTimeImmutable();
 
-        $this->assertFalse($context->isCircularReference($object1));
-        $this->assertFalse($context->isCircularReference($object1));
-        $this->assertFalse($context->isCircularReference($object1));
+        self::assertFalse($context->isCircularReference($object1));
+        self::assertFalse($context->isCircularReference($object1));
+        self::assertFalse($context->isCircularReference($object1));
     }
 
     public function testHandleCircularReferenceWithNoCallbackRaiseError()
@@ -82,7 +82,7 @@ final class ContextTest extends TestCase
         $object = new \DateTimeImmutable();
         $context = new Context(new ArrayTypeDefinitionMap([]));
 
-        $this->expectException(CircularDependencyDetectedError::class);
+        self::expectException(CircularDependencyDetectedError::class);
         $context->handleCircularReference('some_type', $object);
     }
 
@@ -95,15 +95,15 @@ final class ContextTest extends TestCase
             NormalizeOption::CIRCULAR_REFERENCE_HANDLER =>
                 function (string $type, $nested, $context) use (&$called, $object) {
                     $called = true;
-                    $this->assertSame('some_type', $type);
-                    $this->assertSame($object, $nested);
-                    $this->assertInstanceOf(Context::class, $context);
+                    self::assertSame('some_type', $type);
+                    self::assertSame($object, $nested);
+                    self::assertInstanceOf(Context::class, $context);
                 }
         ]);
 
-        $this->assertFalse($called);
+        self::assertFalse($called);
         $context->handleCircularReference('some_type', $object);
-        $this->assertTrue($called);
+        self::assertTrue($called);
     }
 
     public function testHandleCircularReferenceWithSymfonyCompatibility()
@@ -115,28 +115,28 @@ final class ContextTest extends TestCase
             NormalizeOption::CIRCULAR_REFERENCE_HANDLER =>
                 function ($nested, $format, $context) use (&$called, $object) {
                     $called = true;
-                    $this->assertSame('json', $format);
-                    $this->assertSame($object, $nested);
-                    $this->assertIsArray($context);
+                    self::assertSame('json', $format);
+                    self::assertSame($object, $nested);
+                    self::assertIsArray($context);
                 }
         ], true);
 
-        $this->assertFalse($called);
+        self::assertFalse($called);
         $context->handleCircularReference('some_type', $object);
-        $this->assertTrue($called);
+        self::assertTrue($called);
     }
 
     public function testEnterLeave()
     {
         $context = new Context(new ArrayTypeDefinitionMap([]));
 
-        $this->assertSame(0, $context->getDepth());
+        self::assertSame(0, $context->getDepth());
 
         $context->enter();
         $context->enter();
-        $this->assertSame(2, $context->getDepth());
+        self::assertSame(2, $context->getDepth());
 
         $context->leave();
-        $this->assertSame(1, $context->getDepth());
+        self::assertSame(1, $context->getDepth());
     }
 }

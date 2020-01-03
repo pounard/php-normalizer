@@ -168,6 +168,12 @@ final class FallbackNormalizer
     {
         $nativeType = $context->getNativeType($type);
 
+        if ($input instanceof $nativeType) {
+            // Value is already denormalized, I guess it should not happen,
+            // but still it seems legit to do that.
+            return $input;
+        }
+
         $external = Helper::denormalizeScalar($nativeType, $input, $context);
         if ($external->success) {
             return $external->value;

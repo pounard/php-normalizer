@@ -1,23 +1,20 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\MockArticle.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
+namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
+use MakinaCorpus\Normalizer\Benchmarks\MockArticle;
+use MakinaCorpus\Normalizer\Benchmarks\MockWithText;
+use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
 
-/**
- * Public implementation of (de)normalizer for class Php74MockArticle.
- */
-final class Php74MockArticleNormalizer
+final class MockArticleNormalizer
 {
     /** @var callable */
     public static $normalizer0;
@@ -38,12 +35,10 @@ final class Php74MockArticleNormalizer
     public static $denormalizer2;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle instances.
+     * Normalize \MakinaCorpus\Normalizer\Benchmarks\MockArticle instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -57,17 +52,14 @@ final class Php74MockArticleNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\MockArticle instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
-    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockArticle
+    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockArticle
     {
-        $ret = (new \ReflectionClass(Php74MockArticle::class))->newInstanceWithoutConstructor();
+        $ret = (new \ReflectionClass(MockArticle::class))->newInstanceWithoutConstructor();
 
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
         (self::$denormalizer1)($ret, $input, $context, $denormalizer);
@@ -78,58 +70,57 @@ final class Php74MockArticleNormalizer
 }
 
 /**
- * Normalizer for properties of Php74MockWithTitle.
+ * Normalizer for properties of MockWithTitle.
  */
-Php74MockArticleNormalizer::$normalizer0 = \Closure::bind(
-    static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
+MockArticleNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'title' property
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
-    null, Php74MockWithTitle::class
+    null, MockWithTitle::class
 );
 
 /**
- * Denormalizer for properties of Php74MockWithTitle.
+ * Denormalizer for properties of MockWithTitle.
  */
-Php74MockArticleNormalizer::$denormalizer0 = \Closure::bind(
-    static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' required property
-        if (!isset($input['title'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->title = \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context);
-        }
+MockArticleNormalizer::$denormalizer0 = \Closure::bind(
+    static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+        // Denormalize 'title' nullable property
+        $instance->title = isset($input['title']) ? \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context) : null;
     },
-    null, Php74MockWithTitle::class
+    null, MockWithTitle::class
 );
 
 /**
- * Normalizer for properties of Php74MockWithText.
+ * Normalizer for properties of MockWithText.
  */
-Php74MockArticleNormalizer::$normalizer1 = \Closure::bind(
-    static function (array &$ret, Php74MockWithText $object, Context $context, ?callable $normalizer = null): void {
+MockArticleNormalizer::$normalizer1 = \Closure::bind(
+    static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
         // Normalize 'text' property
-        $ret['text'] = (null === $object->text ? null : \Generated8\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        $ret['text'] = (null === $object->text ? null : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
-    null, Php74MockWithText::class
+    null, MockWithText::class
 );
 
 /**
- * Denormalizer for properties of Php74MockWithText.
+ * Denormalizer for properties of MockWithText.
  */
-Php74MockArticleNormalizer::$denormalizer1 = \Closure::bind(
-    static function (Php74MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+MockArticleNormalizer::$denormalizer1 = \Closure::bind(
+    static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? \Generated8\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer) : null;
+        $instance->text = isset($input['text']) ? ($input['text'] instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat
+            ? $input['text']
+            : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+        ) : null;
     },
-    null, Php74MockWithText::class
+    null, MockWithText::class
 );
 
 /**
- * Normalizer for properties of Php74MockArticle.
+ * Normalizer for properties of MockArticle.
  */
-Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
-    static function (array &$ret, Php74MockArticle $object, Context $context, ?callable $normalizer = null): void {
+MockArticleNormalizer::$normalizer2 = \Closure::bind(
+    static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
         // Normalize 'id' property
         $ret['id'] = (null === $object->id ? null : $object->id->__toString());
@@ -164,27 +155,36 @@ Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
         // Normalize 'filename' property
         $ret['filename'] = (null === $object->filename ? null : (string)$object->filename);
     },
-    null, Php74MockArticle::class
+    null, MockArticle::class
 );
 
 /**
- * Denormalizer for properties of Php74MockArticle.
+ * Denormalizer for properties of MockArticle.
  */
-Php74MockArticleNormalizer::$denormalizer2 = \Closure::bind(
-    static function (Php74MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+MockArticleNormalizer::$denormalizer2 = \Closure::bind(
+    static function (MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         // Denormalize 'id' nullable property
-        $instance->id = isset($input['id']) ? \Ramsey\Uuid\Uuid::fromString($input['id']) : null;
+        $instance->id = isset($input['id']) ? ($input['id'] instanceof \Ramsey\Uuid\UuidInterface
+            ? $input['id']
+            : \Ramsey\Uuid\Uuid::fromString($input['id'])
+        ) : null;
 
         // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
             $context->nullValueError('DateTimeImmutable');
         } else {
-            $instance->createdAt = ($denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['createdAt'], $context, $denormalizer) : $input['createdAt']);
+            $instance->createdAt = ($input['createdAt'] instanceof \DateTimeImmutable
+                ? $input['createdAt']
+                : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['createdAt'], $context, $denormalizer) : $input['createdAt'])
+            );
         }
 
         // Denormalize 'updatedAt' nullable property
-        $instance->updatedAt = isset($input['updatedAt']) ? ($denormalizer ? $denormalizer(\DateTimeImmutable::class, $input['updatedAt'], $context, $denormalizer) : $input['updatedAt']) : null;
+        $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof \DateTimeImmutable
+            ? $input['updatedAt']
+            : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'])
+        ) : null;
 
         // Denormalize 'authors' collection property
         if (isset($input['authors'])) {
@@ -228,5 +228,5 @@ Php74MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             $instance->filename = \MakinaCorpus\Normalizer\Helper::toString($input['filename'], $context);
         }
     },
-    null, Php74MockArticle::class
+    null, MockArticle::class
 );

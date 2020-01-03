@@ -49,16 +49,16 @@ final class ReflectionTypeDefinitionMapTest extends TestCase
 
     public function testResolveTypeFromClassPropertyWithFqdn()
     {
-        $this->markTestIncomplete();
+        self::markTestIncomplete();
     }
 
     public function testResolveTypeFromClassPropertyWithLocalName()
     {
-        $this->markTestIncomplete();
+        self::markTestIncomplete();
     }
 
     public function testResolveTypeFromClassPropertyFromUseStatements()
     {
-        $this->markTestIncomplete();
+        self::markTestIncomplete();
     }
 }

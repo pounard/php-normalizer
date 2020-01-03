@@ -13,7 +13,7 @@ class KernelConfigurationTest extends TestCase
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\DependencyInjection\ContainerBuilder')) {
-            $this->markTestSkipped("This test can only run with symfony/dependency-injection component alongside");
+            self::markTestSkipped("This test can only run with symfony/dependency-injection component alongside");
         }
     }
 
@@ -48,9 +48,9 @@ class KernelConfigurationTest extends TestCase
         $config = $this->getMinimalConfig();
         $extension->load([$config], $container = $this->getContainer());
 
-        $this->assertCount(3, $container->findTaggedServiceIds('php_normalizer.normalizer'));
-        $this->assertCount(1, $container->findTaggedServiceIds('serializer.normalizer'));
-        $this->assertCount(2, $container->findTaggedServiceIds('php_normalizer.type_definition_map'));
+        self::assertCount(3, $container->findTaggedServiceIds('php_normalizer.normalizer'));
+        self::assertCount(1, $container->findTaggedServiceIds('serializer.normalizer'));
+        self::assertCount(2, $container->findTaggedServiceIds('php_normalizer.type_definition_map'));
     }
 
     /**
@@ -69,9 +69,9 @@ class KernelConfigurationTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('php_normalizer.normalizer');
-        $this->assertCount(3, $definition->getArgument(0));
+        self::assertCount(3, $definition->getArgument(0));
 
         $definition = $container->getDefinition('php_normalizer.type_definition_map');
-        $this->assertCount(2, $definition->getArgument(0));
+        self::assertCount(2, $definition->getArgument(0));
     }
 }

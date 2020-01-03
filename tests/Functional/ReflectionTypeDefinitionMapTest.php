@@ -7,6 +7,8 @@ namespace MakinaCorpus\Normalizer\Tests\Functional;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\TypeDefinitionMap;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
+use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
+use MakinaCorpus\Normalizer\Benchmarks\MockWithText;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -37,8 +39,8 @@ final class ReflectionTypeDefinitionMapTest extends TestCase
     {
         $map = $this->createTypeDefinitionMap();
 
-        $this->expectException(TypeDoesNotExistError::class);
-        $this->expectExceptionMessageRegExp("/Class does.*'non_existing'/");
+        self::expectException(TypeDoesNotExistError::class);
+        self::expectExceptionMessageRegExp("/Class does.*'non_existing'/");
         $map->get('non_existing');
     }
 
@@ -46,20 +48,21 @@ final class ReflectionTypeDefinitionMapTest extends TestCase
     {
         $map = $this->createTypeDefinitionMap();
 
-        $this->assertTrue($map->exists(MockTextWithFormat::class));
+        self::assertTrue($map->exists(MockTextWithFormat::class));
     }
 
     public function testExistsWithNonExistingClass()
     {
         $map = $this->createTypeDefinitionMap();
 
-        $this->assertFalse($map->exists('non_existing'));
+        self::assertFalse($map->exists('non_existing'));
     }
 
     public function testSimpleUseCase()
     {
-        $map = $this->createTypeDefinitionMap();
+        self::doesNotPerformAssertions();
 
-        /* $type = */ $map->get(MockWithText::class);
+        $map = $this->createTypeDefinitionMap();
+        $map->get(MockWithText::class);
     }
 }

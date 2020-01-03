@@ -46,6 +46,7 @@ final class GeneratorRuntimeNormalizerTest extends AbstractNormalizerTest
             \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObject::class,
             \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObjectArray::class,
             \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString::class,
+            \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithUuid::class,
         ] as $className) {
             $generator->generateNormalizerClass($className);
         }

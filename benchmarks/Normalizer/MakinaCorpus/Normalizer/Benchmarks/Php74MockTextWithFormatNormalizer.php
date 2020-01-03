@@ -7,14 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Generated8\MakinaCorpus\Normalizer\Benchmarks;
+namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
 
-/**
- * Public implementation of (de)normalizer for class Php74MockTextWithFormat.
- */
 final class Php74MockTextWithFormatNormalizer
 {
     /** @var callable */
@@ -24,12 +21,10 @@ final class Php74MockTextWithFormatNormalizer
     public static $denormalizer0;
 
     /**
-     * Create and normalize MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instances.
+     * Normalize \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instance into an array.
      *
      * @param callable $normalizer
-     *   A callback that will normalize externally handled values, parameters are:
-     *      - mixed $input raw value from denormalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
      */
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
@@ -41,13 +36,10 @@ final class Php74MockTextWithFormatNormalizer
     }
 
     /**
-     * Create and denormalize MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instances.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instance.
      *
      * @param callable $normalizer
-     *   A callback that will denormalize externally handled values, parameters are:
-     *      - string $type PHP native type
-     *      - mixed $input raw value from normalized data
-     *      - Context $context the context
+     *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockTextWithFormat
     {

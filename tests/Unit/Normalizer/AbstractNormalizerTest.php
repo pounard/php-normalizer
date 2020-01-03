@@ -17,8 +17,10 @@ use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObject;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObjectArray;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithUuid;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockHelper;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 abstract class AbstractNormalizerTest extends TestCase
 {
@@ -589,6 +591,48 @@ abstract class AbstractNormalizerTest extends TestCase
         self::expectException(RuntimeError::class);
 
         $normalizer->denormalize(MockClassWithObjectArray::class, $input, $context);
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectDenormalizationWithAlreadyDenormalizedValue(Normalizer $normalizer, Context $context)
+    {
+        $input = [
+            'uuid' => $reference = Uuid::uuid4(),
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithUuid::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithUuid::class, $object);
+        self::assertSame($reference, $object->getValue());
+    }
+
+    /**
+     * @dataProvider dataNormalizer()
+     */
+    public function testObjectCollectionDenormalizationWithAlreadyDenormalizedValue(Normalizer $normalizer, Context $context)
+    {
+        $input = [
+            'objectArray' => [
+                'foo' => [
+                    'nullableInt' => 12,
+                ],
+                'bar' => $reference = MockHelper::changeObjectProperties(new MockClassWithNullableInt(), [
+                    'nullableInt' => 23,
+                ]),
+            ],
+        ];
+
+        $object = $normalizer->denormalize(MockClassWithObjectArray::class, $input, $context);
+
+        self::assertInstanceOf(MockClassWithObjectArray::class, $object);
+
+        $values = $object->getValue();
+        self::assertCount(2, $values);
+        self::assertInstanceOf(MockClassWithNullableInt::class, $values['foo']);
+        self::assertInstanceOf(MockClassWithNullableInt::class, $values['bar']);
+        self::assertSame($reference, $values['bar']);
     }
 
     // PHP 7.4 types properties
