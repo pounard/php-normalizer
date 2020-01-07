@@ -161,16 +161,6 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
         }
 
         return null;
-
-        /*
-        if (!$filename = $class->getFileName()) {
-            return null;
-        }
-
-        // Resolver::resolveUseStatements($filename);
-         */
-
-        return null;
     }
 
     /**
@@ -322,7 +312,6 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
         if ($ret = $this->findPropertyWithRawDocBlock($class, $property)) {
             return $ret;
         }
-        // @todo write here a custom docblock parser for speed.
         if ($ret = $this->findPropertyWithPropertyInfo($class, $property)) {
             return $ret;
         }
