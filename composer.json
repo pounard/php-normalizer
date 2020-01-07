@@ -24,6 +24,7 @@
             "src/Error.php",
             "src/Helper.php",
             "src/Normalizer.php",
+            "src/NormalizerRegistry.php",
             "src/Normalizer/CustomDenormalizer.php",
             "src/Normalizer/CustomNormalizer.php",
             "src/Options.php",

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObjectArray;
 
 final class MockClassWithObjectArrayNormalizer
@@ -56,14 +57,13 @@ final class MockClassWithObjectArrayNormalizer
  */
 MockClassWithObjectArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithObjectArray $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'objectArray' property
         $ret['objectArray'] = [];
         if ($object->objectArray) {
             foreach ($object->objectArray as $index => $value) {
                 if (null === $value) {
                     $ret['objectArray'][$index] = null;
                 } else {
-                    $ret['objectArray'][$index] = \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::normalize($value, $context, $normalizer);
+                    $ret['objectArray'][$index] = MockClassWithNullableIntNormalizer::normalize($value, $context, $normalizer);
                 }
             }
         }
@@ -76,7 +76,6 @@ MockClassWithObjectArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithObjectArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObjectArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'objectArray' collection property
         if (isset($input['objectArray'])) {
             if (!\is_iterable($input['objectArray'])) {
                 $input['objectArray'] = (array)$input['objectArray'];
@@ -88,9 +87,9 @@ MockClassWithObjectArrayNormalizer::$denormalizer0 = \Closure::bind(
                         $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
                         $instance->objectArray[$index] = null;
                     } else {
-                        $instance->objectArray[$index] = ($value instanceof \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt
+                        $instance->objectArray[$index] = ($value instanceof MockClassWithNullableInt
                             ? $value
-                            : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($value, $context, $denormalizer)
+                            : MockClassWithNullableIntNormalizer::denormalize($value, $context, $denormalizer)
                         );
                     }
                 }

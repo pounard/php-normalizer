@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableObject;
 
 final class MockClassWithNullableObjectNormalizer
@@ -56,8 +57,7 @@ final class MockClassWithNullableObjectNormalizer
  */
 MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithNullableObject $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'nullableObject' property
-        $ret['nullableObject'] = (null === $object->nullableObject ? null : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::normalize($object->nullableObject, $context, $normalizer));
+        $ret['nullableObject'] = (null === $object->nullableObject ? null : MockClassWithNullableIntNormalizer::normalize($object->nullableObject, $context, $normalizer));
     },
     null, MockClassWithNullableObject::class
 );
@@ -67,10 +67,9 @@ MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithNullableObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'nullableObject' nullable property
-        $instance->nullableObject = isset($input['nullableObject']) ? ($input['nullableObject'] instanceof \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt
+        $instance->nullableObject = isset($input['nullableObject']) ? ($input['nullableObject'] instanceof MockClassWithNullableInt
             ? $input['nullableObject']
-            : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer)
+            : MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer)
         ) : null;
     },
     null, MockClassWithNullableObject::class

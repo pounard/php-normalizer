@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithObject;
 
 final class MockClassWithObjectNormalizer
@@ -56,8 +57,7 @@ final class MockClassWithObjectNormalizer
  */
 MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithObject $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'object' property
-        $ret['object'] = (null === $object->object ? null : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer));
+        $ret['object'] = (null === $object->object ? null : MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer));
     },
     null, MockClassWithObject::class
 );
@@ -67,13 +67,12 @@ MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'object' required property
         if (!isset($input['object'])) {
             $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
         } else {
-            $instance->object = ($input['object'] instanceof \MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt
+            $instance->object = ($input['object'] instanceof MockClassWithNullableInt
                 ? $input['object']
-                : \MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock\MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer)
+                : MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer)
             );
         }
     },

@@ -11,6 +11,8 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithUuid;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final class MockClassWithUuidNormalizer
 {
@@ -56,7 +58,6 @@ final class MockClassWithUuidNormalizer
  */
 MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithUuid $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'uuid' property
         $ret['uuid'] = (null === $object->uuid ? null : $object->uuid->__toString());
     },
     null, MockClassWithUuid::class
@@ -67,10 +68,9 @@ MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithUuidNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithUuid $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'uuid' nullable property
-        $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof \Ramsey\Uuid\UuidInterface
+        $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof UuidInterface
             ? $input['uuid']
-            : \Ramsey\Uuid\Uuid::fromString($input['uuid'])
+            : Uuid::fromString($input['uuid'])
         ) : null;
     },
     null, MockClassWithUuid::class

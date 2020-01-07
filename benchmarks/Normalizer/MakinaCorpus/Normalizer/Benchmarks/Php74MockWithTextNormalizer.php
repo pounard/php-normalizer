@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
+use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 
 final class Php74MockWithTextNormalizer
 {
@@ -65,7 +67,6 @@ final class Php74MockWithTextNormalizer
  */
 Php74MockWithTextNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'title' property
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
     null, Php74MockWithTitle::class
@@ -76,11 +77,10 @@ Php74MockWithTextNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' required property
         if (!isset($input['title'])) {
             $context->nullValueError('string');
         } else {
-            $instance->title = \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context);
+            $instance->title = Helper::toString($input['title'], $context);
         }
     },
     null, Php74MockWithTitle::class
@@ -91,8 +91,7 @@ Php74MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, Php74MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'text' property
-        $ret['text'] = (null === $object->text ? null : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        $ret['text'] = (null === $object->text ? null : Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
     null, Php74MockWithText::class
 );
@@ -102,10 +101,9 @@ Php74MockWithTextNormalizer::$normalizer1 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$denormalizer1 = \Closure::bind(
     static function (Php74MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? ($input['text'] instanceof \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat
+        $instance->text = isset($input['text']) ? ($input['text'] instanceof Php74MockTextWithFormat
             ? $input['text']
-            : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+            : Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
         ) : null;
     },
     null, Php74MockWithText::class

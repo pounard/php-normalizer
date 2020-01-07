@@ -44,6 +44,38 @@ final class Helper
     }
 
     /**
+     * Are those classes in different namespaces.
+     */
+    public static function inSameNamespace(string $classA, string $classB): bool
+    {
+        return self::getClassNamespace($classA) === self::getClassNamespace($classB);
+    }
+
+    /**
+     * Get class namespace
+     */
+    public static function getClassNamespace(string $className): ?string
+    {
+        $className = \trim($className, '\\');
+        if (false !== ($pos = \strrpos($className, '\\'))) {
+            return \substr($className, 0, $pos);
+        }
+        return null;
+    }
+
+    /**
+     * Get class shortname
+     */
+    public static function getClassShortName(string $className): string
+    {
+        $className = \trim($className, '\\');
+        if (false !== ($pos = \strrpos($className, '\\'))) {
+            return \substr($className, $pos + 1);
+        }
+        return $className;
+    }
+
+    /**
      * Find a specific value in given array.
      *
      * @param mixed[] $input
@@ -160,6 +192,45 @@ final class Helper
     }
 
     /**
+     * Convert any value to mutable date
+     */
+    public static function toDate($input, Context $context): ?\DateTime
+    {
+        if (null !== ($ret = self::toDateImmutable($input, $context))) {
+            return \DateTime::createFromImmutable($ret);
+        }
+        return null;
+    }
+
+    /**
+     * Convert any value to immutable date
+     */
+    public static function toDateImmutable($input, Context $context): ?\DateTimeImmutable
+    {
+        if ($input instanceof \DateTimeImmutable) {
+            return $input;
+        }
+        if ($input instanceof \DateTime) {
+            return \DateTimeImmutable::createFromMutable($input);
+        }
+
+        $format = $context->getOption(Option::DATE_FORMAT, \DateTime::RFC3339);
+        try {
+            // Try with context format.
+            return \DateTimeImmutable::createFromFormat($format, $input);
+        } catch (\Throwable $e) {
+            try {
+                // Else attempt with no format at all and prey.
+                return new \DateTimeImmutable($format);
+            } catch (\Throwable $e) {
+                $context->addError("Invalid date format");
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Degradation of re-entring into the generator.
      *
      * @todo This is basically cheating in benchmarks.
@@ -168,20 +239,21 @@ final class Helper
     {
         switch ($type) {
             case 'bool':
-                return ValueOption::ok(Helper::toBool($input, $context));
+                return ValueOption::ok(self::toBool($input, $context));
             case 'float':
-                return ValueOption::ok(Helper::toFloat($input, $context));
+                return ValueOption::ok(self::toFloat($input, $context));
             case 'int':
-                return ValueOption::ok(Helper::toInt($input, $context));
+                return ValueOption::ok(self::toInt($input, $context));
             case 'null':
                 return ValueOption::ok($input);
             case 'string':
-                return ValueOption::ok(Helper::toString($input, $context));
+                return ValueOption::ok(self::toString($input, $context));
             case \DateTime::class:
-                return ValueOption::ok(new \DateTime($input));
+                return ValueOption::ok(self::toDate($input, $context));
             case \DateTimeInterface::class:
             case \DateTimeImmutable::class:
-                return ValueOption::ok(new \DateTimeImmutable($input));
+                return ValueOption::ok(self::toDateImmutable($input, $context));
+            case Uuid::class:
             case UuidInterface::class:
                 return ValueOption::ok(Uuid::fromString($input));
         }
@@ -205,11 +277,12 @@ final class Helper
             case 'null':
                 return ValueOption::ok($input);
             case 'string':
-                return ValueOption::ok(Helper::toString($input, $context));
+                return ValueOption::ok(self::toString($input, $context));
             case \DateTime::class:
             case \DateTimeInterface::class:
             case \DateTimeImmutable::class:
-                return ValueOption::ok($input->format(\DateTime::RFC3339));
+                $format = $context->getOption(Option::DATE_FORMAT, \DateTime::RFC3339);
+                return ValueOption::ok($input->format($format));
             case Uuid::class:
             case UuidInterface::class:
                 return ValueOption::ok($input->__toString());

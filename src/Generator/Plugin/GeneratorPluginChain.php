@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
-use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\ServiceConfigurationError;
@@ -44,7 +44,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function supports(PropertyDefinition $property, Context $context): bool
+    public function supports(PropertyDefinition $property, GeneratorContext $context): bool
     {
         foreach ($this->plugins as $plugin) {
             if ($plugin->supports($property, $context)) {
@@ -57,7 +57,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateNormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateNormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         foreach ($this->plugins as $plugin) {
             if ($plugin->supports($property, $context)) {
@@ -75,7 +75,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateDenormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateDenormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         foreach ($this->plugins as $plugin) {
             if ($plugin->supports($property, $context)) {

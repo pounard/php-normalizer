@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
+use DateTime;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
 
@@ -56,7 +57,6 @@ final class MockClassWithDateArrayNormalizer
  */
 MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithDateArray $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'dateArray' property
         $ret['dateArray'] = [];
         if ($object->dateArray) {
             foreach ($object->dateArray as $index => $value) {
@@ -76,7 +76,6 @@ MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithDateArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'dateArray' collection property
         if (isset($input['dateArray'])) {
             if (!\is_iterable($input['dateArray'])) {
                 $input['dateArray'] = (array)$input['dateArray'];
@@ -88,7 +87,7 @@ MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
                         $context->nullValueError('DateTime');
                         $instance->dateArray[$index] = null;
                     } else {
-                        $instance->dateArray[$index] = ($value instanceof \DateTime
+                        $instance->dateArray[$index] = ($value instanceof DateTime
                             ? $value
                             : ($denormalizer ? $denormalizer('DateTime', $value, $context, $denormalizer) : $value)
                         );

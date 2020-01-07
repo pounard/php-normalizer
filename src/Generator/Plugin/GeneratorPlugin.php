@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
-use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 
 /**
@@ -20,7 +20,7 @@ interface GeneratorPlugin
     /**
      * Does this generator handles the given property.
      */
-    public function supports(PropertyDefinition $property, Context $context): bool;
+    public function supports(PropertyDefinition $property, GeneratorContext $context): bool;
 
     /**
      * Generate normalize code.
@@ -34,7 +34,7 @@ interface GeneratorPlugin
      *   do not attempt anything that would break in any of those three use
      *   cases.
      */
-    public function generateNormalizeCode(PropertyDefinition $property, Context $context, string $input): string;
+    public function generateNormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string;
 
     /**
      * Generate denormalize code.
@@ -48,5 +48,5 @@ interface GeneratorPlugin
      *   do not attempt anything that would break in any of those three use
      *   cases.
      */
-    public function generateDenormalizeCode(PropertyDefinition $property, Context $context, string $input): string;
+    public function generateDenormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string;
 }

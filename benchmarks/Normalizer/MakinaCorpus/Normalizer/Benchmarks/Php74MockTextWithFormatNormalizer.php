@@ -11,6 +11,7 @@ namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 
 final class Php74MockTextWithFormatNormalizer
 {
@@ -57,10 +58,8 @@ final class Php74MockTextWithFormatNormalizer
 Php74MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
-        // Normalize 'text' property
         $ret['text'] = (null === $object->text ? null : (string)$object->text);
 
-        // Normalize 'format' property
         $ret['format'] = (null === $object->format ? null : (string)$object->format);
     },
     null, Php74MockTextWithFormat::class
@@ -72,14 +71,12 @@ Php74MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
 Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? \MakinaCorpus\Normalizer\Helper::toString($input['text'], $context) : null;
+        $instance->text = isset($input['text']) ? Helper::toString($input['text'], $context) : null;
 
-        // Denormalize 'format' required property
         if (!isset($input['format'])) {
             $context->nullValueError('string');
         } else {
-            $instance->format = \MakinaCorpus\Normalizer\Helper::toString($input['format'], $context);
+            $instance->format = Helper::toString($input['format'], $context);
         }
     },
     null, Php74MockTextWithFormat::class

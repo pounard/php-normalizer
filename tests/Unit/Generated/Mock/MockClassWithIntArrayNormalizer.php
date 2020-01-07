@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithIntArray;
 
 final class MockClassWithIntArrayNormalizer
@@ -56,7 +57,6 @@ final class MockClassWithIntArrayNormalizer
  */
 MockClassWithIntArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithIntArray $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'intArray' property
         $ret['intArray'] = [];
         if ($object->intArray) {
             foreach ($object->intArray as $index => $value) {
@@ -76,7 +76,6 @@ MockClassWithIntArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithIntArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'intArray' collection property
         if (isset($input['intArray'])) {
             if (!\is_iterable($input['intArray'])) {
                 $input['intArray'] = (array)$input['intArray'];
@@ -88,7 +87,7 @@ MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
                         $context->nullValueError('int');
                         $instance->intArray[$index] = null;
                     } else {
-                        $instance->intArray[$index] = \MakinaCorpus\Normalizer\Helper::toInt($value, $context);
+                        $instance->intArray[$index] = Helper::toInt($value, $context);
                     }
                 }
             }

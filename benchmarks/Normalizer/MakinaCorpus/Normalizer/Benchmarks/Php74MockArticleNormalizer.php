@@ -9,10 +9,15 @@ declare(strict_types=1);
 
 namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
+use DateTimeImmutable;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
+use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final class Php74MockArticleNormalizer
 {
@@ -74,7 +79,6 @@ final class Php74MockArticleNormalizer
  */
 Php74MockArticleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'title' property
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
     null, Php74MockWithTitle::class
@@ -85,11 +89,10 @@ Php74MockArticleNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockArticleNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' required property
         if (!isset($input['title'])) {
             $context->nullValueError('string');
         } else {
-            $instance->title = \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context);
+            $instance->title = Helper::toString($input['title'], $context);
         }
     },
     null, Php74MockWithTitle::class
@@ -100,8 +103,7 @@ Php74MockArticleNormalizer::$denormalizer0 = \Closure::bind(
  */
 Php74MockArticleNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, Php74MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'text' property
-        $ret['text'] = (null === $object->text ? null : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        $ret['text'] = (null === $object->text ? null : Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
     null, Php74MockWithText::class
 );
@@ -111,10 +113,9 @@ Php74MockArticleNormalizer::$normalizer1 = \Closure::bind(
  */
 Php74MockArticleNormalizer::$denormalizer1 = \Closure::bind(
     static function (Php74MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? ($input['text'] instanceof \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat
+        $instance->text = isset($input['text']) ? ($input['text'] instanceof Php74MockTextWithFormat
             ? $input['text']
-            : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+            : Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
         ) : null;
     },
     null, Php74MockWithText::class
@@ -126,16 +127,12 @@ Php74MockArticleNormalizer::$denormalizer1 = \Closure::bind(
 Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, Php74MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
-        // Normalize 'id' property
         $ret['id'] = (null === $object->id ? null : $object->id->__toString());
 
-        // Normalize 'createdAt' property
         $ret['createdAt'] = (null === $object->createdAt ? null : ($normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt));
 
-        // Normalize 'updatedAt' property
         $ret['updatedAt'] = (null === $object->updatedAt ? null : ($normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt));
 
-        // Normalize 'authors' property
         $ret['authors'] = [];
         if ($object->authors) {
             foreach ($object->authors as $index => $value) {
@@ -147,16 +144,12 @@ Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
             }
         }
 
-        // Normalize 'foo' property
         $ret['foo'] = (null === $object->foo ? null : (string)$object->foo);
 
-        // Normalize 'bar' property
         $ret['bar'] = (null === $object->bar ? null : (int)$object->bar);
 
-        // Normalize 'baz' property
         $ret['baz'] = (null === $object->baz ? null : (float)$object->baz);
 
-        // Normalize 'filename' property
         $ret['filename'] = (null === $object->filename ? null : (string)$object->filename);
     },
     null, Php74MockArticle::class
@@ -168,29 +161,25 @@ Php74MockArticleNormalizer::$normalizer2 = \Closure::bind(
 Php74MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (Php74MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'id' nullable property
-        $instance->id = isset($input['id']) ? ($input['id'] instanceof \Ramsey\Uuid\UuidInterface
+        $instance->id = isset($input['id']) ? ($input['id'] instanceof UuidInterface
             ? $input['id']
-            : \Ramsey\Uuid\Uuid::fromString($input['id'])
+            : Uuid::fromString($input['id'])
         ) : null;
 
-        // Denormalize 'createdAt' required property
         if (!isset($input['createdAt'])) {
             $context->nullValueError('DateTimeImmutable');
         } else {
-            $instance->createdAt = ($input['createdAt'] instanceof \DateTimeImmutable
+            $instance->createdAt = ($input['createdAt'] instanceof DateTimeImmutable
                 ? $input['createdAt']
                 : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['createdAt'], $context, $denormalizer) : $input['createdAt'])
             );
         }
 
-        // Denormalize 'updatedAt' nullable property
-        $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof \DateTimeImmutable
+        $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof DateTimeImmutable
             ? $input['updatedAt']
             : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'])
         ) : null;
 
-        // Denormalize 'authors' collection property
         if (isset($input['authors'])) {
             if (!\is_iterable($input['authors'])) {
                 $input['authors'] = (array)$input['authors'];
@@ -202,34 +191,30 @@ Php74MockArticleNormalizer::$denormalizer2 = \Closure::bind(
                         $context->nullValueError('string');
                         $instance->authors[$index] = null;
                     } else {
-                        $instance->authors[$index] = \MakinaCorpus\Normalizer\Helper::toString($value, $context);
+                        $instance->authors[$index] = Helper::toString($value, $context);
                     }
                 }
             }
         }
 
-        // Denormalize 'foo' nullable property
-        $instance->foo = isset($input['foo']) ? \MakinaCorpus\Normalizer\Helper::toString($input['foo'], $context) : null;
+        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo'], $context) : null;
 
-        // Denormalize 'bar' required property
         if (!isset($input['bar'])) {
             $context->nullValueError('int');
         } else {
-            $instance->bar = \MakinaCorpus\Normalizer\Helper::toInt($input['bar'], $context);
+            $instance->bar = Helper::toInt($input['bar'], $context);
         }
 
-        // Denormalize 'baz' required property
         if (!isset($input['baz'])) {
             $context->nullValueError('float');
         } else {
-            $instance->baz = \MakinaCorpus\Normalizer\Helper::toFloat($input['baz'], $context);
+            $instance->baz = Helper::toFloat($input['baz'], $context);
         }
 
-        // Denormalize 'filename' required property
         if (!isset($input['filename'])) {
             $context->nullValueError('string');
         } else {
-            $instance->filename = \MakinaCorpus\Normalizer\Helper::toString($input['filename'], $context);
+            $instance->filename = Helper::toString($input['filename'], $context);
         }
     },
     null, Php74MockArticle::class

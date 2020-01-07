@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
-use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -17,7 +17,7 @@ final class UuidGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function supports(PropertyDefinition $property, Context $context): bool
+    public function supports(PropertyDefinition $property, GeneratorContext $context): bool
     {
         $type = $context->getNativeType($property->getTypeName());
 
@@ -27,7 +27,7 @@ final class UuidGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateNormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateNormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         return "{$input}->__toString()";
     }
@@ -35,8 +35,10 @@ final class UuidGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateDenormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateDenormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
-        return '\\'.Uuid::class."::fromString({$input})";
+        $localClassName = $context->addImport(Uuid::class);
+
+        return $localClassName."::fromString({$input})";
     }
 }

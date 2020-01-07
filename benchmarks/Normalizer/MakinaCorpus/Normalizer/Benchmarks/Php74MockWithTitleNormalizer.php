@@ -11,6 +11,7 @@ namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 
 final class Php74MockWithTitleNormalizer
 {
@@ -56,7 +57,6 @@ final class Php74MockWithTitleNormalizer
  */
 Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'title' property
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
     null, Php74MockWithTitle::class
@@ -67,11 +67,10 @@ Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' required property
         if (!isset($input['title'])) {
             $context->nullValueError('string');
         } else {
-            $instance->title = \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context);
+            $instance->title = Helper::toString($input['title'], $context);
         }
     },
     null, Php74MockWithTitle::class

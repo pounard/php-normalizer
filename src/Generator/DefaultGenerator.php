@@ -6,17 +6,15 @@ namespace MakinaCorpus\Normalizer\Generator;
 
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
+use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
+use MakinaCorpus\Normalizer\WritableNormalizerRegistry;
 use MakinaCorpus\Normalizer\Generator\Plugin\GeneratorPluginChain;
+use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Default normalizer generator.
- *
- * @todo
- *  - inject naming strategy
- *  - make it more configurable
- *  - make it pluggable
  */
 final class DefaultGenerator implements Generator
 {
@@ -35,6 +33,9 @@ final class DefaultGenerator implements Generator
     /** @var GeneratorPluginChain */
     private $generatorPluginChain;
 
+    /** @var WritableNormalizerRegistry */
+    private $registry;
+
     /**
      * Constructor
      *
@@ -43,15 +44,17 @@ final class DefaultGenerator implements Generator
     public function __construct(
         ContextFactory $contextFactory,
         string $projectSourceDirectory,
+        WritableNormalizerRegistry $registry,
         ?string $generatedClassNamespace = null,
         ?Psr4AppNamingStrategy $namingStrategy = null,
         ?GeneratorPluginChain $generatorPluginChain = null
     ) {
         $this->contextFactory = $contextFactory;
         $this->generatedClassNamespace = $generatedClassNamespace;
+        $this->generatorPluginChain = $generatorPluginChain ?? new GeneratorPluginChain();
         $this->namingStrategy = $namingStrategy ?? new Psr4AppNamingStrategy();
         $this->projectSourceDirectory = $projectSourceDirectory;
-        $this->generatorPluginChain = $generatorPluginChain ?? new GeneratorPluginChain();
+        $this->registry = $registry;
     }
 
     /**
@@ -79,17 +82,40 @@ final class DefaultGenerator implements Generator
         }
 
         $writer = new Writer($filename);
-        $context = $this->contextFactory->createContext();
+        $context = GeneratorContext::of($this->contextFactory->createContext());
 
-        return $this->generateClass($className, $normalizerClassName, $context, $writer);
+        $class = $this->generateClass($className, $normalizerClassName, $context, $writer);
+        $this->registry->register($className, $normalizerClassName, $filename, $context->getClassDependencies());
+
+        return $class;
+    }
+
+    /**
+     * Generate or handle gracefully another type (de)normalizer class.
+     */
+    private function generateOtherNormalizerClass(PropertyDefinition $property, GeneratorContext $context, string $input): ?string
+    {
+        $type = $context->getNativeType($property->getTypeName());
+        try {
+            // If attempt is done with an interface, it will raise an exception.
+            $isTerminal = $context->getType($type)->isTerminal();
+            if (\class_exists($type) && !$isTerminal) {
+                $normalizerClassName = $this->generateNormalizerClass($type);
+                $context->addClassDependency($type);
+                $context->addClassDependency($normalizerClassName);
+                return $normalizerClassName;
+            }
+        } catch (TypeDoesNotExistError $e) {
+            $context->addWarning($e->getMessage());
+        }
+        return null;
     }
 
     /**
      * Generate single value normalizer call code.
      */
-    private function generateNormalizerCallValue(PropertyDefinition $property, Context $context, Writer $writer, string $input): string
+    private function generateNormalizerCallValue(PropertyDefinition $property, GeneratorContext $context, Writer $writer, string $input): string
     {
-        $type = $context->getNativeType($property->getTypeName());
         $normalizeCall = null;
 
         if ($this->generatorPluginChain->supports($property, $context)) {
@@ -98,15 +124,9 @@ final class DefaultGenerator implements Generator
 
         // Attempt eager related class code generation, if possible.
         if (!$normalizeCall) {
-            try {
-                // If attempt is done with an interface, it will raise an exception.
-                $isTerminal = $context->getType($type)->isTerminal();
-                if (\class_exists($type) && !$isTerminal) {
-                    $normalizerClassName = $this->generateNormalizerClass($type);
-                    $normalizeCall = "\\{$normalizerClassName}::normalize({$input}, \$context, \$normalizer)";
-                }
-            } catch (TypeDoesNotExistError $e) {
-                $context->addWarning($e->getMessage());
+            if ($normalizerClassName = $this->generateOtherNormalizerClass($property, $context, $input)) {
+                $shortName = $context->addImport($normalizerClassName);
+                $normalizeCall = "{$shortName}::normalize({$input}, \$context, \$normalizer)";
             }
         }
 
@@ -120,7 +140,7 @@ final class DefaultGenerator implements Generator
     /**
      * Generate single value property set
      */
-    private function generateNormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateNormalizerPropertyValue(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $normalizedName = \addslashes($property->getNormalizedName());
@@ -129,7 +149,6 @@ final class DefaultGenerator implements Generator
         $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        // Normalize '{$propName}' property
         {$output} = (null === {$input} ? null : {$normalizeCall});
 EOT
         );
@@ -138,7 +157,7 @@ EOT
     /**
      * Generate value collection property set
      */
-    private function generateNormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateNormalizerPropertyCollection(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $normalizedName = \addslashes($property->getNormalizedName());
@@ -148,7 +167,6 @@ EOT
         $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        // Normalize '{$propName}' property
         {$output} = [];
         if ({$arrayInput}) {
             foreach ({$arrayInput} as \$index => {$input}) {
@@ -166,7 +184,7 @@ EOT
     /**
      * Generate property handling code
      */
-    private function generateNormalizerProperty(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateNormalizerProperty(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         if ($property->isCollection()) {
             $this->generateNormalizerPropertyCollection($property, $context, $writer);
@@ -178,7 +196,7 @@ EOT
     /**
      * Generate single value normalizer call code.
      */
-    private function generateDeormalizerCallValue(PropertyDefinition $property, Context $context, Writer $writer, string $input): string
+    private function generateDeormalizerCallValue(PropertyDefinition $property, GeneratorContext $context, Writer $writer, string $input): string
     {
         $type = $context->getNativeType($property->getTypeName());
         $normalizeCall = null;
@@ -189,26 +207,20 @@ EOT
 
         // Attempt eager related class code generation, if possible.
         if (!$normalizeCall) {
-            try {
-                // If attempt is done with an interface, it will raise an exception.
-                $isTerminal = $context->getType($type)->isTerminal();
-                if (\class_exists($type) && !$isTerminal) {
-                    $normalizerClassName = $this->generateNormalizerClass($type);
-                    $normalizeCall = "\\{$normalizerClassName}::denormalize({$input}, \$context, \$denormalizer)";
-                }
-            } catch (TypeDoesNotExistError $e) {
-                $context->addWarning($e->getMessage());
+            if ($normalizerClassName = $this->generateOtherNormalizerClass($property, $context, $input)) {
+                $shortName = $context->addImport($normalizerClassName);
+                $normalizeCall = "{$shortName}::denormalize({$input}, \$context, \$denormalizer)";
             }
         }
 
         $isBuiltIn = !\class_exists($type) && !\interface_exists($type);
-        $classFqdn = $isBuiltIn ? null : '\\'.\ltrim($type, '\\');
+        $shortName = $isBuiltIn ? null : $context->addImport($type);
 
         if (!$normalizeCall) {
             if (!$isBuiltIn) {
                 $typeString = "'{$type}'";
             } else {
-                $typeString = $classFqdn.'::class';
+                $typeString = $shortName.'::class';
             }
             $normalizeCall = "(\$denormalizer ? \$denormalizer({$typeString}, {$input}, \$context, \$denormalizer) : {$input})";
         }
@@ -216,7 +228,7 @@ EOT
         // Allow already denormalized objects to pass through.
         if (!$isBuiltIn) {
             return <<<EOT
-({$input} instanceof $classFqdn
+({$input} instanceof $shortName
     ? {$input}
     : {$normalizeCall}
 )
@@ -229,7 +241,7 @@ EOT;
     /**
      * Generate call that find values into the input array when there are more than one candidate.
      */
-    private function generateDenormalizerPropertyValueWithCandidates(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyValueWithCandidates(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
@@ -246,7 +258,6 @@ EOT;
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
             $writer->write(<<<EOT
-        // Denormalize '{$propName}' nullable property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (\$option->success) {
             {$input} = \$option->value;
@@ -261,7 +272,6 @@ EOT
         } else {
             $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
             $writer->write(<<<EOT
-        // Denormalize '{$propName}' required property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         {$input} = \$option->value;
         if (!\$option->success || null === {$input}) {
@@ -277,7 +287,7 @@ EOT
     /**
      * Generate single value property set.
      */
-    private function generateDenormalizerPropertyValue(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyValue(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $candidateNames = $property->getCandidateNames();
         if (1 < \count($candidateNames)) {
@@ -300,14 +310,12 @@ EOT
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
             $writer->write(<<<EOT
-        // Denormalize '{$propName}' nullable property
         {$output} = isset($input) ? {$denormalizeCall} : null;
 EOT
             );
         } else {
             $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
             $writer->write(<<<EOT
-        // Denormalize '{$propName}' required property
         if (!isset($input)) {
             \$context->nullValueError('{$escapedNativeType}');
         } else {
@@ -321,7 +329,7 @@ EOT
     /**
      * Generate value collection property set when there are more than one candidate.
      */
-    private function generateDenormalizerPropertyCollectionWithCandidates(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyCollectionWithCandidates(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $propName = \addslashes($property->getNativeName());
         $candidateNames = \sprintf("['%s']", implode("', '", \array_map('\addslashes', $property->getCandidateNames())));
@@ -335,7 +343,6 @@ EOT
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
-        // Denormalize '{$propName}' collection property
         \$option = Helper::find(\$input, {$candidateNames}, \$context);
         if (\$option->success && ({$arrayInput} = \$option->value)) {
             if (!\is_iterable({$arrayInput})) {
@@ -360,7 +367,7 @@ EOT
     /**
      * Generate value collection property set
      */
-    private function generateDenormalizerPropertyCollection(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerPropertyCollection(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         $candidateNames = $property->getCandidateNames();
         if (1 < \count($candidateNames)) {
@@ -380,7 +387,6 @@ EOT
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
-        // Denormalize '{$propName}' collection property
         if (isset($arrayInput)) {
             if (!\is_iterable({$arrayInput})) {
                 {$arrayInput} = (array){$arrayInput};
@@ -404,7 +410,7 @@ EOT
     /**
      * Generate property handling code
      */
-    private function generateDenormalizerProperty(PropertyDefinition $property, Context $context, Writer $writer): void
+    private function generateDenormalizerProperty(PropertyDefinition $property, GeneratorContext $context, Writer $writer): void
     {
         if ($property->isCollection()) {
             $this->generateDenormalizerPropertyCollection($property, $context, $writer);
@@ -414,12 +420,12 @@ EOT
     }
 
     /**
-     * Generate denormalizer for a class
+     * Generate (de)normalizer class.
      *
      * @return string
      *   The generated class fully qualified name
      */
-    private function generateClass(string $type, string $generatedClassName, Context $context, Writer $writer): string
+    private function generateClass(string $type, string $generatedClassName, GeneratorContext $context, Writer $writer): string
     {
         $typeDef = $context->getType($type);
         $nativeType = $context->getNativeType($type);
@@ -431,42 +437,33 @@ EOT
             throw new \LogicException(\sprintf("Cannot dump normalizer: type '%s' does not exist or is not a class", $nativeType));
         }
 
-        $parts = \array_filter(\explode('\\', $nativeType));
-        $localClassName = \array_pop($parts);
-        $classNamespace = \implode('\\', $parts);
+        $classNamespace = Helper::getClassNamespace($nativeType);
+        $generatedLocalClassName = Helper::getClassShortName($generatedClassName);
+        $generatedClassNamespace = Helper::getClassNamespace($generatedClassName);
 
-        $parts = \array_filter(\explode('\\', $generatedClassName));
-        $generatedLocalClassName = \array_pop($parts);
-        $generatedClassNamespace = \implode('\\', $parts);
-
-        $imports = [Context::class];
+        $memoryWriter = Writer::memory();
+        $context->addImport(Context::class);
         if ($generatedClassNamespace !== $classNamespace) {
-            $imports[] = $nativeType;
+            $context->addImport($nativeType);
         }
 
-        // Create a property map based upon the declaring class and access
-        // scope (private, protected).
-        $perClassMap = [];
-        $index = 0;
-        /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
-        foreach ($properties = $typeDef->getProperties() as $property) {
-            // Get relative name.
-            // @todo handle name conflicts.
-            $parts = \array_filter(\explode('\\', $declaringClass = $property->getDeclaringClass()));
-            $localDeclaringClassName = \array_pop($parts);
-            // Only create a new closure for when the property cannot be
-            // accessed by the hydrated class.
-            if ('private' === $property->getDeclaredScope() && $declaringClass !== $nativeType) {
-                $imports[] = $declaringClass;
-                $perClassMap[$localDeclaringClassName][] = $property;
-            } else {
-                $perClassMap[$localDeclaringClassName][] = $property;
+        $this->generateClassBody($type, $generatedClassName, $context, $memoryWriter);
+
+        $imports = \array_filter(
+            $context->getImports(),
+            static function ($importedClassName) use ($generatedClassName) {
+                return !Helper::inSameNamespace($importedClassName, $generatedClassName);
+            }
+        );
+        \asort($imports);
+        foreach ($imports as $alias => $className) {
+            if ($alias !== Helper::getClassShortName($className)) {
+                $imports[$alias] = $className." as ".$alias;
             }
         }
-
-        // Generate imports.
-        \sort($imports);
         $importsAsString = "use ".\implode(";\nuse ", $imports).';';
+
+        $classBody = $memoryWriter->getBuffer();
 
         $writer->write(<<<EOT
 <?php
@@ -484,10 +481,43 @@ namespace {$generatedClassNamespace};
 
 final class {$generatedLocalClassName}
 {
+{$classBody}
 EOT
         );
 
         $writer->write("\n");
+
+        return $generatedClassNamespace.'\\'.$generatedLocalClassName;
+    }
+
+    /**
+     * Generate class body.
+     */
+    private function generateClassBody(string $type, string $generatedClassName, GeneratorContext $context, Writer $writer): void
+    {
+        $typeDef = $context->getType($type);
+        $nativeType = $context->getNativeType($type);
+
+        $parts = \array_filter(\explode('\\', $nativeType));
+        $localClassName = \array_pop($parts);
+
+        // Create a property map based upon the declaring class and access
+        // scope (private, protected).
+        $perClassMap = [];
+        $index = 0;
+        /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
+        foreach ($properties = $typeDef->getProperties() as $property) {
+            $declaringClass = $property->getDeclaringClass();
+            // Only create a new closure for when the property cannot be
+            // accessed by the hydrated class.
+            if ('private' === $property->getDeclaredScope() && $declaringClass !== $nativeType) {
+                $localDeclaringClassName = $context->addImport($declaringClass);
+                $perClassMap[$localDeclaringClassName][] = $property;
+            } else {
+                $perClassMap[$localClassName][] = $property;
+            }
+        }
+
         for ($index = 0; $index < \count($perClassMap); $index++) {
             $writer->write(<<<EOT
     /** @var callable */
@@ -611,9 +641,5 @@ EOT
             );
             $index++;
         }
-
-        $writer->write("\n");
-
-        return $generatedClassNamespace.'\\'.$generatedLocalClassName;
     }
 }

@@ -16,6 +16,7 @@ use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
 use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Generator\DefaultGenerator;
+use MakinaCorpus\Normalizer\Generator\StaticMapRegistry;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -48,7 +49,11 @@ final class StupidTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        $generator = new DefaultGenerator(new ContextFactory(), $basedir);
+        $generator = new DefaultGenerator(
+            new ContextFactory(),
+            $basedir,
+            new StaticMapRegistry(\dirname(__DIR__).'/normalizers.php')
+        );
         $generator->generateNormalizerClass($className);
     }
 }

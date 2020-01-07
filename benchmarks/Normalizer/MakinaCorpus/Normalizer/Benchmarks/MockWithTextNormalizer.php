@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
+use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithText;
 use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
 
 final class MockWithTextNormalizer
 {
@@ -65,7 +67,6 @@ final class MockWithTextNormalizer
  */
 MockWithTextNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'title' property
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
     null, MockWithTitle::class
@@ -76,8 +77,7 @@ MockWithTextNormalizer::$normalizer0 = \Closure::bind(
  */
 MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'title' nullable property
-        $instance->title = isset($input['title']) ? \MakinaCorpus\Normalizer\Helper::toString($input['title'], $context) : null;
+        $instance->title = isset($input['title']) ? Helper::toString($input['title'], $context) : null;
     },
     null, MockWithTitle::class
 );
@@ -87,8 +87,7 @@ MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
  */
 MockWithTextNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        // Normalize 'text' property
-        $ret['text'] = (null === $object->text ? null : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        $ret['text'] = (null === $object->text ? null : MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
     },
     null, MockWithText::class
 );
@@ -98,10 +97,9 @@ MockWithTextNormalizer::$normalizer1 = \Closure::bind(
  */
 MockWithTextNormalizer::$denormalizer1 = \Closure::bind(
     static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        // Denormalize 'text' nullable property
-        $instance->text = isset($input['text']) ? ($input['text'] instanceof \MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat
+        $instance->text = isset($input['text']) ? ($input['text'] instanceof MockTextWithFormat
             ? $input['text']
-            : \Normalizer\MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+            : MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
         ) : null;
     },
     null, MockWithText::class

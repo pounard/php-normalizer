@@ -49,8 +49,6 @@ final class __OptionTriage
  */
 final class NormalizeOption
 {
-    const ALWAYS_GUESS_TYPE = 'always_guess_type'; // Custom
-
     // Default
     const CIRCULAR_REFERENCE_HANDLER = 'circular_reference_handler'; // SF
     const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit'; // SF

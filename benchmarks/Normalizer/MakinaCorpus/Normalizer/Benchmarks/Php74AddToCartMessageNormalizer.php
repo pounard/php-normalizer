@@ -11,6 +11,9 @@ namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
 
 use MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage;
 use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\Helper;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final class Php74AddToCartMessageNormalizer
 {
@@ -57,13 +60,10 @@ final class Php74AddToCartMessageNormalizer
 Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
-        // Normalize 'orderId' property
         $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
 
-        // Normalize 'productId' property
         $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
 
-        // Normalize 'amount' property
         $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
     },
     null, Php74AddToCartMessage::class
@@ -75,24 +75,21 @@ Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
 Php74AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        // Denormalize 'orderId' nullable property
-        $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof \Ramsey\Uuid\UuidInterface
+        $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
             ? $input['orderId']
-            : \Ramsey\Uuid\Uuid::fromString($input['orderId'])
+            : Uuid::fromString($input['orderId'])
         ) : null;
 
-        // Denormalize 'productId' required property
         if (!isset($input['productId'])) {
             $context->nullValueError('int');
         } else {
-            $instance->productId = \MakinaCorpus\Normalizer\Helper::toInt($input['productId'], $context);
+            $instance->productId = Helper::toInt($input['productId'], $context);
         }
 
-        // Denormalize 'amount' required property
         if (!isset($input['amount'])) {
             $context->nullValueError('float');
         } else {
-            $instance->amount = \MakinaCorpus\Normalizer\Helper::toFloat($input['amount'], $context);
+            $instance->amount = Helper::toFloat($input['amount'], $context);
         }
     },
     null, Php74AddToCartMessage::class

@@ -7,12 +7,12 @@ namespace MakinaCorpus\Normalizer\Generator;
 /**
  * File writer.
  */
-final class Writer
+class Writer
 {
     const INDENT_SIZE = 4;
 
     /** @var resource */
-    private $handle;
+    protected $handle;
 
     /**
      * Constructor
@@ -27,6 +27,14 @@ final class Writer
         if (false === ($this->handle = \fopen($filename, "a+"))) {
             throw new \RuntimeException(\sprintf("'%s': can not open file for writing"));
         }
+    }
+
+    /**
+     * Create in-memory buffer stream
+     */
+    public static function memory(): MemoryWriter
+    {
+        return new MemoryWriter();
     }
 
     /**
@@ -61,5 +69,35 @@ final class Writer
             @fclose($this->handle);
         }
         $this->handle = null;
+    }
+}
+
+/**
+ * In memory temporary writer
+ */
+final class MemoryWriter extends Writer
+{
+    /**
+     * Default constructor
+     */
+    public function __construct()
+    {
+        $this->handle = \fopen('php://memory', 'w');
+    }
+
+    /**
+     * Get current buffer
+     */
+    public function getBuffer(): string
+    {
+        if (!$this->handle) {
+            throw new \RuntimeException("File was closed");
+        }
+        \rewind($this->handle);
+        try {
+            return \stream_get_contents($this->handle);
+        } finally {
+            $this->close();
+        }
     }
 }

@@ -40,12 +40,11 @@ final class ContextTest extends TestCase
     public function testSomeEvidentGetters()
     {
         $context = new Context(new ArrayTypeDefinitionMap([]), [
-            NormalizeOption::ALWAYS_GUESS_TYPE => true,
             Option::SERIALIATION_FORMAT => 'application/stupid-format',
         ]);
 
         self::assertIsArray($context->toSymfonyContext());
-        self::assertSame('application/stupid-format', $context->getFormat());
+        self::assertSame('application/stupid-format', $context->getOption('format'));
     }
 
     public function testCircularReferenceHandling()

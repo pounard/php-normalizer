@@ -13,18 +13,31 @@ namespace MakinaCorpus\Normalizer;
  * It can provide compatibility with all options from symfony/serializer
  * component, and it will behave (almost) exactly the same.
  */
-final class Context implements ValidationResultBuilder
+class Context implements ValidationResultBuilder
 {
-    private $alwaysGuessType = false;
+    /** @var int */
     private $circularReferenceLimit = 1;
+
+    /** @var string[] */
     private $groups = [];
-    private $options = [];
-    private $strict = false;
-    private $verbose = false; // @todo fallabck to false.
+
+    /** @var bool */
     private $symfonyCompatibility = false;
-    private $typeMap = [];
+
+    /** @var ValidationResultBuilder */
     private $validationResult;
+
+    /** @var bool */
+    private $verbose = false; // @todo fallabck to false.
+
+    /** @var string[] */
     private $visitedObjectMap = [];
+
+    /** @var mixed[] */
+    protected $options = [];
+
+    /** @var TypeDefinitionMap */
+    protected $typeMap = [];
 
     /**
      * Default constructor.
@@ -41,10 +54,9 @@ final class Context implements ValidationResultBuilder
      */
     public function __construct(?TypeDefinitionMap $typeMap = null, array $options = [], bool $symfonyCompatibility = false)
     {
-        $this->alwaysGuessType = (bool)($options[NormalizeOption::ALWAYS_GUESS_TYPE] ?? false);
         $this->options = $options;
         $this->symfonyCompatibility = $symfonyCompatibility;
-        $this->typeMap = $typeMap ?? self::createDefaultTypeDefinitionMap();
+        $this->typeMap = $typeMap ?? new MemoryTypeDefinitionMapCache([new ReflectionTypeDefinitionMap()]);
         $this->validationResult = new DefaultValidationResultBuilder();
 
         // Do some validation.
@@ -63,28 +75,11 @@ final class Context implements ValidationResultBuilder
     }
 
     /**
-     * Will attempt to create a type definition map depending upon the
-     * environment capabilities, using sensible defaults.
-     */
-    public static function createDefaultTypeDefinitionMap(): TypeDefinitionMap
-    {
-        return new MemoryTypeDefinitionMapCache([new ReflectionTypeDefinitionMap()]);
-    }
-
-    /**
      * Convert to Symfony context
      */
     public function toSymfonyContext(): array
     {
         return $this->options;
-    }
-
-    /**
-     * Get targetted serialization format
-     */
-    public function getFormat(): string
-    {
-        return $this->options[Option::SERIALIATION_FORMAT] ?? 'json';
     }
 
     /**
@@ -104,7 +99,7 @@ final class Context implements ValidationResultBuilder
             if ($this->symfonyCompatibility) {
                 return \call_user_func(
                     $this->options[NormalizeOption::CIRCULAR_REFERENCE_HANDLER],
-                    $object, $this->getFormat(), $this->toSymfonyContext()
+                    $object, $this->options[Option::SERIALIATION_FORMAT] ?? 'json', $this->toSymfonyContext()
                 );
             }
 
@@ -286,6 +281,83 @@ final class Context implements ValidationResultBuilder
     public function enter(?string $propName = null): void
     {
         $this->validationResult->enter($propName);
+    }
+}
+
+/**
+ * Generator context
+ */
+final class GeneratorContext extends Context
+{
+    /** @var string[] */
+    private $classDependencies = [];
+
+    /** @var string */
+    private $imports = [];
+
+    /**
+     * Create from given context instance
+     */
+    public static function of(Context $context): self
+    {
+        return new self($context->typeMap, $context->options);
+    }
+
+    /**
+     * Add class dependency
+     */
+    public function addClassDependency(string $className): void
+    {
+        $className = \trim($className, '\\');
+        if (!\in_array($className, $this->classDependencies)) {
+            $this->classDependencies[] = $className;
+        }
+    }
+
+    /**
+     * Get class dependencies list
+     */
+    public function getClassDependencies(): array
+    {
+        return $this->classDependencies;
+    }
+
+    /**
+     * Add class dependency
+     */
+    public function addImport(string $className, ?string $alias = null, ?int $recursion = 0): string
+    {
+        $className = \trim($className, '\\');
+        if ($alias) {
+            $shortName = $alias;
+        } else if ($pos = \strrpos($className, '\\')) {
+            $shortName = \substr($className, $pos + 1);
+        } else {
+            $shortName = $alias ?? $className;
+        }
+
+        // If the same alias already exists, but class name is not the same,
+        // this means that we must de-duplicate the imported alias. If more
+        // than one class are imported with the same alias, the first one
+        // wins.
+        if ($existing = ($this->imports[$shortName] ?? null)) {
+            if ($className !== $existing) {
+                return $this->addImport($className, $shortName.(++$recursion), $recursion);
+            }
+            return $shortName;
+        }
+
+        $this->imports[$shortName] = $className;
+
+        return $shortName;
+    }
+
+    /**
+     * Get class dependencies list
+     */
+    public function getImports(): array
+    {
+        return $this->imports;
     }
 }
 

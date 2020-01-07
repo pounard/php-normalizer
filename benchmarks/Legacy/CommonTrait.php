@@ -8,8 +8,7 @@ use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\DefaultNormalizer;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy;
-use MakinaCorpus\Normalizer\Generator\GeneratorRuntime;
-use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\StaticMapRegistry;
 use MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain;
 use MakinaCorpus\Normalizer\Normalizer\DateTimeNormalizer as CustomDateTimeNormalizer;
 use MakinaCorpus\Normalizer\Normalizer\UuidNormalizer as CustomUuidNormalizer;
@@ -29,9 +28,7 @@ trait NormalizerBenchmarkTrait
     private function createNormalizer6(): Normalizer
     {
         return new DefaultNormalizer(
-            new GeneratorRuntime(
-                new Psr4AppNamingStrategy('Normalizer', 'Generated5')
-            ),
+            new StaticMapRegistry($mapFilename),
             new CustomNormalizerChain([
                 new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()
@@ -45,9 +42,7 @@ trait NormalizerBenchmarkTrait
     private function createNormalizer7(): Normalizer
     {
         return new DefaultNormalizer(
-            new GeneratorRuntime(
-                new Psr4AppNamingStrategy('Normalizer', 'Generated7')
-            ),
+            new StaticMapRegistry($mapFilename),
             new CustomNormalizerChain([
                 new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()
@@ -61,9 +56,7 @@ trait NormalizerBenchmarkTrait
     private function createNormalizer8(): Normalizer
     {
         return new DefaultNormalizer(
-            new GeneratorRuntime(
-                new Psr4AppNamingStrategy('Normalizer', 'Generated8')
-            ),
+            new StaticMapRegistry($mapFilename),
             new CustomNormalizerChain([
                 new CustomDateTimeNormalizer(),
                 new CustomUuidNormalizer()

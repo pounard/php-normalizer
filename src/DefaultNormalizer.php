@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
-use MakinaCorpus\Normalizer\Generator\Generator;
 use MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain;
 
 /**
@@ -13,8 +12,8 @@ use MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain;
  */
 final class DefaultNormalizer implements Normalizer
 {
-    /** @var Generator */
-    private $generator;
+    /** @var NormalizerRegistry */
+    private $registry;
 
     /** @var CustomNormalizerChain */
     private $chain;
@@ -25,10 +24,10 @@ final class DefaultNormalizer implements Normalizer
     /**
      * Constructor
      */
-    public function __construct(?Generator $generator, ?CustomNormalizerChain $chain = null)
+    public function __construct(?NormalizerRegistry $registry, ?CustomNormalizerChain $chain = null)
     {
         $this->chain = $chain ?? new CustomNormalizerChain();
-        $this->generator = $generator;
+        $this->registry = $registry;
     }
 
     /**
@@ -47,25 +46,15 @@ final class DefaultNormalizer implements Normalizer
     private function externalNormalisation($object, Context $context): ValueOption
     {
         $type = Helper::getType($object);
+        $option = Helper::normalizeScalar($type, $object, $context);
 
-        switch ($type) {
-            case 'bool':
-                return ValueOption::ok($object);
-            case 'float':
-                return ValueOption::ok($object);
-            case 'int':
-                return ValueOption::ok($object);
-            case 'null':
-                return ValueOption::ok($object);
-            case 'string':
-                return ValueOption::ok($object);
+        if (!$option->success) {
+            if ($this->chain->supportsNormalization($type)) {
+                return ValueOption::ok($this->chain->normalize($type, $object, $context));
+            }
         }
 
-        if ($this->chain->supportsNormalization($type)) {
-            return ValueOption::ok($this->chain->normalize($type, $object, $context));
-        }
-
-        return ValueOption::miss();
+        return $option;
     }
 
     /**
@@ -79,7 +68,7 @@ final class DefaultNormalizer implements Normalizer
         }
 
         $nativeType = Helper::getType($object);
-        $normalizer = $this->generator->getNormalizerClass($nativeType);
+        $normalizer = $this->registry->find($nativeType);
 
         if (!$normalizer || !\class_exists($normalizer)) {
             if ($this->enableFallback) {
@@ -103,24 +92,15 @@ final class DefaultNormalizer implements Normalizer
      */
     private function externalDenormalisation(string $type, $input, Context $context): ValueOption
     {
-        switch ($type) {
-            case 'bool':
-                return ValueOption::ok($input);
-            case 'float':
-                return ValueOption::ok($input);
-            case 'int':
-                return ValueOption::ok($input);
-            case 'null':
-                return ValueOption::ok($input);
-            case 'string':
-                return ValueOption::ok($input);
+        $option = Helper::denormalizeScalar($type, $input, $context);
+
+        if (!$option->success) {
+            if ($this->chain->supportsDenormalization($type)) {
+                return ValueOption::ok($this->chain->denormalize($type, $input, $context));
+            }
         }
 
-        if ($this->chain->supportsDenormalization($type)) {
-            return ValueOption::ok($this->chain->denormalize($type, $input, $context));
-        }
-
-        return ValueOption::miss();
+        return $option;
     }
 
     /**
@@ -135,7 +115,7 @@ final class DefaultNormalizer implements Normalizer
             return $external->value;
         }
 
-        $normalizer = $this->generator->getNormalizerClass($nativeType);
+        $normalizer = $this->registry->find($nativeType);
 
         if (!$normalizer || !\class_exists($normalizer)) {
             if ($this->enableFallback) {

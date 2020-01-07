@@ -9,16 +9,18 @@ use MakinaCorpus\Normalizer\DefaultNormalizer;
 use MakinaCorpus\Normalizer\Normalizer;
 use MakinaCorpus\Normalizer\ReflectionTypeDefinitionMap;
 use MakinaCorpus\Normalizer\Generator\DefaultGenerator;
-use MakinaCorpus\Normalizer\Generator\GeneratorRuntime;
 use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
+use MakinaCorpus\Normalizer\Generator\StaticMapRegistry;
 use MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain;
 use MakinaCorpus\Normalizer\Normalizer\DateTimeNormalizer;
 
-final class GeneratorRuntimeNormalizerTest extends AbstractNormalizerTest
+final class GeneratorNormalizerTest extends AbstractNormalizerTest
 {
     protected function createNormalizer(): Normalizer
     {
         $generatedClassNamespace = 'MakinaCorpus\\Normalizer\\Tests\\Unit';
+        $mapFilename = \dirname(\dirname(\dirname(__DIR__))).'/normalizers.php';
+        $registry = new StaticMapRegistry($mapFilename);
 
         $namingStrategy = new Psr4AppNamingStrategy(
             'Normalizer',
@@ -31,6 +33,7 @@ final class GeneratorRuntimeNormalizerTest extends AbstractNormalizerTest
                 new ReflectionTypeDefinitionMap()
             ),
             \dirname(__DIR__),
+            $registry,
             $generatedClassNamespace,
             $namingStrategy
         );
@@ -52,7 +55,7 @@ final class GeneratorRuntimeNormalizerTest extends AbstractNormalizerTest
         }
 
         $normalizer = new DefaultNormalizer(
-            new GeneratorRuntime($namingStrategy, $generatedClassNamespace),
+            $registry,
             new CustomNormalizerChain([
                 new DateTimeNormalizer(),
             ])

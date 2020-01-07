@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
-use MakinaCorpus\Normalizer\Context;
+use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use MakinaCorpus\Normalizer\ServiceConfigurationError;
@@ -17,7 +17,7 @@ final class ScalarGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function supports(PropertyDefinition $property, Context $context): bool
+    public function supports(PropertyDefinition $property, GeneratorContext $context): bool
     {
         $type = $context->getNativeType($property->getTypeName());
 
@@ -38,7 +38,7 @@ final class ScalarGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateNormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateNormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         $type = $context->getNativeType($property->getTypeName());
 
@@ -58,20 +58,20 @@ final class ScalarGeneratorPlugin implements GeneratorPlugin
     /**
      * {@inheritdoc}
      */
-    public function generateDenormalizeCode(PropertyDefinition $property, Context $context, string $input): string
+    public function generateDenormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         $type = $context->getNativeType($property->getTypeName());
-        $helperClass = Helper::class;
+        $helperClass = $context->addImport(Helper::class);
 
         switch ($type) {
             case 'bool':
-                return "\\{$helperClass}::toBool({$input}, \$context)";
+                return "{$helperClass}::toBool({$input}, \$context)";
             case 'float':
-                return "\\{$helperClass}::toFloat({$input}, \$context)";
+                return "{$helperClass}::toFloat({$input}, \$context)";
             case 'int':
-                return "\\{$helperClass}::toInt({$input}, \$context)";
+                return "{$helperClass}::toInt({$input}, \$context)";
             case 'string':
-                return "\\{$helperClass}::toString({$input}, \$context)";
+                return "{$helperClass}::toString({$input}, \$context)";
             default:
                 throw new ServiceConfigurationError();
         }
