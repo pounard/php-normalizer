@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
 use function MakinaCorpus\Normalizer\Generator\Iterations\normalizer1;
+use MakinaCorpus\Normalizer\Mock\ObjectGenerator;
 
 /**
  * Benchmark stream denormalization
@@ -16,8 +17,6 @@ use function MakinaCorpus\Normalizer\Generator\Iterations\normalizer1;
  */
 final class TheOtherWayArticleBench
 {
-    use NormalizerBenchmarkTrait;
-
     private $data;
 
     /**

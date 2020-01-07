@@ -23,7 +23,7 @@ trait WithGeneratedNormalizerTrait
     {
         return new DefaultNormalizer(
             new StaticMapRegistry(
-                \dirname(__DIR__).'/normalizers.php'
+                \dirname(__DIR__).'/mock/Generated/registry.php'
             ),
             new CustomNormalizerChain([
                 new DateTimeNormalizer(),

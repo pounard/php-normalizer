@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks;
 
-use function MakinaCorpus\Normalizer\Generator\Iterations\normalizer1;
+use function MakinaCorpus\Normalizer\Generator\Iterations\hydrator1;
+use MakinaCorpus\Normalizer\Mock\AddToCartMessage;
+use MakinaCorpus\Normalizer\Mock\ObjectGenerator;
 
 /**
  * Benchmark stream denormalization
@@ -14,17 +16,15 @@ use function MakinaCorpus\Normalizer\Generator\Iterations\normalizer1;
  *
  * @BeforeMethods({"setUp"})
  */
-final class TheOtherWaySmallBench
+final class DenormalizeSmallBench
 {
-    use NormalizerBenchmarkTrait;
-
     /**
      * Use this method for benchmark setup
      */
     public function setUp(): void
     {
         $this->initializeComponents();
-        $this->data = ObjectGenerator::createAndHydrateMessages(10);
+        $this->data = ObjectGenerator::createMessages(10);
     }
 
     /**
@@ -34,7 +34,7 @@ final class TheOtherWaySmallBench
     public function benchIteration1WithReflection() : void
     {
         foreach ($this->data as $data) {
-            normalizer1($data, $this->getContextWithReflection());
+            hydrator1(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -45,7 +45,7 @@ final class TheOtherWaySmallBench
     public function benchIteration1WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            normalizer1($data, $this->getContextWithConfigOnly());
+            hydrator1(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -56,7 +56,7 @@ final class TheOtherWaySmallBench
     public function benchIteration7WithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->normalizer7->normalize($data, $this->getContextWithReflection());
+            $this->normalizer7->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -67,7 +67,7 @@ final class TheOtherWaySmallBench
     public function benchIteration7WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->normalizer7->normalize($data, $this->getContextWithConfigOnly());
+            $this->normalizer7->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -78,7 +78,7 @@ final class TheOtherWaySmallBench
     public function benchIteration8WithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->normalizer8->normalize($data, $this->getContextWithReflection());
+            $this->normalizer8->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -89,7 +89,7 @@ final class TheOtherWaySmallBench
     public function benchIteration8WithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->normalizer8->normalize($data, $this->getContextWithConfigOnly());
+            $this->normalizer8->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -100,7 +100,7 @@ final class TheOtherWaySmallBench
     public function benchFallbackWithReflection() : void
     {
         foreach ($this->data as $data) {
-            $this->fallbackNormalizer->normalize($data, $this->getContextWithReflection());
+            $this->fallbackNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithReflection());
         }
     }
 
@@ -111,7 +111,7 @@ final class TheOtherWaySmallBench
     public function benchFallbackWithConfigOnly() : void
     {
         foreach ($this->data as $data) {
-            $this->fallbackNormalizer->normalize($data, $this->getContextWithConfigOnly());
+            $this->fallbackNormalizer->denormalize(AddToCartMessage::class, $data, $this->getContextWithConfigOnly());
         }
     }
 
@@ -122,7 +122,7 @@ final class TheOtherWaySmallBench
     public function benchSymfony() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizer->normalize($data);
+            $this->symfonyNormalizer->denormalize($data, AddToCartMessage::class);
         }
     }
 
@@ -133,7 +133,7 @@ final class TheOtherWaySmallBench
     public function benchSymfonyProxy() : void
     {
         foreach ($this->data as $data) {
-            $this->symfonyNormalizerProxy->normalize($data);
+            $this->symfonyNormalizerProxy->denormalize($data, AddToCartMessage::class);
         }
     }
 }

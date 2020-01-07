@@ -32,36 +32,17 @@
             "src/Validation.php"
         ],
         "psr-4": {
-            "MakinaCorpus\\Normalizer\\": "src/",
-            "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
+            "MakinaCorpus\\Normalizer\\": "src/"
         }
     },
     "autoload-dev": {
         "classmap": [
-            "benchmarks/Definitions.php",
-            "benchmarks/DefinitionsPhp74.php"
-        ],
-        "files": [
-            "iterations/Iteration1-Reference.php",
-            "iterations/Iteration2-Generation.php",
-            "iterations/Iteration3-Helper.php",
-            "iterations/Iteration3-Reference.php",
-            "iterations/Iteration4-Generation.php",
-            "iterations/Iteration5-RecursiveGeneration.php",
-            "iterations/Iteration7-GenerateClosures.php"
+            "mock/Definitions.php",
+            "mock/DefinitionsPhp74.php"
         ],
         "psr-4": {
-            "Generated2\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated2/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated2\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated2/MakinaCorpus/Normalizer/Tests/Functional/",
-            "Generated4\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated4/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated4\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated4/MakinaCorpus/Normalizer/Tests/Functional/",
-            "Generated5\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated5/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated5\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated5/MakinaCorpus/Normalizer/Tests/Functional/",
-            "Generated7\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated7/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated7\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated7/MakinaCorpus/Normalizer/Tests/Functional/",
-            "Generated8\\MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/Generated8/MakinaCorpus/Normalizer/Benchmarks/",
-            "Generated8\\MakinaCorpus\\Normalizer\\Tests\\Functional\\": "tests/Generated8/MakinaCorpus/Normalizer/Tests/Functional/",
             "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
+            "MakinaCorpus\\Normalizer\\Mock\\": "mock/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
         }
     },

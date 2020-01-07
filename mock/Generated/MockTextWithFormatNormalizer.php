@@ -1,19 +1,19 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Mock\MockTextWithFormat.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
+namespace MakinaCorpus\Normalizer\Mock\Generated;
 
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\Mock\MockTextWithFormat;
 
-final class Php74MockTextWithFormatNormalizer
+final class MockTextWithFormatNormalizer
 {
     /** @var callable */
     public static $normalizer0;
@@ -22,7 +22,7 @@ final class Php74MockTextWithFormatNormalizer
     public static $denormalizer0;
 
     /**
-     * Normalize \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instance into an array.
+     * Normalize \MakinaCorpus\Normalizer\Mock\MockTextWithFormat instance into an array.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
@@ -37,14 +37,14 @@ final class Php74MockTextWithFormatNormalizer
     }
 
     /**
-     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat instance.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Mock\MockTextWithFormat instance.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
-    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockTextWithFormat
+    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockTextWithFormat
     {
-        $ret = (new \ReflectionClass(Php74MockTextWithFormat::class))->newInstanceWithoutConstructor();
+        $ret = (new \ReflectionClass(MockTextWithFormat::class))->newInstanceWithoutConstructor();
 
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
@@ -53,23 +53,23 @@ final class Php74MockTextWithFormatNormalizer
 }
 
 /**
- * Normalizer for properties of Php74MockTextWithFormat.
+ * Normalizer for properties of MockTextWithFormat.
  */
-Php74MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
-    static function (array &$ret, Php74MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
+MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
         $ret['text'] = (null === $object->text ? null : (string)$object->text);
 
         $ret['format'] = (null === $object->format ? null : (string)$object->format);
     },
-    null, Php74MockTextWithFormat::class
+    null, MockTextWithFormat::class
 );
 
 /**
- * Denormalizer for properties of Php74MockTextWithFormat.
+ * Denormalizer for properties of MockTextWithFormat.
  */
-Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
-    static function (Php74MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
+    static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         $instance->text = isset($input['text']) ? Helper::toString($input['text'], $context) : null;
 
@@ -79,5 +79,5 @@ Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
             $instance->format = Helper::toString($input['format'], $context);
         }
     },
-    null, Php74MockTextWithFormat::class
+    null, MockTextWithFormat::class
 );

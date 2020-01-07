@@ -15,7 +15,7 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks;
+namespace MakinaCorpus\Normalizer\Mock;
 
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;

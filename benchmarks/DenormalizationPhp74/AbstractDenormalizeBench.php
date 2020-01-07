@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks\DenormalizationPhp74;
 
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
-use MakinaCorpus\Normalizer\Benchmarks\Php74ObjectGenerator;
+use MakinaCorpus\Normalizer\Mock\Php74MockArticle;
+use MakinaCorpus\Normalizer\Mock\Php74ObjectGenerator;
 
 /**
  * @BeforeMethods({"initSerializer", "initData"})

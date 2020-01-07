@@ -1,19 +1,19 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Mock\Php74MockWithText.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
+namespace MakinaCorpus\Normalizer\Mock\Generated;
 
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\Mock\Php74MockTextWithFormat;
+use MakinaCorpus\Normalizer\Mock\Php74MockWithText;
+use MakinaCorpus\Normalizer\Mock\Php74MockWithTitle;
 
 final class Php74MockWithTextNormalizer
 {
@@ -30,7 +30,7 @@ final class Php74MockWithTextNormalizer
     public static $denormalizer1;
 
     /**
-     * Normalize \MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText instance into an array.
+     * Normalize \MakinaCorpus\Normalizer\Mock\Php74MockWithText instance into an array.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
@@ -46,7 +46,7 @@ final class Php74MockWithTextNormalizer
     }
 
     /**
-     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText instance.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Mock\Php74MockWithText instance.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()

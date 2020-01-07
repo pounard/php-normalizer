@@ -1,21 +1,21 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Mock\AddToCartMessage.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
+namespace MakinaCorpus\Normalizer\Mock\Generated;
 
-use MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\Mock\AddToCartMessage;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-final class Php74AddToCartMessageNormalizer
+final class AddToCartMessageNormalizer
 {
     /** @var callable */
     public static $normalizer0;
@@ -24,7 +24,7 @@ final class Php74AddToCartMessageNormalizer
     public static $denormalizer0;
 
     /**
-     * Normalize \MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage instance into an array.
+     * Normalize \MakinaCorpus\Normalizer\Mock\AddToCartMessage instance into an array.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
@@ -39,14 +39,14 @@ final class Php74AddToCartMessageNormalizer
     }
 
     /**
-     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage instance.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Mock\AddToCartMessage instance.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
-    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74AddToCartMessage
+    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): AddToCartMessage
     {
-        $ret = (new \ReflectionClass(Php74AddToCartMessage::class))->newInstanceWithoutConstructor();
+        $ret = (new \ReflectionClass(AddToCartMessage::class))->newInstanceWithoutConstructor();
 
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
@@ -55,10 +55,10 @@ final class Php74AddToCartMessageNormalizer
 }
 
 /**
- * Normalizer for properties of Php74AddToCartMessage.
+ * Normalizer for properties of AddToCartMessage.
  */
-Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
-    static function (array &$ret, Php74AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
+AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
         $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
 
@@ -66,14 +66,14 @@ Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
 
         $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
     },
-    null, Php74AddToCartMessage::class
+    null, AddToCartMessage::class
 );
 
 /**
- * Denormalizer for properties of Php74AddToCartMessage.
+ * Denormalizer for properties of AddToCartMessage.
  */
-Php74AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
-    static function (Php74AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
+    static function (AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
         $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
             ? $input['orderId']
@@ -92,5 +92,5 @@ Php74AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
             $instance->amount = Helper::toFloat($input['amount'], $context);
         }
     },
-    null, Php74AddToCartMessage::class
+    null, AddToCartMessage::class
 );

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Benchmarks\DenormalizationPhp74;
 
 use Jane\AutoMapper\Context;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
+use MakinaCorpus\Normalizer\Mock\Php74MockArticle;
 use MakinaCorpus\Normalizer\Benchmarks\WithJaneAutomapperTrait;
 
 final class JaneAutomapperDenormalizerBench extends AbstractDenormalizeBench

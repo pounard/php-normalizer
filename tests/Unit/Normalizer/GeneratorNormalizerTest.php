@@ -19,7 +19,7 @@ final class GeneratorNormalizerTest extends AbstractNormalizerTest
     protected function createNormalizer(): Normalizer
     {
         $generatedClassNamespace = 'MakinaCorpus\\Normalizer\\Tests\\Unit';
-        $mapFilename = \dirname(\dirname(\dirname(__DIR__))).'/normalizers.php';
+        $mapFilename = \dirname(__DIR__).'/Mock/registry.php';
         $registry = new StaticMapRegistry($mapFilename);
 
         $namingStrategy = new Psr4AppNamingStrategy(

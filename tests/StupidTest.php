@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests;
 
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\Benchmarks\AddToCartMessage as AddToCartMessageBench;
-use MakinaCorpus\Normalizer\Benchmarks\MockArticle as MockArticleBench;
-use MakinaCorpus\Normalizer\Benchmarks\MockTextWithFormat as MockTextWithFormatBench;
-use MakinaCorpus\Normalizer\Benchmarks\MockWithText as MockWithTextBench;
-use MakinaCorpus\Normalizer\Benchmarks\MockWithTitle as MockWithTitleBench;
-use MakinaCorpus\Normalizer\Benchmarks\Php74AddToCartMessage;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockArticle;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockTextWithFormat;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithText;
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Generator\DefaultGenerator;
+use MakinaCorpus\Normalizer\Generator\Psr4AppNamingStrategy;
 use MakinaCorpus\Normalizer\Generator\StaticMapRegistry;
+use MakinaCorpus\Normalizer\Mock\AddToCartMessage as AddToCartMessageBench;
+use MakinaCorpus\Normalizer\Mock\MockArticle as MockArticleBench;
+use MakinaCorpus\Normalizer\Mock\MockTextWithFormat as MockTextWithFormatBench;
+use MakinaCorpus\Normalizer\Mock\MockWithText as MockWithTextBench;
+use MakinaCorpus\Normalizer\Mock\MockWithTitle as MockWithTitleBench;
+use MakinaCorpus\Normalizer\Mock\Php74AddToCartMessage;
+use MakinaCorpus\Normalizer\Mock\Php74MockArticle;
+use MakinaCorpus\Normalizer\Mock\Php74MockTextWithFormat;
+use MakinaCorpus\Normalizer\Mock\Php74MockWithText;
+use MakinaCorpus\Normalizer\Mock\Php74MockWithTitle;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,7 +30,7 @@ final class StupidTest extends TestCase
     public static function dataClassName()
     {
         // Benchmarks
-        $basedir = \dirname(__DIR__).'/benchmarks';
+        $basedir = \dirname(__DIR__).'/mock';
         yield [AddToCartMessageBench::class, $basedir];
         yield [MockArticleBench::class, $basedir];
         yield [MockTextWithFormatBench::class, $basedir];
@@ -52,7 +53,13 @@ final class StupidTest extends TestCase
         $generator = new DefaultGenerator(
             new ContextFactory(),
             $basedir,
-            new StaticMapRegistry(\dirname(__DIR__).'/normalizers.php')
+            new StaticMapRegistry(\dirname(__DIR__).'/mock/Generated/registry.php'),
+            'MakinaCorpus\Normalizer\Mock',
+            new Psr4AppNamingStrategy(
+                'Normalizer',
+                'Generated',
+                'MakinaCorpus\Normalizer\Mock'
+            )
         );
         $generator->generateNormalizerClass($className);
     }

@@ -1,8 +1,8 @@
 <?php
 
-final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends \Jane\AutoMapper\Mapper
+final class Mapper_array_MakinaCorpus_Normalizer_Mock_Php74MockArticle extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1578041530';
+    protected $hash = '1578415842';
     public function __construct()
     {
     }
@@ -13,15 +13,15 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
         }
         $result = $context->getObjectToPopulate();
         if (null === $result) {
-            $result = new \MakinaCorpus\Normalizer\Benchmarks\MockArticle();
+            $result = new \MakinaCorpus\Normalizer\Mock\Php74MockArticle();
         }
         $context = $context->withIncrementedDepth();
-        if (array_key_exists('updateddAt', $value) && $context->isAllowedAttribute('updateddAt')) {
+        if (array_key_exists('updatedAt', $value) && $context->isAllowedAttribute('updatedAt')) {
             $value_1 = null;
-            if (null !== $value['updateddAt']) {
-                $value_1 = \DateTimeImmutable::createFromFormat('Y-m-d\\TH:i:sP', $value['updateddAt']);
+            if (null !== $value['updatedAt']) {
+                $value_1 = \DateTimeImmutable::createFromFormat('Y-m-d\\TH:i:sP', $value['updatedAt']);
             }
-            $result->setupdateddAt($value_1);
+            $result->setupdatedAt($value_1);
         }
         if (array_key_exists('authors', $value) && $context->isAllowedAttribute('authors')) {
             $values = array();
@@ -33,7 +33,7 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
         if (array_key_exists('text', $value) && $context->isAllowedAttribute('text')) {
             $value_3 = null;
             if (null !== $value['text']) {
-                $value_3 =& $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat']->map($value['text'], $context->withNewContext('text'));
+                $value_3 =& $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Mock\\Php74MockTextWithFormat']->map($value['text'], $context->withNewContext('text'));
             }
             $result->settext($value_3);
         }
@@ -64,6 +64,6 @@ final class Mapper_array_MakinaCorpus_Normalizer_Benchmarks_MockArticle extends 
     }
     public function injectMappers(\Jane\AutoMapper\AutoMapperInterface $autoMapper)
     {
-        $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat'] = $autoMapper->getMapper('array', 'MakinaCorpus\\Normalizer\\Benchmarks\\MockTextWithFormat');
+        $this->mappers['Mapper_array_MakinaCorpus\\Normalizer\\Mock\\Php74MockTextWithFormat'] = $autoMapper->getMapper('array', 'MakinaCorpus\\Normalizer\\Mock\\Php74MockTextWithFormat');
     }
 }

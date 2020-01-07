@@ -1,19 +1,19 @@
 <?php
 /**
- * Generated (de)normalizer for class MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle.
+ * Generated (de)normalizer for class MakinaCorpus\Normalizer\Mock\MockWithTitle.
  *
  * Do not modify it manually, re-generate it upon each code modification.
  */
 
 declare(strict_types=1);
 
-namespace Normalizer\MakinaCorpus\Normalizer\Benchmarks;
+namespace MakinaCorpus\Normalizer\Mock\Generated;
 
-use MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle;
 use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\Mock\MockWithTitle;
 
-final class Php74MockWithTitleNormalizer
+final class MockWithTitleNormalizer
 {
     /** @var callable */
     public static $normalizer0;
@@ -22,7 +22,7 @@ final class Php74MockWithTitleNormalizer
     public static $denormalizer0;
 
     /**
-     * Normalize \MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle instance into an array.
+     * Normalize \MakinaCorpus\Normalizer\Mock\MockWithTitle instance into an array.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::normalize()
@@ -37,14 +37,14 @@ final class Php74MockWithTitleNormalizer
     }
 
     /**
-     * Create and denormalize an \MakinaCorpus\Normalizer\Benchmarks\Php74MockWithTitle instance.
+     * Create and denormalize an \MakinaCorpus\Normalizer\Mock\MockWithTitle instance.
      *
      * @param callable $normalizer
      *   Signature is \MakinaCorpus\Normalizer\Normalizer::denormalize()
      */
-    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockWithTitle
+    public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockWithTitle
     {
-        $ret = (new \ReflectionClass(Php74MockWithTitle::class))->newInstanceWithoutConstructor();
+        $ret = (new \ReflectionClass(MockWithTitle::class))->newInstanceWithoutConstructor();
 
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
@@ -53,25 +53,25 @@ final class Php74MockWithTitleNormalizer
 }
 
 /**
- * Normalizer for properties of Php74MockWithTitle.
+ * Normalizer for properties of MockWithTitle.
  */
-Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
-    static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
+MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
+    static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
         $ret['title'] = (null === $object->title ? null : (string)$object->title);
     },
-    null, Php74MockWithTitle::class
+    null, MockWithTitle::class
 );
 
 /**
- * Denormalizer for properties of Php74MockWithTitle.
+ * Denormalizer for properties of MockWithTitle.
  */
-Php74MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
-    static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
+MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
+    static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         if (!isset($input['title'])) {
             $context->nullValueError('string');
         } else {
             $instance->title = Helper::toString($input['title'], $context);
         }
     },
-    null, Php74MockWithTitle::class
+    null, MockWithTitle::class
 );
