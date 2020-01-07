@@ -485,6 +485,9 @@ final class {$generatedLocalClassName}
 EOT
         );
 
+        // Weird thing, should fix this, class closure is handled within the next
+        // generateClassBody() method call, to avoid having to propagate the map
+        // of properties computed there.
         $writer->write("\n");
 
         return $generatedClassNamespace.'\\'.$generatedLocalClassName;
@@ -501,8 +504,7 @@ EOT
         $parts = \array_filter(\explode('\\', $nativeType));
         $localClassName = \array_pop($parts);
 
-        // Create a property map based upon the declaring class and access
-        // scope (private, protected).
+        // Create a property map with declaring classes and access scopes.
         $perClassMap = [];
         $index = 0;
         /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */

@@ -11,11 +11,6 @@ final class Option
 {
     const SERIALIATION_FORMAT = 'format'; // Custom
 
-    /**
-     * By settings
-     */
-    const STRICT_NULL = 'strict'; // Custom
-
     // DateInterval
     // const FORMAT_KEY = 'dateinterval_format'; // SF
 

@@ -6,6 +6,16 @@ namespace MakinaCorpus\Normalizer;
 
 /**
  * Object (de)normalizer to use whenever the generated variant does not exist.
+ *
+ * This is the reference implementation, it recursively traverse the object or
+ * input hierarchy, following the type and property definition, and handle
+ * whatever matches those definitions.
+ *
+ * As being the reference implementation, it's also the "most readable" one
+ * which covers 100% of unit tests. To write a new one, understand this one
+ * first.
+ *
+ * Definitions are handled by the context.
  */
 final class FallbackNormalizer
 {
