@@ -328,6 +328,14 @@ final class GeneratorContext extends Context
     public function addImport(string $className, ?string $alias = null, ?int $recursion = 0): string
     {
         $className = \trim($className, '\\');
+
+        if ($existing = \array_search($className, $this->imports)) {
+            if (!$alias || $alias === $existing) {
+                return $existing;
+            }
+            throw new RuntimeError(\sprintf("Class '%s' was already aliased with '%s': '%s' given", $className, $existing, $alias));
+        }
+
         if ($alias) {
             $shortName = $alias;
         } else if ($pos = \strrpos($className, '\\')) {

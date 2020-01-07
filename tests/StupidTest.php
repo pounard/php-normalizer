@@ -30,29 +30,28 @@ final class StupidTest extends TestCase
     public static function dataClassName()
     {
         // Benchmarks
-        $basedir = \dirname(__DIR__).'/mock';
-        yield [AddToCartMessageBench::class, $basedir];
-        yield [MockArticleBench::class, $basedir];
-        yield [MockTextWithFormatBench::class, $basedir];
-        yield [MockWithTextBench::class, $basedir];
-        yield [MockWithTitleBench::class, $basedir];
-        yield [Php74AddToCartMessage::class, $basedir];
-        yield [Php74MockArticle::class, $basedir];
-        yield [Php74MockTextWithFormat::class, $basedir];
-        yield [Php74MockWithText::class, $basedir];
-        yield [Php74MockWithTitle::class, $basedir];
+        yield [AddToCartMessageBench::class];
+        yield [MockArticleBench::class];
+        yield [MockTextWithFormatBench::class];
+        yield [MockWithTextBench::class];
+        yield [MockWithTitleBench::class];
+        yield [Php74AddToCartMessage::class];
+        yield [Php74MockArticle::class];
+        yield [Php74MockTextWithFormat::class];
+        yield [Php74MockWithText::class];
+        yield [Php74MockWithTitle::class];
     }
 
     /**
      * @dataProvider dataClassName
      */
-    public function testNormalizerDefaultGenerator(string $className, string $basedir)
+    public function testNormalizerDefaultGenerator(string $className)
     {
         self::expectNotToPerformAssertions();
 
         $generator = new DefaultGenerator(
             new ContextFactory(),
-            $basedir,
+            \dirname(__DIR__).'/mock',
             new StaticMapRegistry(\dirname(__DIR__).'/mock/Generated/registry.php'),
             'MakinaCorpus\Normalizer\Mock',
             new Psr4AppNamingStrategy(
