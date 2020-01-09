@@ -125,9 +125,9 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
 
         $ret['id'] = (null === $object->id ? null : $object->id->__toString());
 
-        $ret['createdAt'] = (null === $object->createdAt ? null : ($normalizer ? $normalizer($object->createdAt, $context, $normalizer) : $object->createdAt));
+        $ret['createdAt'] = (null === $object->createdAt ? null : $object->createdAt->format('Y-m-d\\TH:i:sP'));
 
-        $ret['updatedAt'] = (null === $object->updatedAt ? null : ($normalizer ? $normalizer($object->updatedAt, $context, $normalizer) : $object->updatedAt));
+        $ret['updatedAt'] = (null === $object->updatedAt ? null : $object->updatedAt->format('Y-m-d\\TH:i:sP'));
 
         $ret['authors'] = [];
         if ($object->authors) {
@@ -167,13 +167,13 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
         } else {
             $instance->createdAt = ($input['createdAt'] instanceof DateTimeImmutable
                 ? $input['createdAt']
-                : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['createdAt'], $context, $denormalizer) : $input['createdAt'])
+                : Helper::toDateImmutable($input['createdAt'], $context)
             );
         }
 
         $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof DateTimeImmutable
             ? $input['updatedAt']
-            : ($denormalizer ? $denormalizer('DateTimeImmutable', $input['updatedAt'], $context, $denormalizer) : $input['updatedAt'])
+            : Helper::toDateImmutable($input['updatedAt'], $context)
         ) : null;
 
         if (isset($input['authors'])) {

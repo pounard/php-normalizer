@@ -37,6 +37,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
         // Add some defaults to run after the user given ones.
         if ($setDefaults) {
             $this->plugins[] = new ScalarGeneratorPlugin();
+            $this->plugins[] = new DateTimeGeneratorPlugin();
             $this->plugins[] = new UuidGeneratorPlugin();
         }
     }
