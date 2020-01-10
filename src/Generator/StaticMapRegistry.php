@@ -181,11 +181,9 @@ final class StaticMapRegistry implements WritableNormalizerRegistry
             }
         }
 
-        $date = (new \DateTimeImmutable())->format(\DateTime::ISO8601);
         $contents = \var_export($map, true);
         $bytes = \file_put_contents($this->mapFilename, <<<EOT
 <?php
-// Generated on {$date}.
 return {$contents};\n
 EOT
         );

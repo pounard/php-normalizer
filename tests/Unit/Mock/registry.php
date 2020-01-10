@@ -1,5 +1,4 @@
 <?php
-// Generated on 2020-01-09T19:26:33+0100.
 return array (
   'MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithDateArray' => 
   array (
