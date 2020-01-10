@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithInt;
 
 final class MockClassWithIntNormalizer
@@ -76,7 +76,7 @@ MockClassWithIntNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['int'])) {
                 $context->nullValueError('int');
             } else {
-                $instance->int = Helper::toInt($input['int'], $context);
+                $instance->int = RuntimeHelper::toInt($input['int'], $context);
             }
         } finally {
             $context->leave();

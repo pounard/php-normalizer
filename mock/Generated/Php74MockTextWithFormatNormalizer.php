@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\Php74MockTextWithFormat;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 
 final class Php74MockTextWithFormatNormalizer
 {
@@ -82,7 +82,7 @@ Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
 
         try {
             $context->enter('text');
-            $instance->text = isset($input['text']) ? Helper::toString($input['text'], $context) : null;
+            $instance->text = isset($input['text']) ? RuntimeHelper::toString($input['text'], $context) : null;
         } finally {
             $context->leave();
         }
@@ -92,7 +92,7 @@ Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['format'])) {
                 $context->nullValueError('string');
             } else {
-                $instance->format = Helper::toString($input['format'], $context);
+                $instance->format = RuntimeHelper::toString($input['format'], $context);
             }
         } finally {
             $context->leave();

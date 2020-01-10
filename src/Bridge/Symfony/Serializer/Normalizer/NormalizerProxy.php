@@ -2,8 +2,8 @@
 
 namespace MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer;
 
+use const Functional\Functional\true;
 use MakinaCorpus\Normalizer\ContextFactory;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Normalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -23,14 +23,6 @@ final class NormalizerProxy implements NormalizerInterface, DenormalizerInterfac
     {
         $this->contextFactory = $contextFactory;
         $this->normalizer = $normalizer;
-    }
-
-    /**
-     * Get data type
-     */
-    private function getDataType($data): string
-    {
-        return Helper::getType($data);
     }
 
     /**

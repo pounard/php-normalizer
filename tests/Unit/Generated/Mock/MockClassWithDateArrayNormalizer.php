@@ -11,7 +11,7 @@ namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use DateTime;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
 
 final class MockClassWithDateArrayNormalizer
@@ -96,7 +96,7 @@ MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
                         } else {
                             $instance->dateArray[$index] = ($value instanceof DateTime
                                 ? $value
-                                : Helper::toDate($value, $context)
+                                : RuntimeHelper::toDate($value, $context)
                             );
                         }
                     }

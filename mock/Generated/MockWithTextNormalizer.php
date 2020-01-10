@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Mock\MockWithText;
 use MakinaCorpus\Normalizer\Mock\MockWithTitle;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 
 final class MockWithTextNormalizer
 {
@@ -83,7 +83,7 @@ MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         try {
             $context->enter('title');
-            $instance->title = isset($input['title']) ? Helper::toString($input['title'], $context) : null;
+            $instance->title = isset($input['title']) ? RuntimeHelper::toString($input['title'], $context) : null;
         } finally {
             $context->leave();
         }

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithString;
 
 final class MockClassWithStringNormalizer
@@ -76,7 +76,7 @@ MockClassWithStringNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['string'])) {
                 $context->nullValueError('string');
             } else {
-                $instance->string = Helper::toString($input['string'], $context);
+                $instance->string = RuntimeHelper::toString($input['string'], $context);
             }
         } finally {
             $context->leave();

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Normalizer;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\InvalidValueTypeError;
 use MakinaCorpus\Normalizer\Option;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\UnsupportedTypeError;
 
 /**
@@ -65,7 +65,7 @@ final class DateTimeNormalizer implements CustomNormalizer, CustomDenormalizer
             case \DateTimeInterface::class:
             case \DateTime::class:
                 if (!$object instanceof \DateTimeInterface) {
-                    throw new InvalidValueTypeError($type, Helper::getType($object));
+                    throw new InvalidValueTypeError($type, RuntimeHelper::getType($object));
                 }
                 return $object->format(
                     $context->getOption(Option::DATE_FORMAT, \DateTime::ISO8601)
@@ -83,7 +83,7 @@ final class DateTimeNormalizer implements CustomNormalizer, CustomDenormalizer
         if (!\is_string($data)) {
             throw new InvalidValueTypeError(\sprintf(
                 "Invalid data type provided, awaiting for 'string', got '%s'",
-                Helper::getType($data)
+                RuntimeHelper::getType($data)
             ));
         }
 

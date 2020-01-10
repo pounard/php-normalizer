@@ -56,9 +56,9 @@ function generate2_validation(PropertyDefinition $property, Context $context): s
             throw new \LogicException(\sprintf("Cannot dump normalizer: class '%s' for property '%s' does not exist", $nativeType, $property->getNativeName()));
         }
         if ($property->isOptional()) {
-            return "null === \$value || \\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\RuntimeHelper::getType(\$value) === '".$nativeType."'";
         } else {
-            return "\\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\RuntimeHelper::getType(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;

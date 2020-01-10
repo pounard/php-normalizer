@@ -12,7 +12,7 @@ use Ramsey\Uuid\UuidInterface;
  *
  * Defines commonly used code which will be used by normalizers at runtime.
  */
-final class Helper
+final class RuntimeHelper
 {
     /**
      * Alias of \gettype() which returns PHP type hints.

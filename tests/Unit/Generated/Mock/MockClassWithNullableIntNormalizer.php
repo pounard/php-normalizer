@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithNullableInt;
 
 final class MockClassWithNullableIntNormalizer
@@ -73,7 +73,7 @@ MockClassWithNullableIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         try {
             $context->enter('nullableInt');
-            $instance->nullableInt = isset($input['nullableInt']) ? Helper::toInt($input['nullableInt'], $context) : null;
+            $instance->nullableInt = isset($input['nullableInt']) ? RuntimeHelper::toInt($input['nullableInt'], $context) : null;
         } finally {
             $context->leave();
         }

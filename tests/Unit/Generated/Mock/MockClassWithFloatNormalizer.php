@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithFloat;
 
 final class MockClassWithFloatNormalizer
@@ -76,7 +76,7 @@ MockClassWithFloatNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['float'])) {
                 $context->nullValueError('float');
             } else {
-                $instance->float = Helper::toFloat($input['float'], $context);
+                $instance->float = RuntimeHelper::toFloat($input['float'], $context);
             }
         } finally {
             $context->leave();

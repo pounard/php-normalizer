@@ -35,7 +35,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Generator\Iterations;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -112,7 +112,7 @@ function hydrator1_property_validate($value, PropertyDefinition $property, Conte
         return $value;
     }
 
-    $type = Helper::getType($value);
+    $type = RuntimeHelper::getType($value);
     $expected = $context->getNativeType($property->getTypeName());
 
     $isValid = false;
@@ -371,7 +371,7 @@ function normalizer1_external_implementation(string $type, $input, Context $cont
  */
 function normalizer1(/* string|array|T */ $object, Context $context) /* : scalar|array */
 {
-    $nativeType = Helper::getType($object);
+    $nativeType = RuntimeHelper::getType($object);
 
     $external = normalizer1_external_implementation($nativeType, $object, $context);
     if ($external->handled) {

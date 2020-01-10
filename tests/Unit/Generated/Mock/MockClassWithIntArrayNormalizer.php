@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Generated\Mock;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithIntArray;
 
 final class MockClassWithIntArrayNormalizer
@@ -93,7 +93,7 @@ MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
                             $context->nullValueError('int');
                             $instance->intArray[$index] = null;
                         } else {
-                            $instance->intArray[$index] = Helper::toInt($value, $context);
+                            $instance->intArray[$index] = RuntimeHelper::toInt($value, $context);
                         }
                     }
                 }

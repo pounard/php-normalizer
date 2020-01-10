@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\MockWithTitle;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 
 final class MockWithTitleNormalizer
 {
@@ -76,7 +76,7 @@ MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['title'])) {
                 $context->nullValueError('string');
             } else {
-                $instance->title = Helper::toString($input['title'], $context);
+                $instance->title = RuntimeHelper::toString($input['title'], $context);
             }
         } finally {
             $context->leave();

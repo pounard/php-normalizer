@@ -22,7 +22,6 @@
             "src/Cache.php",
             "src/Context.php",
             "src/Error.php",
-            "src/Helper.php",
             "src/Normalizer.php",
             "src/NormalizerRegistry.php",
             "src/Normalizer/CustomDenormalizer.php",

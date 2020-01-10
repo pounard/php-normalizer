@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Normalizer;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\InvalidValueTypeError;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\UnsupportedTypeError;
 
 /**
@@ -23,7 +23,7 @@ final class ScalarNormalizer implements CustomNormalizer, CustomDenormalizer
             return $object;
         }
         if (!\is_scalar($object) && 'null' !== $type) {
-            throw new InvalidValueTypeError($type, Helper::getType($object));
+            throw new InvalidValueTypeError($type, RuntimeHelper::getType($object));
         }
 
         switch ($type) {

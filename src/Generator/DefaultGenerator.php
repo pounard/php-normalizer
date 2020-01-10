@@ -8,10 +8,10 @@ use MakinaCorpus\Normalizer\Context;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\GeneratorContext;
 use MakinaCorpus\Normalizer\PropertyDefinition;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\TypeDoesNotExistError;
 use MakinaCorpus\Normalizer\WritableNormalizerRegistry;
 use MakinaCorpus\Normalizer\Generator\Plugin\GeneratorPluginChain;
-use MakinaCorpus\Normalizer\Helper;
 
 /**
  * Default normalizer generator.
@@ -251,6 +251,7 @@ EOT;
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
+        $helperClassName = $context->addImport(RuntimeHelper::class);
 
         if ($property->isOptional()) {
             // Nullable properties can have a default value:
@@ -258,7 +259,7 @@ EOT;
             //   - if there is no explicit null, leave the default value as-is.
             $denormalizeCall = $writer::indent($denormalizeCall, 2, true);
             $writer->write(<<<EOT
-\$option = Helper::find(\$input, {$candidateNames}, \$context);
+\$option = {$helperClassName}::find(\$input, {$candidateNames}, \$context);
 if (\$option->success) {
     {$input} = \$option->value;
     if (null === {$input}) {
@@ -272,7 +273,7 @@ EOT
         } else {
             $denormalizeCall = $writer::indent($denormalizeCall, 1, true);
             $writer->write(<<<EOT
-\$option = Helper::find(\$input, {$candidateNames}, \$context);
+\$option = {$helperClassName}::find(\$input, {$candidateNames}, \$context);
 {$input} = \$option->value;
 if (!\$option->success || null === {$input}) {
     \$context->nullValueError('{$escapedNativeType}');
@@ -340,9 +341,10 @@ EOT
         $denormalizeCall = $writer::indent($denormalizeCall, 4, true);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
+        $helperClassName = $context->addImport(RuntimeHelper::class);
 
         $writer->write(<<<EOT
-\$option = Helper::find(\$input, {$candidateNames}, \$context);
+\$option = {$helperClassName}::find(\$input, {$candidateNames}, \$context);
 if (\$option->success && ({$arrayInput} = \$option->value)) {
     if (!\is_iterable({$arrayInput})) {
         {$arrayInput} = (array){$arrayInput};
@@ -436,9 +438,9 @@ EOT
             throw new \LogicException(\sprintf("Cannot dump normalizer: type '%s' does not exist or is not a class", $nativeType));
         }
 
-        $classNamespace = Helper::getClassNamespace($nativeType);
-        $generatedLocalClassName = Helper::getClassShortName($generatedClassName);
-        $generatedClassNamespace = Helper::getClassNamespace($generatedClassName);
+        $classNamespace = RuntimeHelper::getClassNamespace($nativeType);
+        $generatedLocalClassName = RuntimeHelper::getClassShortName($generatedClassName);
+        $generatedClassNamespace = RuntimeHelper::getClassNamespace($generatedClassName);
 
         $memoryWriter = Writer::memory();
         $context->addImport(Context::class);
@@ -451,12 +453,12 @@ EOT
         $imports = \array_filter(
             $context->getImports(),
             static function ($importedClassName) use ($generatedClassName) {
-                return !Helper::inSameNamespace($importedClassName, $generatedClassName);
+                return !RuntimeHelper::inSameNamespace($importedClassName, $generatedClassName);
             }
         );
         \asort($imports);
         foreach ($imports as $alias => $className) {
-            if ($alias !== Helper::getClassShortName($className)) {
+            if ($alias !== RuntimeHelper::getClassShortName($className)) {
                 $imports[$alias] = $className." as ".$alias;
             }
         }

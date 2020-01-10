@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
 use MakinaCorpus\Normalizer\GeneratorContext;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\ServiceConfigurationError;
 
 /**
@@ -28,7 +28,7 @@ final class GeneratorPluginChain implements GeneratorPlugin
             if (!$plugin instanceof GeneratorPlugin) {
                 throw new ServiceConfigurationError(\sprintf(
                     "Expected an implementation of '%s' got '%s' at index %s",
-                    GeneratorPlugin::class, Helper::getType($plugin), $index
+                    GeneratorPlugin::class, RuntimeHelper::getType($plugin), $index
                 ));
             }
             $this->plugins[] = $plugin;

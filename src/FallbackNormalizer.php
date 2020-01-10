@@ -73,7 +73,7 @@ final class FallbackNormalizer
             return $input[\reset($candidateNames)] ?? null;
         }
 
-        $option = Helper::find($input, $candidateNames, $context);
+        $option = RuntimeHelper::find($input, $candidateNames, $context);
         if ($option->success) {
             return $option->value;
         }
@@ -97,7 +97,7 @@ final class FallbackNormalizer
             return $value;
         }
 
-        if (($type = Helper::getType($value)) !== $expected && !$value instanceof $expected) {
+        if (($type = RuntimeHelper::getType($value)) !== $expected && !$value instanceof $expected) {
             $context->typeMismatchError($expected, $type);
         }
 
@@ -184,7 +184,7 @@ final class FallbackNormalizer
             return $input;
         }
 
-        $external = Helper::denormalizeScalar($nativeType, $input, $context);
+        $external = RuntimeHelper::denormalizeScalar($nativeType, $input, $context);
         if ($external->success) {
             return $external->value;
         }
@@ -294,7 +294,7 @@ final class FallbackNormalizer
             return null;
         }
 
-        $option = Helper::normalizeScalar($type, $object, $context);
+        $option = RuntimeHelper::normalizeScalar($type, $object, $context);
         if ($option->success) {
             return $option->value;
         }
@@ -322,6 +322,6 @@ final class FallbackNormalizer
      */
     public static function normalize($object, Context $context)
     {
-        return self::doNormalize(Helper::getType($object), $object, $context);
+        return self::doNormalize(RuntimeHelper::getType($object), $object, $context);
     }
 }

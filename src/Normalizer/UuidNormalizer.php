@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Normalizer;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\InvalidValueTypeError;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -21,7 +21,7 @@ final class UuidNormalizer implements CustomNormalizer, CustomDenormalizer
     public function normalize(string $type, $object, Context $context)
     {
         if (!$object instanceof UuidInterface) {
-            throw new InvalidValueTypeError(UuidInterface::class, Helper::getType($object));
+            throw new InvalidValueTypeError(UuidInterface::class, RuntimeHelper::getType($object));
         }
 
         return (string)$object;
@@ -33,7 +33,7 @@ final class UuidNormalizer implements CustomNormalizer, CustomDenormalizer
     public function denormalize(string $type, $data, Context $context)
     {
         if (!\is_string($data)) {
-            throw new InvalidValueTypeError('string', Helper::getType($data));
+            throw new InvalidValueTypeError('string', RuntimeHelper::getType($data));
         }
 
         return Uuid::fromString($data);

@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\AddToCartMessage;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -104,7 +104,7 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['productId'])) {
                 $context->nullValueError('int');
             } else {
-                $instance->productId = Helper::toInt($input['productId'], $context);
+                $instance->productId = RuntimeHelper::toInt($input['productId'], $context);
             }
         } finally {
             $context->leave();
@@ -115,7 +115,7 @@ AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['amount'])) {
                 $context->nullValueError('float');
             } else {
-                $instance->amount = Helper::toFloat($input['amount'], $context);
+                $instance->amount = RuntimeHelper::toFloat($input['amount'], $context);
             }
         } finally {
             $context->leave();

@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\Php74MockTextWithFormat;
 use MakinaCorpus\Normalizer\Mock\Php74MockWithText;
 use MakinaCorpus\Normalizer\Mock\Php74MockWithTitle;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 
 final class Php74MockWithTextNormalizer
 {
@@ -86,7 +86,7 @@ Php74MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
             if (!isset($input['title'])) {
                 $context->nullValueError('string');
             } else {
-                $instance->title = Helper::toString($input['title'], $context);
+                $instance->title = RuntimeHelper::toString($input['title'], $context);
             }
         } finally {
             $context->leave();

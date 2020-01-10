@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Generator\Plugin;
 
 use MakinaCorpus\Normalizer\GeneratorContext;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\PropertyDefinition;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use MakinaCorpus\Normalizer\ServiceConfigurationError;
 
 /**
@@ -61,7 +61,7 @@ final class ScalarGeneratorPlugin implements GeneratorPlugin
     public function generateDenormalizeCode(PropertyDefinition $property, GeneratorContext $context, string $input): string
     {
         $type = $context->getNativeType($property->getTypeName());
-        $helperClass = $context->addImport(Helper::class);
+        $helperClass = $context->addImport(RuntimeHelper::class);
 
         switch ($type) {
             case 'bool':

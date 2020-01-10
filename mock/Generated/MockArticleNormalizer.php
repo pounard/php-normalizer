@@ -11,11 +11,11 @@ namespace MakinaCorpus\Normalizer\Mock\Generated;
 
 use DateTimeImmutable;
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
 use MakinaCorpus\Normalizer\Mock\MockArticle;
 use MakinaCorpus\Normalizer\Mock\MockTextWithFormat;
 use MakinaCorpus\Normalizer\Mock\MockWithText;
 use MakinaCorpus\Normalizer\Mock\MockWithTitle;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -95,7 +95,7 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
         try {
             $context->enter('title');
-            $instance->title = isset($input['title']) ? Helper::toString($input['title'], $context) : null;
+            $instance->title = isset($input['title']) ? RuntimeHelper::toString($input['title'], $context) : null;
         } finally {
             $context->leave();
         }
@@ -237,7 +237,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             } else {
                 $instance->createdAt = ($input['createdAt'] instanceof DateTimeImmutable
                     ? $input['createdAt']
-                    : Helper::toDateImmutable($input['createdAt'], $context)
+                    : RuntimeHelper::toDateImmutable($input['createdAt'], $context)
                 );
             }
         } finally {
@@ -248,7 +248,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             $context->enter('updatedAt');
             $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof DateTimeImmutable
                 ? $input['updatedAt']
-                : Helper::toDateImmutable($input['updatedAt'], $context)
+                : RuntimeHelper::toDateImmutable($input['updatedAt'], $context)
             ) : null;
         } finally {
             $context->leave();
@@ -267,7 +267,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
                             $context->nullValueError('string');
                             $instance->authors[$index] = null;
                         } else {
-                            $instance->authors[$index] = Helper::toString($value, $context);
+                            $instance->authors[$index] = RuntimeHelper::toString($value, $context);
                         }
                     }
                 }
@@ -278,7 +278,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
 
         try {
             $context->enter('foo');
-            $instance->foo = isset($input['foo']) ? Helper::toString($input['foo'], $context) : null;
+            $instance->foo = isset($input['foo']) ? RuntimeHelper::toString($input['foo'], $context) : null;
         } finally {
             $context->leave();
         }
@@ -288,7 +288,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             if (!isset($input['bar'])) {
                 $context->nullValueError('int');
             } else {
-                $instance->bar = Helper::toInt($input['bar'], $context);
+                $instance->bar = RuntimeHelper::toInt($input['bar'], $context);
             }
         } finally {
             $context->leave();
@@ -299,7 +299,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             if (!isset($input['baz'])) {
                 $context->nullValueError('float');
             } else {
-                $instance->baz = Helper::toFloat($input['baz'], $context);
+                $instance->baz = RuntimeHelper::toFloat($input['baz'], $context);
             }
         } finally {
             $context->leave();
@@ -310,7 +310,7 @@ MockArticleNormalizer::$denormalizer2 = \Closure::bind(
             if (!isset($input['filename'])) {
                 $context->nullValueError('string');
             } else {
-                $instance->filename = Helper::toString($input['filename'], $context);
+                $instance->filename = RuntimeHelper::toString($input['filename'], $context);
             }
         } finally {
             $context->leave();

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer;
 
 /**
- * Option type for Helper::find() return.
+ * Option type for RuntimeHelper::find() return.
  */
 final class ValueOption
 {

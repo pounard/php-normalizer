@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Generator\Iterations;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\Helper;
+use MakinaCorpus\Normalizer\RuntimeHelper;
 
 /**
  * Option type for hydrator1_external_implementation()
@@ -110,7 +110,7 @@ function find_value(array $input, array $candidates, ?Context $context = null)
  */
 function validate_scalar(string $type, $input, ?Context $context = null): bool
 {
-    if ($type !== ($real = Helper::getType($input))) {
+    if ($type !== ($real = RuntimeHelper::getType($input))) {
         handle_error(\sprintf("Expected value type '%s', got '%s'", $type, $real));
         return false;
     }

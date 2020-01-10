@@ -58,9 +58,9 @@ function generate4_validation(PropertyDefinition $property, Context $context): s
         }
 
         if ($property->isOptional()) {
-            return "null === \$value || \\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
+            return "null === \$value || \\MakinaCorpus\Normalizer\\RuntimeHelper::getType(\$value) === '".$nativeType."'";
         } else {
-            return "\\MakinaCorpus\Normalizer\\Helper::getType(\$value) === '".$nativeType."'";
+            return "\\MakinaCorpus\Normalizer\\RuntimeHelper::getType(\$value) === '".$nativeType."'";
         }
     } else if ($property->isOptional()) {
         return "null === \$value || \$value instanceof \\".$nativeType;
@@ -82,32 +82,32 @@ function generate4_property_handle_value(PropertyDefinition $property, Context $
     // Scalar helpers validate at the same time.
     switch ($property->getTypeName()) {
         case 'bool':
-            $ret[] = "{$variable} = Helper\\to_bool(\$value, \$context);";
+            $ret[] = "{$variable} = RuntimeHelper\\to_bool(\$value, \$context);";
             break;
         case 'float':
-            $ret[] = "{$variable} = Helper\\to_float(\$value, \$context);";
+            $ret[] = "{$variable} = RuntimeHelper\\to_float(\$value, \$context);";
             break;
         case 'int':
-            $ret[] = "{$variable} = Helper\\to_int(\$value, \$context);";
+            $ret[] = "{$variable} = RuntimeHelper\\to_int(\$value, \$context);";
             break;
         case 'null':
             break;
         case 'string':
-            $ret[] = "{$variable} = Helper\\to_string(\$value, \$context);";
+            $ret[] = "{$variable} = RuntimeHelper\\to_string(\$value, \$context);";
             break;
         default:
             $ret[] = "if (null !== \$value && \$normalizer) {";
             $ret[] = "    {$variable} = \$normalizer('{$nativeType}', \$value, \$context);";
             if ($property->isOptional()) {
                 $ret[] = "    if (!(".$validation.")) {";
-                $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                $ret[] = "        RuntimeHelper\\handle_error(\"Type mismatch\", \$context);";
                 $ret[] = "        \$value = null;";
                 $ret[] = "    }";
             } else {
                 $ret[] = "    if (null === \$value) {";
-                $ret[] = "        Helper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
+                $ret[] = "        RuntimeHelper\\handle_error(\"Property '{$propName}' cannot be null\", \$context);";
                 $ret[] = "    } else if (!(".$validation.")) {";
-                $ret[] = "        Helper\\handle_error(\"Type mismatch\", \$context);";
+                $ret[] = "        RuntimeHelper\\handle_error(\"Type mismatch\", \$context);";
                 $ret[] = "        \$value = null;";
                 $ret[] = "    }";
             }
@@ -129,7 +129,7 @@ function generate4_property_set(PropertyDefinition $property, Context $context, 
 
     $writer->write(<<<EOT
         // Denormalize '{$propName}' property
-        \$value = Helper\\find_value(\$input, {$candidateNames}, \$context);
+        \$value = RuntimeHelper\\find_value(\$input, {$candidateNames}, \$context);
         {$handleCode}
         \call_user_func(self::\$accessor, \$ret, '{$propName}', \$value);
 EOT
@@ -149,7 +149,7 @@ function generate4_property_set_collection(PropertyDefinition $property, Context
     $writer->write(<<<EOT
         // Denormalize '{$propName}' collection property
         \$propValue = [];
-        \$values = Helper\\find_value(\$input, {$candidateNames}, \$context);
+        \$values = RuntimeHelper\\find_value(\$input, {$candidateNames}, \$context);
         if (!\is_iterable(\$values)) {
             {$handleCode1}
             \$propValue[] = \$values;
@@ -227,7 +227,7 @@ namespace {$generatedClassNamespace};
 
 {$importsAsString}
 
-use MakinaCorpus\Normalizer\Generator\Iterations as Helper;
+use MakinaCorpus\Normalizer\Generator\Iterations as RuntimeHelper;
 
 final class {$generatedLocalClassName}
 {

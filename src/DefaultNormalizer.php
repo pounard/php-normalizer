@@ -45,8 +45,8 @@ final class DefaultNormalizer implements Normalizer
      */
     private function externalNormalisation($object, Context $context): ValueOption
     {
-        $type = Helper::getType($object);
-        $option = Helper::normalizeScalar($type, $object, $context);
+        $type = RuntimeHelper::getType($object);
+        $option = RuntimeHelper::normalizeScalar($type, $object, $context);
 
         if (!$option->success) {
             if ($this->chain->supportsNormalization($type)) {
@@ -67,7 +67,7 @@ final class DefaultNormalizer implements Normalizer
             return $external->value;
         }
 
-        $nativeType = Helper::getType($object);
+        $nativeType = RuntimeHelper::getType($object);
         $normalizer = $this->registry->find($nativeType);
 
         if (!$normalizer || !\class_exists($normalizer)) {
@@ -92,7 +92,7 @@ final class DefaultNormalizer implements Normalizer
      */
     private function externalDenormalisation(string $type, $input, Context $context): ValueOption
     {
-        $option = Helper::denormalizeScalar($type, $input, $context);
+        $option = RuntimeHelper::denormalizeScalar($type, $input, $context);
 
         if (!$option->success) {
             if ($this->chain->supportsDenormalization($type)) {
