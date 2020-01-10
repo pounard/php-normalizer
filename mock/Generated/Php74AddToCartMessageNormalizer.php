@@ -32,7 +32,6 @@ final class Php74AddToCartMessageNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -47,7 +46,6 @@ final class Php74AddToCartMessageNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74AddToCartMessage
     {
         $ret = (new \ReflectionClass(Php74AddToCartMessage::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -60,11 +58,27 @@ final class Php74AddToCartMessageNormalizer
 Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
-        $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
+        try {
+            $context->enter('orderId');
+            $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
+        } finally {
+            $context->leave();
+        }
 
-        $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
+        try {
+            $context->enter('productId');
+            $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
+        } finally {
+            $context->leave();
+        }
 
-        $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
+        try {
+            $context->enter('amount');
+            $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74AddToCartMessage::class
 );
@@ -75,22 +89,39 @@ Php74AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
 Php74AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
-            ? $input['orderId']
-            : Uuid::fromString($input['orderId'])
-        ) : null;
-
-        if (!isset($input['productId'])) {
-            $context->nullValueError('int');
-        } else {
-            $instance->productId = Helper::toInt($input['productId'], $context);
+        try {
+            $context->enter('orderId');
+            $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
+                ? $input['orderId']
+                : Uuid::fromString($input['orderId'])
+            ) : null;
+        } finally {
+            $context->leave();
         }
 
-        if (!isset($input['amount'])) {
-            $context->nullValueError('float');
-        } else {
-            $instance->amount = Helper::toFloat($input['amount'], $context);
+        try {
+            $context->enter('productId');
+            if (!isset($input['productId'])) {
+                $context->nullValueError('int');
+            } else {
+                $instance->productId = Helper::toInt($input['productId'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
+        try {
+            $context->enter('amount');
+            if (!isset($input['amount'])) {
+                $context->nullValueError('float');
+            } else {
+                $instance->amount = Helper::toFloat($input['amount'], $context);
+            }
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74AddToCartMessage::class
 );
+

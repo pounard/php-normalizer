@@ -149,7 +149,7 @@ final class DefaultGenerator implements Generator
         $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        {$output} = (null === {$input} ? null : {$normalizeCall});
+{$output} = (null === {$input} ? null : {$normalizeCall});
 EOT
         );
     }
@@ -167,16 +167,16 @@ EOT
         $normalizeCall = $this->generateNormalizerCallValue($property, $context, $writer, $input);
 
         $writer->write(<<<EOT
-        {$output} = [];
-        if ({$arrayInput}) {
-            foreach ({$arrayInput} as \$index => {$input}) {
-                if (null === {$input}) {
-                    {$output}[\$index] = null;
-                } else {
-                    {$output}[\$index] = {$normalizeCall};
-                }
-            }
+{$output} = [];
+if ({$arrayInput}) {
+    foreach ({$arrayInput} as \$index => {$input}) {
+        if (null === {$input}) {
+            {$output}[\$index] = null;
+        } else {
+            {$output}[\$index] = {$normalizeCall};
         }
+    }
+}
 EOT
         );
     }
@@ -253,32 +253,32 @@ EOT;
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         if ($property->isOptional()) {
-            $denormalizeCall = $writer->indent($denormalizeCall, 4, true);
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
+            $denormalizeCall = $writer::indent($denormalizeCall, 2, true);
             $writer->write(<<<EOT
-        \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (\$option->success) {
-            {$input} = \$option->value;
-            if (null === {$input}) {
-                {$output} = null;
-            } else {
-                {$output} = {$denormalizeCall};
-            }
-        }
+\$option = Helper::find(\$input, {$candidateNames}, \$context);
+if (\$option->success) {
+    {$input} = \$option->value;
+    if (null === {$input}) {
+        {$output} = null;
+    } else {
+        {$output} = {$denormalizeCall};
+    }
+}
 EOT
             );
         } else {
-            $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
+            $denormalizeCall = $writer::indent($denormalizeCall, 1, true);
             $writer->write(<<<EOT
-        \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        {$input} = \$option->value;
-        if (!\$option->success || null === {$input}) {
-            \$context->nullValueError('{$escapedNativeType}');
-        } else {
-            {$output} = {$denormalizeCall};
-        }
+\$option = Helper::find(\$input, {$candidateNames}, \$context);
+{$input} = \$option->value;
+if (!\$option->success || null === {$input}) {
+    \$context->nullValueError('{$escapedNativeType}');
+} else {
+    {$output} = {$denormalizeCall};
+}
 EOT
             );
         }
@@ -305,22 +305,21 @@ EOT
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         if ($property->isOptional()) {
-            $denormalizeCall = $writer->indent($denormalizeCall, 2, true);
             // Nullable properties can have a default value:
             //   - if we find null, we must ensure there was an explicit null,
             //   - if there is no explicit null, leave the default value as-is.
             $writer->write(<<<EOT
-        {$output} = isset($input) ? {$denormalizeCall} : null;
+{$output} = isset($input) ? {$denormalizeCall} : null;
 EOT
             );
         } else {
-            $denormalizeCall = $writer->indent($denormalizeCall, 3, true);
+            $denormalizeCall = $writer::indent($denormalizeCall, 1, true);
             $writer->write(<<<EOT
-        if (!isset($input)) {
-            \$context->nullValueError('{$escapedNativeType}');
-        } else {
-            {$output} = {$denormalizeCall};
-        }
+if (!isset($input)) {
+    \$context->nullValueError('{$escapedNativeType}');
+} else {
+    {$output} = {$denormalizeCall};
+}
 EOT
             );
         }
@@ -338,28 +337,28 @@ EOT
         $input = "\$value";
         $arrayInput = "\$values";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
-        $denormalizeCall = $writer->indent($denormalizeCall, 6, true);
+        $denormalizeCall = $writer::indent($denormalizeCall, 4, true);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
-        \$option = Helper::find(\$input, {$candidateNames}, \$context);
-        if (\$option->success && ({$arrayInput} = \$option->value)) {
-            if (!\is_iterable({$arrayInput})) {
-                {$arrayInput} = (array){$arrayInput};
-            }
-            if ({$arrayInput}) {
-                {$output} = [];
-                foreach ({$arrayInput} as \$index => {$input}) {
-                    if (null === {$input}) {
-                        \$context->nullValueError('{$escapedNativeType}');
-                        {$output}[\$index] = null;
-                    } else {
-                        {$output}[\$index] = {$denormalizeCall};
-                    }
-                }
+\$option = Helper::find(\$input, {$candidateNames}, \$context);
+if (\$option->success && ({$arrayInput} = \$option->value)) {
+    if (!\is_iterable({$arrayInput})) {
+        {$arrayInput} = (array){$arrayInput};
+    }
+    if ({$arrayInput}) {
+        {$output} = [];
+        foreach ({$arrayInput} as \$index => {$input}) {
+            if (null === {$input}) {
+                \$context->nullValueError('{$escapedNativeType}');
+                {$output}[\$index] = null;
+            } else {
+                {$output}[\$index] = {$denormalizeCall};
             }
         }
+    }
+}
 EOT
         );
     }
@@ -382,27 +381,27 @@ EOT
         $input = "\$value";
         $arrayInput = "\$input['{$inputKey}']";
         $denormalizeCall = $this->generateDeormalizerCallValue($property, $context, $writer, $input);
-        $denormalizeCall = $writer->indent($denormalizeCall, 6, true);
+        $denormalizeCall = $writer::indent($denormalizeCall, 4, true);
 
         $escapedNativeType = \addslashes($context->getNativeType($property->getTypeName()));
 
         $writer->write(<<<EOT
-        if (isset($arrayInput)) {
-            if (!\is_iterable({$arrayInput})) {
-                {$arrayInput} = (array){$arrayInput};
-            }
-            if ({$arrayInput}) {
-                {$output} = [];
-                foreach ({$arrayInput} as \$index => {$input}) {
-                    if (null === {$input}) {
-                        \$context->nullValueError('{$escapedNativeType}');
-                        {$output}[\$index] = null;
-                    } else {
-                        {$output}[\$index] = {$denormalizeCall};
-                    }
-                }
+if (isset($arrayInput)) {
+    if (!\is_iterable({$arrayInput})) {
+        {$arrayInput} = (array){$arrayInput};
+    }
+    if ({$arrayInput}) {
+        {$output} = [];
+        foreach ({$arrayInput} as \$index => {$input}) {
+            if (null === {$input}) {
+                \$context->nullValueError('{$escapedNativeType}');
+                {$output}[\$index] = null;
+            } else {
+                {$output}[\$index] = {$denormalizeCall};
             }
         }
+    }
+}
 EOT
         );
     }
@@ -488,7 +487,6 @@ EOT
         // Weird thing, should fix this, class closure is handled within the next
         // generateClassBody() method call, to avoid having to propagate the map
         // of properties computed there.
-        $writer->write("\n");
 
         return $generatedClassNamespace.'\\'.$generatedLocalClassName;
     }
@@ -529,7 +527,7 @@ EOT
     public static \$denormalizer{$index};
 EOT
             );
-            $writer->write("\n\n");
+            $writer->newline();
         }
 
         $writer->write(<<<EOT
@@ -545,15 +543,13 @@ EOT
 EOT
         );
 
-        $writer->write("\n");
         for ($index = 0; $index < \count($perClassMap); $index++) {
-            $writer->write("\n");
             $writer->write(<<<EOT
         (self::\$normalizer{$index})(\$ret, \$object, \$context, \$normalizer);
 EOT
             );
         }
-        $writer->write("\n\n");
+        $writer->newline();
 
         $writer->write(<<<EOT
         return \$ret;
@@ -571,15 +567,13 @@ EOT
 EOT
         );
 
-        $writer->write("\n");
         for ($index = 0; $index < \count($perClassMap); $index++) {
-            $writer->write("\n");
             $writer->write(<<<EOT
         (self::\$denormalizer{$index})(\$ret, \$input, \$context, \$denormalizer);
 EOT
             );
         }
-        $writer->write("\n\n");
+        $writer->newline();
 
         $writer->write(<<<EOT
         return \$ret;
@@ -590,7 +584,7 @@ EOT
 
         $index = 0;
         foreach ($perClassMap as $className => $properties) {
-            $writer->write("\n\n");
+            $writer->newline();
             $writer->write(<<<EOT
 /**
  * Normalizer for properties of {$className}.
@@ -602,15 +596,30 @@ EOT
 
             $count = \count($properties);
             foreach ($properties as $property) {
-                if (1 === $count) { // Minor useless tweak.
-                    $writer->write("\n");
-                } else {
-                    $writer->write("\n\n");
+                if (1 !== $count) { // Minor useless tweak.
+                    $writer->newline();
                 }
-                $this->generateNormalizerProperty($property, $context, $writer);
+                $escapedPropertyName = \addslashes($property->getNativeName());
+                $writer->write(<<<EOT
+        try {
+            \$context->enter('{$escapedPropertyName}');
+EOT
+                );
+                try {
+                    $writer->indentationReset(3);
+                    $this->generateNormalizerProperty($property, $context, $writer);
+                } finally {
+                    $writer->indentationReset();
+                }
+                $writer->write(<<<EOT
+        } finally {
+            \$context->leave();
+        }
+EOT
+                );
             }
 
-            $writer->write("\n");
+            $writer->newline();
             $writer->write(<<<EOT
     },
     null, {$className}::class
@@ -626,15 +635,30 @@ EOT
 
             $count = \count($properties);
             foreach ($properties as $property) {
-                if (1 === $count) { // Minor useless tweak.
-                    $writer->write("\n");
-                } else {
-                    $writer->write("\n\n");
+                if (1 !== $count) { // Minor useless tweak.
+                    $writer->newline();
                 }
-                $this->generateDenormalizerProperty($property, $context, $writer);
+                $escapedPropertyName = \addslashes($property->getNativeName());
+                $writer->write(<<<EOT
+        try {
+            \$context->enter('{$escapedPropertyName}');
+EOT
+                );
+                try {
+                    $writer->indentationReset(3);
+                    $this->generateDenormalizerProperty($property, $context, $writer);
+                } finally {
+                    $writer->indentationReset();
+                }
+                $writer->write(<<<EOT
+        } finally {
+            \$context->leave();
+        }
+EOT
+                );
             }
 
-            $writer->write("\n");
+            $writer->newline();
             $writer->write(<<<EOT
     },
     null, {$className}::class

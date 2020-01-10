@@ -38,7 +38,6 @@ final class Php74MockWithTextNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
         (self::$normalizer1)($ret, $object, $context, $normalizer);
 
@@ -54,7 +53,6 @@ final class Php74MockWithTextNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockWithText
     {
         $ret = (new \ReflectionClass(Php74MockWithText::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
         (self::$denormalizer1)($ret, $input, $context, $denormalizer);
 
@@ -67,7 +65,13 @@ final class Php74MockWithTextNormalizer
  */
 Php74MockWithTextNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        try {
+            $context->enter('title');
+            $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74MockWithTitle::class
 );
@@ -77,11 +81,17 @@ Php74MockWithTextNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['title'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->title = Helper::toString($input['title'], $context);
+        try {
+            $context->enter('title');
+            if (!isset($input['title'])) {
+                $context->nullValueError('string');
+            } else {
+                $instance->title = Helper::toString($input['title'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, Php74MockWithTitle::class
 );
@@ -91,7 +101,13 @@ Php74MockWithTextNormalizer::$denormalizer0 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, Php74MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        $ret['text'] = (null === $object->text ? null : Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        try {
+            $context->enter('text');
+            $ret['text'] = (null === $object->text ? null : Php74MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74MockWithText::class
 );
@@ -101,10 +117,17 @@ Php74MockWithTextNormalizer::$normalizer1 = \Closure::bind(
  */
 Php74MockWithTextNormalizer::$denormalizer1 = \Closure::bind(
     static function (Php74MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->text = isset($input['text']) ? ($input['text'] instanceof Php74MockTextWithFormat
-            ? $input['text']
-            : Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
-        ) : null;
+        try {
+            $context->enter('text');
+            $instance->text = isset($input['text']) ? ($input['text'] instanceof Php74MockTextWithFormat
+                ? $input['text']
+                : Php74MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+            ) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74MockWithText::class
 );
+

@@ -30,7 +30,6 @@ final class MockClassWithNullableObjectNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithNullableObjectNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithNullableObject
     {
         $ret = (new \ReflectionClass(MockClassWithNullableObject::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithNullableObjectNormalizer
  */
 MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithNullableObject $object, Context $context, ?callable $normalizer = null): void {
-        $ret['nullableObject'] = (null === $object->nullableObject ? null : MockClassWithNullableIntNormalizer::normalize($object->nullableObject, $context, $normalizer));
+        try {
+            $context->enter('nullableObject');
+            $ret['nullableObject'] = (null === $object->nullableObject ? null : MockClassWithNullableIntNormalizer::normalize($object->nullableObject, $context, $normalizer));
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithNullableObject::class
 );
@@ -67,10 +71,17 @@ MockClassWithNullableObjectNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithNullableObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->nullableObject = isset($input['nullableObject']) ? ($input['nullableObject'] instanceof MockClassWithNullableInt
-            ? $input['nullableObject']
-            : MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer)
-        ) : null;
+        try {
+            $context->enter('nullableObject');
+            $instance->nullableObject = isset($input['nullableObject']) ? ($input['nullableObject'] instanceof MockClassWithNullableInt
+                ? $input['nullableObject']
+                : MockClassWithNullableIntNormalizer::denormalize($input['nullableObject'], $context, $denormalizer)
+            ) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithNullableObject::class
 );
+

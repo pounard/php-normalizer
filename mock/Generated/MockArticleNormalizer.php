@@ -48,7 +48,6 @@ final class MockArticleNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
         (self::$normalizer1)($ret, $object, $context, $normalizer);
         (self::$normalizer2)($ret, $object, $context, $normalizer);
@@ -65,7 +64,6 @@ final class MockArticleNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockArticle
     {
         $ret = (new \ReflectionClass(MockArticle::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
         (self::$denormalizer1)($ret, $input, $context, $denormalizer);
         (self::$denormalizer2)($ret, $input, $context, $denormalizer);
@@ -79,7 +77,13 @@ final class MockArticleNormalizer
  */
 MockArticleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        try {
+            $context->enter('title');
+            $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockWithTitle::class
 );
@@ -89,7 +93,13 @@ MockArticleNormalizer::$normalizer0 = \Closure::bind(
  */
 MockArticleNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->title = isset($input['title']) ? Helper::toString($input['title'], $context) : null;
+        try {
+            $context->enter('title');
+            $instance->title = isset($input['title']) ? Helper::toString($input['title'], $context) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockWithTitle::class
 );
@@ -99,7 +109,13 @@ MockArticleNormalizer::$denormalizer0 = \Closure::bind(
  */
 MockArticleNormalizer::$normalizer1 = \Closure::bind(
     static function (array &$ret, MockWithText $object, Context $context, ?callable $normalizer = null): void {
-        $ret['text'] = (null === $object->text ? null : MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        try {
+            $context->enter('text');
+            $ret['text'] = (null === $object->text ? null : MockTextWithFormatNormalizer::normalize($object->text, $context, $normalizer));
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockWithText::class
 );
@@ -109,10 +125,16 @@ MockArticleNormalizer::$normalizer1 = \Closure::bind(
  */
 MockArticleNormalizer::$denormalizer1 = \Closure::bind(
     static function (MockWithText $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->text = isset($input['text']) ? ($input['text'] instanceof MockTextWithFormat
-            ? $input['text']
-            : MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
-        ) : null;
+        try {
+            $context->enter('text');
+            $instance->text = isset($input['text']) ? ($input['text'] instanceof MockTextWithFormat
+                ? $input['text']
+                : MockTextWithFormatNormalizer::denormalize($input['text'], $context, $denormalizer)
+            ) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockWithText::class
 );
@@ -123,30 +145,71 @@ MockArticleNormalizer::$denormalizer1 = \Closure::bind(
 MockArticleNormalizer::$normalizer2 = \Closure::bind(
     static function (array &$ret, MockArticle $object, Context $context, ?callable $normalizer = null): void {
 
-        $ret['id'] = (null === $object->id ? null : $object->id->__toString());
-
-        $ret['createdAt'] = (null === $object->createdAt ? null : $object->createdAt->format('Y-m-d\\TH:i:sP'));
-
-        $ret['updatedAt'] = (null === $object->updatedAt ? null : $object->updatedAt->format('Y-m-d\\TH:i:sP'));
-
-        $ret['authors'] = [];
-        if ($object->authors) {
-            foreach ($object->authors as $index => $value) {
-                if (null === $value) {
-                    $ret['authors'][$index] = null;
-                } else {
-                    $ret['authors'][$index] = (string)$value;
-                }
-            }
+        try {
+            $context->enter('id');
+            $ret['id'] = (null === $object->id ? null : $object->id->__toString());
+        } finally {
+            $context->leave();
         }
 
-        $ret['foo'] = (null === $object->foo ? null : (string)$object->foo);
+        try {
+            $context->enter('createdAt');
+            $ret['createdAt'] = (null === $object->createdAt ? null : $object->createdAt->format('Y-m-d\\TH:i:sP'));
+        } finally {
+            $context->leave();
+        }
 
-        $ret['bar'] = (null === $object->bar ? null : (int)$object->bar);
+        try {
+            $context->enter('updatedAt');
+            $ret['updatedAt'] = (null === $object->updatedAt ? null : $object->updatedAt->format('Y-m-d\\TH:i:sP'));
+        } finally {
+            $context->leave();
+        }
 
-        $ret['baz'] = (null === $object->baz ? null : (float)$object->baz);
+        try {
+            $context->enter('authors');
+            $ret['authors'] = [];
+            if ($object->authors) {
+                foreach ($object->authors as $index => $value) {
+                    if (null === $value) {
+                        $ret['authors'][$index] = null;
+                    } else {
+                        $ret['authors'][$index] = (string)$value;
+                    }
+                }
+            }
+        } finally {
+            $context->leave();
+        }
 
-        $ret['filename'] = (null === $object->filename ? null : (string)$object->filename);
+        try {
+            $context->enter('foo');
+            $ret['foo'] = (null === $object->foo ? null : (string)$object->foo);
+        } finally {
+            $context->leave();
+        }
+
+        try {
+            $context->enter('bar');
+            $ret['bar'] = (null === $object->bar ? null : (int)$object->bar);
+        } finally {
+            $context->leave();
+        }
+
+        try {
+            $context->enter('baz');
+            $ret['baz'] = (null === $object->baz ? null : (float)$object->baz);
+        } finally {
+            $context->leave();
+        }
+
+        try {
+            $context->enter('filename');
+            $ret['filename'] = (null === $object->filename ? null : (string)$object->filename);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockArticle::class
 );
@@ -157,61 +220,103 @@ MockArticleNormalizer::$normalizer2 = \Closure::bind(
 MockArticleNormalizer::$denormalizer2 = \Closure::bind(
     static function (MockArticle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        $instance->id = isset($input['id']) ? ($input['id'] instanceof UuidInterface
-            ? $input['id']
-            : Uuid::fromString($input['id'])
-        ) : null;
-
-        if (!isset($input['createdAt'])) {
-            $context->nullValueError('DateTimeImmutable');
-        } else {
-            $instance->createdAt = ($input['createdAt'] instanceof DateTimeImmutable
-                ? $input['createdAt']
-                : Helper::toDateImmutable($input['createdAt'], $context)
-            );
+        try {
+            $context->enter('id');
+            $instance->id = isset($input['id']) ? ($input['id'] instanceof UuidInterface
+                ? $input['id']
+                : Uuid::fromString($input['id'])
+            ) : null;
+        } finally {
+            $context->leave();
         }
 
-        $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof DateTimeImmutable
-            ? $input['updatedAt']
-            : Helper::toDateImmutable($input['updatedAt'], $context)
-        ) : null;
-
-        if (isset($input['authors'])) {
-            if (!\is_iterable($input['authors'])) {
-                $input['authors'] = (array)$input['authors'];
+        try {
+            $context->enter('createdAt');
+            if (!isset($input['createdAt'])) {
+                $context->nullValueError('DateTimeImmutable');
+            } else {
+                $instance->createdAt = ($input['createdAt'] instanceof DateTimeImmutable
+                    ? $input['createdAt']
+                    : Helper::toDateImmutable($input['createdAt'], $context)
+                );
             }
-            if ($input['authors']) {
-                $instance->authors = [];
-                foreach ($input['authors'] as $index => $value) {
-                    if (null === $value) {
-                        $context->nullValueError('string');
-                        $instance->authors[$index] = null;
-                    } else {
-                        $instance->authors[$index] = Helper::toString($value, $context);
+        } finally {
+            $context->leave();
+        }
+
+        try {
+            $context->enter('updatedAt');
+            $instance->updatedAt = isset($input['updatedAt']) ? ($input['updatedAt'] instanceof DateTimeImmutable
+                ? $input['updatedAt']
+                : Helper::toDateImmutable($input['updatedAt'], $context)
+            ) : null;
+        } finally {
+            $context->leave();
+        }
+
+        try {
+            $context->enter('authors');
+            if (isset($input['authors'])) {
+                if (!\is_iterable($input['authors'])) {
+                    $input['authors'] = (array)$input['authors'];
+                }
+                if ($input['authors']) {
+                    $instance->authors = [];
+                    foreach ($input['authors'] as $index => $value) {
+                        if (null === $value) {
+                            $context->nullValueError('string');
+                            $instance->authors[$index] = null;
+                        } else {
+                            $instance->authors[$index] = Helper::toString($value, $context);
+                        }
                     }
                 }
             }
+        } finally {
+            $context->leave();
         }
 
-        $instance->foo = isset($input['foo']) ? Helper::toString($input['foo'], $context) : null;
-
-        if (!isset($input['bar'])) {
-            $context->nullValueError('int');
-        } else {
-            $instance->bar = Helper::toInt($input['bar'], $context);
+        try {
+            $context->enter('foo');
+            $instance->foo = isset($input['foo']) ? Helper::toString($input['foo'], $context) : null;
+        } finally {
+            $context->leave();
         }
 
-        if (!isset($input['baz'])) {
-            $context->nullValueError('float');
-        } else {
-            $instance->baz = Helper::toFloat($input['baz'], $context);
+        try {
+            $context->enter('bar');
+            if (!isset($input['bar'])) {
+                $context->nullValueError('int');
+            } else {
+                $instance->bar = Helper::toInt($input['bar'], $context);
+            }
+        } finally {
+            $context->leave();
         }
 
-        if (!isset($input['filename'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->filename = Helper::toString($input['filename'], $context);
+        try {
+            $context->enter('baz');
+            if (!isset($input['baz'])) {
+                $context->nullValueError('float');
+            } else {
+                $instance->baz = Helper::toFloat($input['baz'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
+        try {
+            $context->enter('filename');
+            if (!isset($input['filename'])) {
+                $context->nullValueError('string');
+            } else {
+                $instance->filename = Helper::toString($input['filename'], $context);
+            }
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockArticle::class
 );
+

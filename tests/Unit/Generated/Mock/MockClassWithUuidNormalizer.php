@@ -31,7 +31,6 @@ final class MockClassWithUuidNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -46,7 +45,6 @@ final class MockClassWithUuidNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithUuid
     {
         $ret = (new \ReflectionClass(MockClassWithUuid::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -58,7 +56,13 @@ final class MockClassWithUuidNormalizer
  */
 MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithUuid $object, Context $context, ?callable $normalizer = null): void {
-        $ret['uuid'] = (null === $object->uuid ? null : $object->uuid->__toString());
+        try {
+            $context->enter('uuid');
+            $ret['uuid'] = (null === $object->uuid ? null : $object->uuid->__toString());
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithUuid::class
 );
@@ -68,10 +72,17 @@ MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithUuidNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithUuid $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof UuidInterface
-            ? $input['uuid']
-            : Uuid::fromString($input['uuid'])
-        ) : null;
+        try {
+            $context->enter('uuid');
+            $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof UuidInterface
+                ? $input['uuid']
+                : Uuid::fromString($input['uuid'])
+            ) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithUuid::class
 );
+

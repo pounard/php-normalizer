@@ -30,7 +30,6 @@ final class MockClassWithIntNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithIntNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithInt
     {
         $ret = (new \ReflectionClass(MockClassWithInt::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithIntNormalizer
  */
 MockClassWithIntNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithInt $object, Context $context, ?callable $normalizer = null): void {
-        $ret['int'] = (null === $object->int ? null : (int)$object->int);
+        try {
+            $context->enter('int');
+            $ret['int'] = (null === $object->int ? null : (int)$object->int);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithInt::class
 );
@@ -67,11 +71,18 @@ MockClassWithIntNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['int'])) {
-            $context->nullValueError('int');
-        } else {
-            $instance->int = Helper::toInt($input['int'], $context);
+        try {
+            $context->enter('int');
+            if (!isset($input['int'])) {
+                $context->nullValueError('int');
+            } else {
+                $instance->int = Helper::toInt($input['int'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, MockClassWithInt::class
 );
+

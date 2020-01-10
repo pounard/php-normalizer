@@ -30,7 +30,6 @@ final class MockClassWithNullableIntNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithNullableIntNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithNullableInt
     {
         $ret = (new \ReflectionClass(MockClassWithNullableInt::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithNullableIntNormalizer
  */
 MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithNullableInt $object, Context $context, ?callable $normalizer = null): void {
-        $ret['nullableInt'] = (null === $object->nullableInt ? null : (int)$object->nullableInt);
+        try {
+            $context->enter('nullableInt');
+            $ret['nullableInt'] = (null === $object->nullableInt ? null : (int)$object->nullableInt);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithNullableInt::class
 );
@@ -67,7 +71,14 @@ MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithNullableIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        $instance->nullableInt = isset($input['nullableInt']) ? Helper::toInt($input['nullableInt'], $context) : null;
+        try {
+            $context->enter('nullableInt');
+            $instance->nullableInt = isset($input['nullableInt']) ? Helper::toInt($input['nullableInt'], $context) : null;
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithNullableInt::class
 );
+

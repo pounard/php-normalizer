@@ -14,6 +14,9 @@ class Writer
     /** @var resource */
     protected $handle;
 
+    /** @var int */
+    protected $indentation = 0;
+
     /**
      * Constructor
      */
@@ -40,7 +43,7 @@ class Writer
     /**
      * Force indentation of given lines (one tab = 4 spaces).
      */
-    public function indent(string $input, int $tabs, bool $skipFirstList = false): string
+    public static function indent(string $input, int $tabs, bool $skipFirstList = false): string
     {
         $indentString = \str_repeat(" ", $tabs * self::INDENT_SIZE);
         if ($skipFirstList) {
@@ -50,14 +53,66 @@ class Writer
     }
 
     /**
+     * Reset indentation
+     */
+    public function indentationReset(int $howMuch = 0): void
+    {
+        $this->indentation = \abs($howMuch);
+    }
+
+    /**
+     * Increment indentation
+     */
+    public function indentationInc(int $howMuch = 1): void
+    {
+        $this->indentation += \abs($howMuch);
+    }
+
+    /**
+     * Decrement indentation
+     */
+    public function indentationDec(int $howMuch = 1): void
+    {
+        $this->indentation = \max([0, $this->indentation - \abs($howMuch)]);
+    }
+
+    /**
      * Append text to generated file
      */
-    public function write(string $string): void
+    private function doWrite(string $string): void
     {
         if (!$this->handle) {
             throw new \RuntimeException("File was closed");
         }
         \fwrite($this->handle, $string);
+    }
+
+    /**
+     * Append text to generated file
+     */
+    public function write(string $string): void
+    {
+        if ($this->indentation) {
+            $string = self::indent($string, $this->indentation);
+        }
+        $this->doWrite($string);
+        $this->doWrite("\n");
+    }
+
+    /**
+     * Write new line
+     */
+    public function newline(): void
+    {
+        $this->doWrite("\n");
+    }
+
+    /**
+     * Append text to generated file
+     */
+    public function writeInline(string $string): void
+    {
+        $this->doWrite($string);
     }
 
     /**

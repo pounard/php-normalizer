@@ -30,7 +30,6 @@ final class MockTextWithFormatNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockTextWithFormatNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockTextWithFormat
     {
         $ret = (new \ReflectionClass(MockTextWithFormat::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -58,9 +56,20 @@ final class MockTextWithFormatNormalizer
 MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
-        $ret['text'] = (null === $object->text ? null : (string)$object->text);
+        try {
+            $context->enter('text');
+            $ret['text'] = (null === $object->text ? null : (string)$object->text);
+        } finally {
+            $context->leave();
+        }
 
-        $ret['format'] = (null === $object->format ? null : (string)$object->format);
+        try {
+            $context->enter('format');
+            $ret['format'] = (null === $object->format ? null : (string)$object->format);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockTextWithFormat::class
 );
@@ -71,13 +80,25 @@ MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
 MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        $instance->text = isset($input['text']) ? Helper::toString($input['text'], $context) : null;
-
-        if (!isset($input['format'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->format = Helper::toString($input['format'], $context);
+        try {
+            $context->enter('text');
+            $instance->text = isset($input['text']) ? Helper::toString($input['text'], $context) : null;
+        } finally {
+            $context->leave();
         }
+
+        try {
+            $context->enter('format');
+            if (!isset($input['format'])) {
+                $context->nullValueError('string');
+            } else {
+                $instance->format = Helper::toString($input['format'], $context);
+            }
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockTextWithFormat::class
 );
+

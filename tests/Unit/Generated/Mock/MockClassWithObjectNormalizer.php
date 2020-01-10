@@ -30,7 +30,6 @@ final class MockClassWithObjectNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithObjectNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithObject
     {
         $ret = (new \ReflectionClass(MockClassWithObject::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithObjectNormalizer
  */
 MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithObject $object, Context $context, ?callable $normalizer = null): void {
-        $ret['object'] = (null === $object->object ? null : MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer));
+        try {
+            $context->enter('object');
+            $ret['object'] = (null === $object->object ? null : MockClassWithNullableIntNormalizer::normalize($object->object, $context, $normalizer));
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithObject::class
 );
@@ -67,14 +71,21 @@ MockClassWithObjectNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithObjectNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObject $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['object'])) {
-            $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
-        } else {
-            $instance->object = ($input['object'] instanceof MockClassWithNullableInt
-                ? $input['object']
-                : MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer)
-            );
+        try {
+            $context->enter('object');
+            if (!isset($input['object'])) {
+                $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
+            } else {
+                $instance->object = ($input['object'] instanceof MockClassWithNullableInt
+                    ? $input['object']
+                    : MockClassWithNullableIntNormalizer::denormalize($input['object'], $context, $denormalizer)
+                );
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, MockClassWithObject::class
 );
+

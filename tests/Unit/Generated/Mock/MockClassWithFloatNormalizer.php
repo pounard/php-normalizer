@@ -30,7 +30,6 @@ final class MockClassWithFloatNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithFloatNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithFloat
     {
         $ret = (new \ReflectionClass(MockClassWithFloat::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithFloatNormalizer
  */
 MockClassWithFloatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithFloat $object, Context $context, ?callable $normalizer = null): void {
-        $ret['float'] = (null === $object->float ? null : (float)$object->float);
+        try {
+            $context->enter('float');
+            $ret['float'] = (null === $object->float ? null : (float)$object->float);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithFloat::class
 );
@@ -67,11 +71,18 @@ MockClassWithFloatNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithFloatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithFloat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['float'])) {
-            $context->nullValueError('float');
-        } else {
-            $instance->float = Helper::toFloat($input['float'], $context);
+        try {
+            $context->enter('float');
+            if (!isset($input['float'])) {
+                $context->nullValueError('float');
+            } else {
+                $instance->float = Helper::toFloat($input['float'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, MockClassWithFloat::class
 );
+

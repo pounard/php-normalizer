@@ -30,7 +30,6 @@ final class MockClassWithStringNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class MockClassWithStringNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): MockClassWithString
     {
         $ret = (new \ReflectionClass(MockClassWithString::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class MockClassWithStringNormalizer
  */
 MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithString $object, Context $context, ?callable $normalizer = null): void {
-        $ret['string'] = (null === $object->string ? null : (string)$object->string);
+        try {
+            $context->enter('string');
+            $ret['string'] = (null === $object->string ? null : (string)$object->string);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, MockClassWithString::class
 );
@@ -67,11 +71,18 @@ MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithStringNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithString $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['string'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->string = Helper::toString($input['string'], $context);
+        try {
+            $context->enter('string');
+            if (!isset($input['string'])) {
+                $context->nullValueError('string');
+            } else {
+                $instance->string = Helper::toString($input['string'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, MockClassWithString::class
 );
+

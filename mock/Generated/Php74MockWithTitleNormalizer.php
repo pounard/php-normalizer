@@ -30,7 +30,6 @@ final class Php74MockWithTitleNormalizer
     public static function normalize($object, Context $context, ?callable $normalizer = null): array
     {
         $ret = [];
-
         (self::$normalizer0)($ret, $object, $context, $normalizer);
 
         return $ret;
@@ -45,7 +44,6 @@ final class Php74MockWithTitleNormalizer
     public static function denormalize(array $input, Context $context, ?callable $denormalizer = null): Php74MockWithTitle
     {
         $ret = (new \ReflectionClass(Php74MockWithTitle::class))->newInstanceWithoutConstructor();
-
         (self::$denormalizer0)($ret, $input, $context, $denormalizer);
 
         return $ret;
@@ -57,7 +55,13 @@ final class Php74MockWithTitleNormalizer
  */
 Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        try {
+            $context->enter('title');
+            $ret['title'] = (null === $object->title ? null : (string)$object->title);
+        } finally {
+            $context->leave();
+        }
+
     },
     null, Php74MockWithTitle::class
 );
@@ -67,11 +71,18 @@ Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        if (!isset($input['title'])) {
-            $context->nullValueError('string');
-        } else {
-            $instance->title = Helper::toString($input['title'], $context);
+        try {
+            $context->enter('title');
+            if (!isset($input['title'])) {
+                $context->nullValueError('string');
+            } else {
+                $instance->title = Helper::toString($input['title'], $context);
+            }
+        } finally {
+            $context->leave();
         }
+
     },
     null, Php74MockWithTitle::class
 );
+
