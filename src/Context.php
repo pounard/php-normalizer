@@ -56,7 +56,7 @@ class Context implements ValidationResultBuilder
     {
         $this->options = $options;
         $this->symfonyCompatibility = $symfonyCompatibility;
-        $this->typeMap = $typeMap ?? new MemoryTypeDefinitionMapCache([new ReflectionTypeDefinitionMap()]);
+        $this->typeMap = $typeMap ?? self::createDefaultTypeDefinitionMap();
         $this->validationResult = new DefaultValidationResultBuilder();
 
         // Do some validation.
@@ -72,6 +72,14 @@ class Context implements ValidationResultBuilder
         if (isset($options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT])) {
             $this->circularReferenceLimit = (int)$options[NormalizeOption::CIRCULAR_REFERENCE_LIMIT];
         }
+    }
+
+    /**
+     * Create default type definition map
+     */
+    public static function createDefaultTypeDefinitionMap(): TypeDefinitionMap
+    {
+        return new TypeDefinitionMapChain([new ReflectionTypeDefinitionMap()]);
     }
 
     /**
@@ -382,7 +390,7 @@ final class ContextFactory
      */
     public function __construct(?TypeDefinitionMap $typeMap = null)
     {
-        $this->typeMap = $typeMap ?? new ReflectionTypeDefinitionMap();
+        $this->typeMap = Context::createDefaultTypeDefinitionMap();
     }
 
     /**

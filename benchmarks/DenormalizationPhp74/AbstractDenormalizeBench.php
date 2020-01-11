@@ -23,7 +23,7 @@ abstract class AbstractDenormalizeBench
      */
     final public function initData(array $params): void
     {
-        $this->data = Php74ObjectGenerator::createNormalizedArticleList(10, $this->withUuid());
+        $this->data = Php74ObjectGenerator::createNormalizedArticleList(15, $this->withUuid());
     }
 
     /**

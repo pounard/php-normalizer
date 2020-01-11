@@ -406,12 +406,4 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
     {
         return $name;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllAliases(): array
-    {
-        return [];
-    }
 }

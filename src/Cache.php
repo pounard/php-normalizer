@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * Type cache abstract implementation.
  */
@@ -14,11 +16,11 @@ class TypeDefinitionMapChain implements TypeDefinitionMap
     /** @var string[] */
     private $aliases = [];
 
+    /** @var TypeDefinition[] */
+    private $cache = [];
+
     /** @var TypeDefinitionMap[] */
     private $reflectors = [];
-
-    /** @var bool[] */
-    private $existing = [];
 
     /**
      * Default constructor
@@ -28,56 +30,9 @@ class TypeDefinitionMapChain implements TypeDefinitionMap
     public function __construct(iterable $reflectors)
     {
         foreach ($reflectors as $reflector) {
+            \assert($reflector instanceof TypeDefinitionMap);
             $this->reflectors[] = $reflector;
-            $this->aliases += $reflector->getAllAliases();
         }
-    }
-
-    /**
-     * Load type from cache
-     */
-    protected function loadFromCache(string $name): ?TypeDefinition
-    {
-        return null;
-    }
-
-    /**
-     * Store into cache
-     */
-    protected function storeIntoCache(string $name, TypeDefinition $type): void
-    {
-    }
-
-    /**
-     * Set static definition map, the one including base configuration
-     */
-    public function setUserConfiguration(array $userConfiguration): void
-    {
-        throw new NotImplementedError();
-    }
-
-    /**
-     * Set type aliases
-     */
-    public function setUserAliases(array $aliases): void
-    {
-        throw new NotImplementedError();
-    }
-
-    /**
-     * exists() implementation
-     */
-    private function doExists(string $name): bool
-    {
-        if (isset($this->aliases[$name])) {
-            return true; 
-        }
-        foreach ($this->reflectors as $instance) {
-            if ($instance->exists($name)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -85,9 +40,23 @@ class TypeDefinitionMapChain implements TypeDefinitionMap
      */
     public function exists(string $name): bool
     {
-        return !$this->isBlacklisted($name) && (
-            $this->existing[$name] ?? ($this->existing[$name] = $this->doExists($name))
-        );
+        return !$this->isBlacklisted($name) && $this->getNativeType($name);
+    }
+
+    /**
+     * Real implementation of getNativeType();
+     */
+    private function doGetNativeType(string $name): string
+    {
+        foreach ($this->reflectors as $instance) {
+            // Per default, most reflectors will just return name, allow
+            // each one of them to bypass the default name, else we would
+            // have false positives.
+            if ($name !== ($nativeType = $instance->getNativeType($name))) {
+                return $nativeType;
+            }
+        }
+        return $nativeType;
     }
 
     /**
@@ -95,10 +64,13 @@ class TypeDefinitionMapChain implements TypeDefinitionMap
      */
     public function getNativeType(string $name): string
     {
-        // Considering that specific implementations should not carry
-        // user configuration, we skip this for reflectors, user configuration
-        // aliases and such is to be overriden by the one set in this object.
-        return $this->aliases[$name] ?? $name;
+        if (isset($this->cache[$name])) {
+            return $name;
+        }
+
+        return $this->aliases[$name] ?? (
+            $this->aliases[$name] = $this->doGetNativeType($name)
+        );
     }
 
     /**
@@ -142,45 +114,80 @@ class TypeDefinitionMapChain implements TypeDefinitionMap
 
         $nativeType = $this->getNativeType($name);
 
-        if (!$type = $this->loadFromCache($nativeType)) {
-            $type = $this->doGet($nativeType);
-        }
-
-        // New types are added, add them to memory and to cache.
-        $this->storeIntoCache($name, $type);
+        $type = $this->cache[$nativeType] ?? (
+            $this->cache[$nativeType] = $this->doGet($nativeType)
+        );
 
         return $type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllAliases(): array
-    {
-        return $this->aliases;
     }
 }
 
 /**
  * In-memory type definition cache.
  */
-final class MemoryTypeDefinitionMapCache extends TypeDefinitionMapChain
+final class CacheItemPoolTypeDefinitionMapCache implements TypeDefinitionMap
 {
+    /** @var CacheItemPoolInterface */
+    private $pool;
+
+    /** @var TypeDefinitionMap */
+    private $decorated;
+
+    /** @var TypeDefinition[] */
     private $cache = [];
 
     /**
-     * Load type from cache
+     * Default constructor
+     *
+     * @param iterable|TypeDefinitionMap[] $reflectors
      */
-    protected function loadFromCache(string $name): ?TypeDefinition
+    public function __construct(TypeDefinitionMap $decorated, CacheItemPoolInterface $pool)
     {
-        return $this->cache[$name] ?? null;
+        $this->decorated = $decorated;
+        $this->pool = $pool;
     }
 
     /**
-     * Store into cache
+     * Does type exist.
      */
-    protected function storeIntoCache(string $name, TypeDefinition $type): void
+    public function exists(string $name): bool
     {
-        $this->cache[$name] = $type;
+        return $this->decorated->exists($name);
+    }
+
+    /**
+     * Get type definition.
+     *
+     * User given type aliases overrides native defined types with
+     * the same name. On the other hand, aliases that point to real
+     * type name do give you the otherwise conflicting type.
+     */
+    public function get(string $name): TypeDefinition
+    {
+        $nativeType = $this->getNativeType($name);
+
+        if (isset($this->cache[$nativeType])) {
+            return $this->cache[$nativeType];
+        }
+
+        $item = $this->pool->getItem('php_normalizer.'.\str_replace('\\', '.', $nativeType));
+
+        if (!$item->isHit()) {
+            $this->pool->save(
+                $item->set(
+                    $this->decorated->get($nativeType)
+                )
+            );
+        }
+
+        return $item->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNativeType(string $name): string
+    {
+        return $this->decorated->getNativeType($name);
     }
 }

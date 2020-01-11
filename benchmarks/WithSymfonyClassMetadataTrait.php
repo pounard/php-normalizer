@@ -10,6 +10,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
+use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
@@ -42,10 +43,12 @@ trait WithSymfonyClassMetadataTrait
         // normalizer spend most of its time in setAttributeValue(), because it
         // uses the property-access component, which is terribly slow. Nobody
         // should ever use this on a production environment.
-        $classMetadataFactory = new ClassMetadataFactory(
-            new LoaderChain([
-                new AnnotationLoader(new AnnotationReader()),
-            ]),
+        $classMetadataFactory = new CacheClassMetadataFactory(
+            $classMetadataFactory = new ClassMetadataFactory(
+                new LoaderChain([
+                    new AnnotationLoader(new AnnotationReader()),
+                ])
+            ),
             new ApcuAdapter('SymfonyMetadata')
         );
 

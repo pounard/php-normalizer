@@ -2,7 +2,7 @@ services:
 
     php_normalizer.type_definition_map:
         public: false
-        class: MakinaCorpus\Normalizer\MemoryTypeDefinitionMapCache
+        class: MakinaCorpus\Normalizer\TypeDefinitionMapChain
         arguments: [[]]
 
     php_normalizer.normalizer:

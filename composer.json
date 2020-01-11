@@ -42,6 +42,7 @@
         "psr-4": {
             "MakinaCorpus\\Normalizer\\Benchmarks\\": "benchmarks/",
             "MakinaCorpus\\Normalizer\\Mock\\": "mock/",
+            "MakinaCorpus\\Normalizer\\Profiling\\": "profiling/",
             "MakinaCorpus\\Normalizer\\Tests\\": "tests/"
         }
     },
