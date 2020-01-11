@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace MakinaCorpus\Normalizer\Tests\Unit\Normalizer;
 
 use MakinaCorpus\Normalizer\Context;
-use MakinaCorpus\Normalizer\InvalidValueTypeError;
 use MakinaCorpus\Normalizer\Normalizer;
+use MakinaCorpus\Normalizer\NullValueTypeError;
 use MakinaCorpus\Normalizer\RuntimeError;
+use MakinaCorpus\Normalizer\TypeMismatchError;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithDateArray;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithFloat;
 use MakinaCorpus\Normalizer\Tests\Unit\Mock\MockClassWithInt;
@@ -66,7 +67,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testIntAsStringDenormalizeAllowed(Normalizer $normalizer, Context $context): void
     {
-        $object = $normalizer->denormalize(MockClassWithInt::class, ['int' => 37], $context);
+        $object = $normalizer->denormalize(MockClassWithInt::class, ['int' => '37'], $context);
 
         self::assertInstanceOf(MockClassWithInt::class, $object);
         self::assertSame(37, $object->getValue());
@@ -91,7 +92,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testIntAsFloatDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(InvalidValueTypeError::class);
+        self::expectException(TypeMismatchError::class);
 
         $normalizer->denormalize(MockClassWithInt::class, ['int' => 12.76], $context);
     }
@@ -101,7 +102,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testInvalidIntAsStringDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(InvalidValueTypeError::class);
+        self::expectException(TypeMismatchError::class);
 
         $normalizer->denormalize(MockClassWithInt::class, ['int' => 'this is not an int'], $context);
     }
@@ -164,7 +165,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testInvalidFloatAsStringDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(InvalidValueTypeError::class);
+        self::expectException(TypeMismatchError::class);
 
         $normalizer->denormalize(MockClassWithFloat::class, ['float' => 'wrong!'], $context);
     }
@@ -211,7 +212,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testNonToStringObjectDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(InvalidValueTypeError::class);
+        self::expectException(TypeMismatchError::class);
 
         $normalizer->denormalize(MockClassWithString::class, ['string' => new \DateTime()], $context);
     }
@@ -260,7 +261,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testNonNullableScalarDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(NullValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithString::class, ['string' => null], $context);
     }
@@ -309,7 +310,7 @@ abstract class AbstractNormalizerTest extends TestCase
      */
     public function testNullableObjectDenormalizeRaiseError(Normalizer $normalizer, Context $context): void
     {
-        self::expectException(RuntimeError::class);
+        self::expectException(NullValueTypeError::class);
 
         $normalizer->denormalize(MockClassWithObject::class, ['object' => null], $context);
     }

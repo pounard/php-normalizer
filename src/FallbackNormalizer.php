@@ -39,9 +39,9 @@ final class FallbackNormalizer
     }
 
     /**
-     * Create instance and hydrate values
+     * Create object empty instance
      */
-    private static function createInstance(string $type, Context $context)
+    private static function objectCreate(string $type, Context $context)
     {
         if (!\class_exists($type)) {
             $context->classDoesNotExistError($type);
@@ -53,7 +53,7 @@ final class FallbackNormalizer
     /**
      * Create instance and hydrate values
      */
-    private static function propertySet($object, $value, PropertyDefinition $property, Context $context): void
+    private static function objectValueSet($object, $value, PropertyDefinition $property): void
     {
         $stealer = \Closure::bind(
             static function () use ($object, $value, $property) {
@@ -65,74 +65,38 @@ final class FallbackNormalizer
     }
 
     /**
-     * Extract a single value
+     * Extract property value from object
      */
-    private static function propertyExtract(array $input, PropertyDefinition $property, Context $context)
+    private static function objectValueGet($object, PropertyDefinition $property)
     {
-        if (1 === \count($candidateNames = $property->getCandidateNames())) {
-            return $input[\reset($candidateNames)] ?? null;
-        }
-
-        $option = RuntimeHelper::find($input, $candidateNames, $context);
-        if ($option->success) {
-            return $option->value;
-        }
+        $stealer = \Closure::bind(
+            static function () use ($object, $property) {
+                return $object->{$property->getNativeName()};
+            },
+            null, $property->getDeclaringClass()
+        );
+        return $stealer();
     }
 
     /**
-     * Validate value
+     * Denormalize value as a collection, null input here is not allowed.
      */
-    private static function propertyValidate($value, PropertyDefinition $property, Context $context)
-    {
-        $propType = $property->getTypeName();
-
-        if (null === $value) {
-            if (!$property->isOptional()) {
-                $context->nullValueError($propType);
-            }
-            return $value; // Shortcut.
-        }
-
-        if ('null' === ($expected = $context->getNativeType($propType))) { // Shortcut.
-            return $value;
-        }
-
-        if (($type = RuntimeHelper::getType($value)) !== $expected && !$value instanceof $expected) {
-            $context->typeMismatchError($expected, $type);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Extract a single value
-     */
-    private static function propertyDenormalizeCollection(array $input, PropertyDefinition $property, Context $context)
+    private static function valueDenormalizeCollection($values, PropertyDefinition $property, Context $context): array
     {
         $ret = [];
-        $values = self::propertyExtract($input, $property, $context);
         $type = $property->getTypeName();
 
-        if (\is_iterable($values)) {
-            foreach ($values as $index => $value) {
-                if (null === $value) {
-                    $context->nullValueError($type);
-                    // Let it pass if partial allowed.
-                    $ret[$index] = null;
-                } else {
-                    // $value, );
-                    $ret[$index] = self::propertyValidate(
-                        self::denormalize($type, $value, $context),
-                        $property, $context
-                    );
-                }
+        if (!\is_iterable($values)) {
+            $values = [$values];
+        }
+
+        foreach ($values as $index => $value) {
+            if (null === $value) {
+                $context->nullValueError($type);
+                $ret[$index] = null; // Let it pass if partial allowed.
+            } else {
+                $ret[$index] = self::denormalize($type, $value, $context);
             }
-        } else {
-            // Wronly not an iterable object, must be a single value.
-            $ret[] = self::propertyValidate(
-                self::denormalize($type, $values, $context),
-                $property, $context
-            );
         }
 
         return $ret;
@@ -141,30 +105,45 @@ final class FallbackNormalizer
     /**
      * Handle single value
      */
-    private static function denormalizeProperty(array $input, PropertyDefinition $property, Context $context)
+    private static function propertyDenormalize(array $input, PropertyDefinition $property, Context $context): ValueOption
     {
         $propName = $property->getNativeName();
+        $isCollection = $property->isCollection();
+
         try {
             $context->enter($propName);
 
-            if ($property->isCollection()) {
-                return self::propertyDenormalizeCollection($input, $property, $context);
+            $option = RuntimeHelper::find($input, $property->getCandidateNames(), $context);
+
+            // No value in incomming array, check for disallowed null
+            // values and pass denormalization.
+            if (!$option->success) {
+                if (!$isCollection && !$property->isOptional()) {
+                    $context->nullValueError($property->getTypeName());
+                }
+                return $option;
             }
 
-            $value = self::propertyExtract($input, $property, $context);
+            if ($isCollection) {
+                return ValueOption::ok(
+                    self::valueDenormalizeCollection(
+                        $option->value, $property, $context
+                    )
+                );
+            }
 
-            if (null === $value) {
+            // Shortcuts null values, which don't need denormalization.
+            if (null === $option->value) {
                 if (!$property->isOptional()) {
                     $context->nullValueError($property->getTypeName());
                 }
-                return null; // Fallback to null in case partial is allowed.
+                return $option;
             }
 
-            return self::propertyValidate(
+            return ValueOption::ok(
                 self::denormalize(
-                    $property->getTypeName(), $value, $context
-                ),
-                $property, $context
+                    $property->getTypeName(), $option->value, $context
+                )
             );
         } finally {
             $context->leave($propName);
@@ -204,7 +183,7 @@ final class FallbackNormalizer
             return null;
         }
 
-        $instance = self::createInstance($typeDef->getNativeName(), $context);
+        $instance = self::objectCreate($nativeType, $context);
 
         if (null === $instance) {
             return $instance;
@@ -212,29 +191,13 @@ final class FallbackNormalizer
 
         /** @var \MakinaCorpus\Normalizer\PropertyDefinition $property */
         foreach ($typeDef->getProperties() as $property) {
-            self::propertySet(
-                $instance,
-                self::denormalizeProperty($input, $property, $context),
-                $property,
-                $context
-            );
+            $option = self::propertyDenormalize($input, $property, $context);
+            if ($option->success) {
+                self::objectValueSet($instance, $option->value, $property);
+            }
         }
 
         return $instance;
-    }
-
-    /**
-     * Extract property value from object
-     */
-    private static function propertyGet($object, PropertyDefinition $property, Context $context)
-    {
-        $stealer = \Closure::bind(
-            static function () use ($object, $property) {
-                return $object->{$property->getNativeName()};
-            },
-            null, $property->getDeclaringClass()
-        );
-        return $stealer();
     }
 
     /**
@@ -246,7 +209,7 @@ final class FallbackNormalizer
             $context->enter($property->getNativeName());
 
             $type = $property->getTypeName();
-            $values = self::propertyGet($object, $property, $context);
+            $values = self::objectValueGet($object, $property);
 
             if (!$property->isCollection()) {
                 return self::doNormalize($type, $values, $context);

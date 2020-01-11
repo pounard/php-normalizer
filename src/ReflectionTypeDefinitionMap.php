@@ -7,7 +7,6 @@ namespace MakinaCorpus\Normalizer;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 
 /**
  * This implementation does not support aliases, it should only be used
@@ -40,18 +39,17 @@ final class ReflectionTypeDefinitionMap implements TypeDefinitionMap
      * self::$typeInfoExtractorLoaded boolean to avoid redundant class and
      * interface existence checks.
      */
-    public static function createDefaultTypeInfoExtractor(): ?PropertyTypeExtractorInterface
+    public static function createDefaultTypeInfoExtractor(bool $withCache = true): ?PropertyTypeExtractorInterface
     {
         if (\interface_exists(PropertyTypeExtractorInterface::class)) {
-            $reflectionExtractor = new ReflectionExtractor();
             $phpDocExtractor = new PhpDocExtractor();
 
             return new PropertyInfoExtractor(
                 [],
-                [$phpDocExtractor, $reflectionExtractor],
-                [$phpDocExtractor, $reflectionExtractor],
-                [$reflectionExtractor],
-                [$reflectionExtractor]
+                [$phpDocExtractor],
+                [$phpDocExtractor],
+                [],
+                []
             );
         }
         return null;

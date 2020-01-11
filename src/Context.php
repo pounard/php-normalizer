@@ -214,7 +214,7 @@ class Context implements ValidationResultBuilder
             $message = \sprintf("type mismatch: expected '%s' got '%s'", $expected, $real);
         }
         if (!$this->verbose) {
-            throw new NullValueTypeError($message);
+            throw new TypeMismatchError($message);
         }
         $this->addError($message, false); // This is NOT recoverable.
     }
