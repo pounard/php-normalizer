@@ -43,9 +43,8 @@ final class DefaultNormalizer implements Normalizer
      *
      * Hardcode some scalar types, defer on external implementations.
      */
-    private function externalNormalisation($object, Context $context): ValueOption
+    private function externalNormalisation(string $type, $object, Context $context): ValueOption
     {
-        $type = RuntimeHelper::getType($object);
         $option = RuntimeHelper::normalizeScalar($type, $object, $context);
 
         if (!$option->success) {
@@ -62,12 +61,13 @@ final class DefaultNormalizer implements Normalizer
      */
     public function normalize($object, Context $context)
     {
-        $external = $this->externalNormalisation($object, $context);
+        $nativeType = RuntimeHelper::getType($object);
+
+        $external = $this->externalNormalisation($nativeType, $object, $context);
         if ($external->success) {
             return $external->value;
         }
 
-        $nativeType = RuntimeHelper::getType($object);
         $normalizer = $this->registry->find($nativeType);
 
         if (!$normalizer || !\class_exists($normalizer)) {

@@ -26,7 +26,7 @@ abstract class AbstractNormalizeBench
      */
     final public function initData(array $params): void
     {
-        $this->data = ObjectGenerator::createInstanceArticleList(10, $this->withUuid());
+        $this->data = ObjectGenerator::createInstanceArticleList(5, $this->withUuid());
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractNormalizeBench
      */
     protected function withUuid(): bool
     {
-        return true;
+        return false;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 final class Mapper_Ramsey_Uuid_Converter_NumberConverterInterface_array extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1577156169';
+    protected $hash = '1578744718';
     public function __construct()
     {
     }

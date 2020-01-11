@@ -1,6 +1,6 @@
 <?php
 
-final class Mapper_array_Ramsey_Uuid_UuidInterface extends \Jane\AutoMapper\Mapper
+final class Mapper_Ramsey_Uuid_Fields_FieldsInterface_array extends \Jane\AutoMapper\Mapper
 {
     protected $hash = '1578744718';
     public function __construct()
@@ -13,7 +13,10 @@ final class Mapper_array_Ramsey_Uuid_UuidInterface extends \Jane\AutoMapper\Mapp
         }
         $result = $context->getObjectToPopulate();
         if (null === $result) {
-            $result = new \Ramsey\Uuid\UuidInterface();
+            $result = array();
+        }
+        if ($context->isAllowedAttribute('bytes')) {
+            $result['bytes'] = $value->getbytes();
         }
         return $result;
     }

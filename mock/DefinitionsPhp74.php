@@ -87,8 +87,8 @@ final class Php74ObjectGenerator
     {
         $faker = \Faker\Factory::create();
 
-        $hydrator1 = \Closure::bind(static function (Php74MockArticle $object) use ($faker) {
-            $object->id = Uuid::uuid4();
+        $hydrator1 = \Closure::bind(static function (Php74MockArticle $object) use ($faker, $withId) {
+            $object->id = $withId ? Uuid::uuid4() : null;
             $object->createdAt = $faker->dateTimeThisCentury;
             $object->updatedAt = $faker->dateTimeThisCentury;
             $object->authors = Php74ObjectGenerator::generateNameList($faker);
