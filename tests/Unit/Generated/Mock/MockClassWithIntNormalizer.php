@@ -55,12 +55,7 @@ final class MockClassWithIntNormalizer
  */
 MockClassWithIntNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithInt $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('int');
-            $ret['int'] = (null === $object->int ? null : (int)$object->int);
-        } finally {
-            $context->leave();
-        }
+        $ret['int'] = (null === $object->int ? null : (int)$object->int);
 
     },
     null, MockClassWithInt::class
@@ -71,15 +66,10 @@ MockClassWithIntNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('int');
-            if (!isset($input['int'])) {
-                $context->nullValueError('int');
-            } else {
-                $instance->int = RuntimeHelper::toInt($input['int'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['int'])) {
+            $context->nullValueError('int');
+        } else {
+            $instance->int = RuntimeHelper::toInt($input['int'], $context);
         }
 
     },

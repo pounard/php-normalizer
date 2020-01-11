@@ -56,19 +56,9 @@ final class Php74MockTextWithFormatNormalizer
 Php74MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockTextWithFormat $object, Context $context, ?callable $normalizer = null): void {
 
-        try {
-            $context->enter('text');
-            $ret['text'] = (null === $object->text ? null : (string)$object->text);
-        } finally {
-            $context->leave();
-        }
+        $ret['text'] = (null === $object->text ? null : (string)$object->text);
 
-        try {
-            $context->enter('format');
-            $ret['format'] = (null === $object->format ? null : (string)$object->format);
-        } finally {
-            $context->leave();
-        }
+        $ret['format'] = (null === $object->format ? null : (string)$object->format);
 
     },
     null, Php74MockTextWithFormat::class
@@ -80,22 +70,12 @@ Php74MockTextWithFormatNormalizer::$normalizer0 = \Closure::bind(
 Php74MockTextWithFormatNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockTextWithFormat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        try {
-            $context->enter('text');
-            $instance->text = isset($input['text']) ? RuntimeHelper::toString($input['text'], $context) : null;
-        } finally {
-            $context->leave();
-        }
+        $instance->text = isset($input['text']) ? RuntimeHelper::toString($input['text'], $context) : null;
 
-        try {
-            $context->enter('format');
-            if (!isset($input['format'])) {
-                $context->nullValueError('string');
-            } else {
-                $instance->format = RuntimeHelper::toString($input['format'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['format'])) {
+            $context->nullValueError('string');
+        } else {
+            $instance->format = RuntimeHelper::toString($input['format'], $context);
         }
 
     },

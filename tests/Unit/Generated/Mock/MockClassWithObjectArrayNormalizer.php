@@ -55,20 +55,15 @@ final class MockClassWithObjectArrayNormalizer
  */
 MockClassWithObjectArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithObjectArray $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('objectArray');
-            $ret['objectArray'] = [];
-            if ($object->objectArray) {
-                foreach ($object->objectArray as $index => $value) {
-                    if (null === $value) {
-                        $ret['objectArray'][$index] = null;
-                    } else {
-                        $ret['objectArray'][$index] = MockClassWithNullableIntNormalizer::normalize($value, $context, $normalizer);
-                    }
+        $ret['objectArray'] = [];
+        if ($object->objectArray) {
+            foreach ($object->objectArray as $index => $value) {
+                if (null === $value) {
+                    $ret['objectArray'][$index] = null;
+                } else {
+                    $ret['objectArray'][$index] = MockClassWithNullableIntNormalizer::normalize($value, $context, $normalizer);
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },
@@ -80,29 +75,24 @@ MockClassWithObjectArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithObjectArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithObjectArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('objectArray');
-            if (isset($input['objectArray'])) {
-                if (!\is_iterable($input['objectArray'])) {
-                    $input['objectArray'] = (array)$input['objectArray'];
-                }
-                if ($input['objectArray']) {
-                    $instance->objectArray = [];
-                    foreach ($input['objectArray'] as $index => $value) {
-                        if (null === $value) {
-                            $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
-                            $instance->objectArray[$index] = null;
-                        } else {
-                            $instance->objectArray[$index] = ($value instanceof MockClassWithNullableInt
-                                ? $value
-                                : MockClassWithNullableIntNormalizer::denormalize($value, $context, $denormalizer)
-                            );
-                        }
+        if (isset($input['objectArray'])) {
+            if (!\is_iterable($input['objectArray'])) {
+                $input['objectArray'] = (array)$input['objectArray'];
+            }
+            if ($input['objectArray']) {
+                $instance->objectArray = [];
+                foreach ($input['objectArray'] as $index => $value) {
+                    if (null === $value) {
+                        $context->nullValueError('MakinaCorpus\\Normalizer\\Tests\\Unit\\Mock\\MockClassWithNullableInt');
+                        $instance->objectArray[$index] = null;
+                    } else {
+                        $instance->objectArray[$index] = ($value instanceof MockClassWithNullableInt
+                            ? $value
+                            : MockClassWithNullableIntNormalizer::denormalize($value, $context, $denormalizer)
+                        );
                     }
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },

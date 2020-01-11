@@ -2,7 +2,7 @@
 
 final class Mapper_array_MakinaCorpus_Normalizer_Mock_MockTextWithFormat extends \Jane\AutoMapper\Mapper
 {
-    protected $hash = '1578415845';
+    protected $hash = '1578675982';
     public function __construct()
     {
     }
@@ -16,12 +16,16 @@ final class Mapper_array_MakinaCorpus_Normalizer_Mock_MockTextWithFormat extends
             if ($context->hasConstructorArgument('MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat', 'text')) {
                 $constructArg = $context->getConstructorArgument('MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat', 'text');
             } else {
-                $constructArg = NULL;
+                $value_1 = null;
+                if (null !== $value['text']) {
+                    $value_1 = $value['text'];
+                }
+                $constructArg = $value_1;
             }
             if ($context->hasConstructorArgument('MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat', 'format')) {
                 $constructArg_1 = $context->getConstructorArgument('MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat', 'format');
             } else {
-                $constructArg_1 = NULL;
+                $constructArg_1 = $value['format'];
             }
             $result = new \MakinaCorpus\Normalizer\Mock\MockTextWithFormat($constructArg, $constructArg_1);
         }

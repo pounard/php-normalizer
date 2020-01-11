@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks\Denormalization;
+namespace MakinaCorpus\Normalizer\Benchmarks\Normalization;
 
 use MakinaCorpus\Normalizer\Benchmarks\WithContextTrait;
 use MakinaCorpus\Normalizer\Benchmarks\WithGeneratedNormalizerTrait;
+use MakinaCorpus\Normalizer\Mock\MockArticle;
 
-final class GeneratedDenormalizerBench extends AbstractDenormalizeBench
+final class GeneratedNormalizerBench extends AbstractNormalizeBench
 {
     use WithContextTrait;
     use WithGeneratedNormalizerTrait;
@@ -15,9 +16,9 @@ final class GeneratedDenormalizerBench extends AbstractDenormalizeBench
     /**
      * {@inheritdoc}
      */
-    protected function denormalize(string $type, array $input): void
+    protected function normalize(MockArticle $object): void
     {
-        $this->display($this->normalizer->denormalize($type, $input, $this->context->fresh()));
+        $this->display($this->normalizer->normalize($object, $this->context->fresh()));
     }
 
     /**

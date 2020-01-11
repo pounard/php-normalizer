@@ -56,12 +56,7 @@ final class MockClassWithUuidNormalizer
  */
 MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithUuid $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('uuid');
-            $ret['uuid'] = (null === $object->uuid ? null : $object->uuid->__toString());
-        } finally {
-            $context->leave();
-        }
+        $ret['uuid'] = (null === $object->uuid ? null : $object->uuid->__toString());
 
     },
     null, MockClassWithUuid::class
@@ -72,15 +67,10 @@ MockClassWithUuidNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithUuidNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithUuid $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('uuid');
-            $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof UuidInterface
-                ? $input['uuid']
-                : Uuid::fromString($input['uuid'])
-            ) : null;
-        } finally {
-            $context->leave();
-        }
+        $instance->uuid = isset($input['uuid']) ? ($input['uuid'] instanceof UuidInterface
+            ? $input['uuid']
+            : Uuid::fromString($input['uuid'])
+        ) : null;
 
     },
     null, MockClassWithUuid::class

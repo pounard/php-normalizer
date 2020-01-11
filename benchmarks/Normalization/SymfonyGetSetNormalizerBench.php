@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks\Denormalization;
+namespace MakinaCorpus\Normalizer\Benchmarks\Normalization;
 
 use MakinaCorpus\Normalizer\Benchmarks\WithSymfonyGetSetNormalizerTrait;
+use MakinaCorpus\Normalizer\Mock\MockArticle;
 
-final class SymfonyObjectDenormalizerBench extends AbstractDenormalizeBench
+final class SymfonyObjectDenormalizerBench extends AbstractNormalizeBench
 {
     use WithSymfonyGetSetNormalizerTrait;
 
     /**
      * {@inheritdoc}
      */
-    protected function denormalize(string $type, array $input): void
+    protected function normalize(MockArticle $object): void
     {
-        $this->display($this->serializer->denormalize($input, $type));
+        $this->display($this->serializer->normalize($object));
     }
 
     /**

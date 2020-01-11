@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks\DenormalizationPhp74;
+namespace MakinaCorpus\Normalizer\Benchmarks\Normalization;
 
-use MakinaCorpus\Normalizer\Mock\Php74MockArticle;
-use MakinaCorpus\Normalizer\Mock\Php74ObjectGenerator;
+use MakinaCorpus\Normalizer\Benchmarks\WithStupidDisplayTrait;
+use MakinaCorpus\Normalizer\Mock\MockArticle;
+use MakinaCorpus\Normalizer\Mock\ObjectGenerator;
 
 /**
  * @BeforeMethods({"initSerializer", "initData"})
@@ -13,8 +14,10 @@ use MakinaCorpus\Normalizer\Mock\Php74ObjectGenerator;
  * @Revs(5)
  * @Iterations(5)
  */
-abstract class AbstractDenormalizeBench
+abstract class AbstractNormalizeBench
 {
+    use WithStupidDisplayTrait;
+
     /** @var mixed[] */
     private $data;
 
@@ -23,7 +26,7 @@ abstract class AbstractDenormalizeBench
      */
     final public function initData(array $params): void
     {
-        $this->data = Php74ObjectGenerator::createNormalizedArticleList(10, $this->withUuid());
+        $this->data = ObjectGenerator::createInstanceArticleList(10, $this->withUuid());
     }
 
     /**
@@ -32,7 +35,7 @@ abstract class AbstractDenormalizeBench
     final public function benchSerialize(): void
     {
         foreach ($this->data as $input) {
-            $this->denormalize(Php74MockArticle::class, $input);
+            $this->normalize($input);
         }
     }
 
@@ -54,7 +57,7 @@ abstract class AbstractDenormalizeBench
     /**
      * Denormalize given data.
      */
-    abstract protected function denormalize(string $type, array $input): void;
+    abstract protected function normalize(MockArticle $object): void;
 
     /**
      * Get package name.

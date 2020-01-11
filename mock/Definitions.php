@@ -53,7 +53,7 @@ final class ObjectGenerator
             'id' => $withId ? (string)Uuid::uuid4() : null,
             'createdAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
             'updatedAt' => (string)($faker->dateTimeThisCentury)->format(\DateTime::ISO8601),
-            'authors' => self::generateNameList(),
+            'authors' => self::generateNameList(5),
             'title' => $faker->sentence,
             'text' => [
                 'text' => $faker->text,
@@ -83,7 +83,7 @@ final class ObjectGenerator
     /**
      * Create single article instance
      */
-    public static function createInstanceArticle(bool $withId = true): array
+    public static function createInstanceArticle(bool $withId = true): MockArticle
     {
         $faker = \Faker\Factory::create();
 
@@ -91,7 +91,7 @@ final class ObjectGenerator
             $object->id = Uuid::uuid4();
             $object->createdAt = $faker->dateTimeThisCentury;
             $object->updatedAt = $faker->dateTimeThisCentury;
-            $object->authors = ObjectGenerator::generateNameList($faker);
+            $object->authors = ObjectGenerator::generateNameList(5);
             $object->foo = $faker->jobTitle;
             $object->bar = $faker->randomDigitNotNull;
             $object->baz = $faker->randomFloat();
@@ -194,12 +194,22 @@ class MockTextWithFormat
         return $this->text;
     }
 
+    public function setText(?string $value): void
+    {
+        $this->text = $value;
+    }
+
     /** @var string */
     private $format;
 
     public function getFormat(): ?string
     {
         return $this->format;
+    }
+
+    public function setFormat(?string $value): void
+    {
+        $this->format = $value;
     }
 
     public function __construct(?string $text = null, ?string $format = null)
@@ -237,7 +247,7 @@ class MockWithTitle
  */
 class MockWithText extends MockWithTitle
 {
-    /** @var ?MockTextWithFormat */
+    /** @var null|MockTextWithFormat */
     private $text;
 
     /** @return null|MockTextWithFormat */
@@ -246,7 +256,7 @@ class MockWithText extends MockWithTitle
         return $this->text;
     }
 
-    public function setText(?MockTextWithFormat $value): void
+    public function setMarkup(?MockTextWithFormat $value): void
     {
         $this->text = $value;
     }
@@ -354,14 +364,36 @@ final class MockArticle extends MockWithText
     /** @var null|UuidInterface */
     private $id = null;
 
+    /** @return ?UuidInterface */
+    public function getId(): ?UuidInterface
+    {
+        return $this->id;
+    }
+
+    public function setId(?UuidInterface $value): void
+    {
+        $this->id = $value;
+    }
+
     /** @var \DateTimeImmutable */
     private $createdAt;
+
+    /** @return ?\DateTimeImmutable */
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $value): void
+    {
+        $this->createdAt = $value;
+    }
 
     /** @var ?\DateTimeImmutable */
     private $updatedAt;
 
     /** @return ?\DateTimeImmutable */
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
     }

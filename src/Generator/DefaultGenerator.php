@@ -217,7 +217,7 @@ EOT
         $shortName = $isBuiltIn ? null : $context->addImport($type);
 
         if (!$normalizeCall) {
-            if (!$isBuiltIn) {
+            if (!$isBuiltIn || 'null' === $type) {
                 $typeString = "'{$type}'";
             } else {
                 $typeString = $shortName.'::class';
@@ -601,6 +601,7 @@ EOT
                 if (1 !== $count) { // Minor useless tweak.
                     $writer->newline();
                 }
+                /*
                 $escapedPropertyName = \addslashes($property->getNativeName());
                 $writer->write(<<<EOT
         try {
@@ -619,6 +620,13 @@ EOT
         }
 EOT
                 );
+                 */
+                try {
+                    $writer->indentationReset(2);
+                    $this->generateNormalizerProperty($property, $context, $writer);
+                } finally {
+                    $writer->indentationReset();
+                }
             }
 
             $writer->newline();
@@ -640,6 +648,7 @@ EOT
                 if (1 !== $count) { // Minor useless tweak.
                     $writer->newline();
                 }
+                /*
                 $escapedPropertyName = \addslashes($property->getNativeName());
                 $writer->write(<<<EOT
         try {
@@ -658,6 +667,14 @@ EOT
         }
 EOT
                 );
+                 */
+
+                try {
+                    $writer->indentationReset(2);
+                    $this->generateDenormalizerProperty($property, $context, $writer);
+                } finally {
+                    $writer->indentationReset();
+                }
             }
 
             $writer->newline();

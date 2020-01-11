@@ -55,20 +55,15 @@ final class MockClassWithIntArrayNormalizer
  */
 MockClassWithIntArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithIntArray $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('intArray');
-            $ret['intArray'] = [];
-            if ($object->intArray) {
-                foreach ($object->intArray as $index => $value) {
-                    if (null === $value) {
-                        $ret['intArray'][$index] = null;
-                    } else {
-                        $ret['intArray'][$index] = (int)$value;
-                    }
+        $ret['intArray'] = [];
+        if ($object->intArray) {
+            foreach ($object->intArray as $index => $value) {
+                if (null === $value) {
+                    $ret['intArray'][$index] = null;
+                } else {
+                    $ret['intArray'][$index] = (int)$value;
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },
@@ -80,26 +75,21 @@ MockClassWithIntArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithIntArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithIntArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('intArray');
-            if (isset($input['intArray'])) {
-                if (!\is_iterable($input['intArray'])) {
-                    $input['intArray'] = (array)$input['intArray'];
-                }
-                if ($input['intArray']) {
-                    $instance->intArray = [];
-                    foreach ($input['intArray'] as $index => $value) {
-                        if (null === $value) {
-                            $context->nullValueError('int');
-                            $instance->intArray[$index] = null;
-                        } else {
-                            $instance->intArray[$index] = RuntimeHelper::toInt($value, $context);
-                        }
+        if (isset($input['intArray'])) {
+            if (!\is_iterable($input['intArray'])) {
+                $input['intArray'] = (array)$input['intArray'];
+            }
+            if ($input['intArray']) {
+                $instance->intArray = [];
+                foreach ($input['intArray'] as $index => $value) {
+                    if (null === $value) {
+                        $context->nullValueError('int');
+                        $instance->intArray[$index] = null;
+                    } else {
+                        $instance->intArray[$index] = RuntimeHelper::toInt($value, $context);
                     }
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace MakinaCorpus\Normalizer\Benchmarks\Denormalization;
+namespace MakinaCorpus\Normalizer\Benchmarks\Normalization;
 
 use Jane\AutoMapper\Context;
 use MakinaCorpus\Normalizer\Mock\MockArticle;
 use MakinaCorpus\Normalizer\Benchmarks\WithJaneAutomapperTrait;
 
-final class JaneAutomapperDenormalizerBench extends AbstractDenormalizeBench
+final class JaneAutomapperNormalizerBench extends AbstractNormalizeBench
 {
     use WithJaneAutomapperTrait;
 
     /**
      * {@inheritdoc}
      */
-    protected function denormalize(string $type, array $input): void
+    protected function normalize(MockArticle $object): void
     {
-        $this->display($this->mapper->map($input, new Context()));
+        $this->display($this->mapper->map($object, new Context()));
     }
 
     /**
@@ -41,6 +41,6 @@ final class JaneAutomapperDenormalizerBench extends AbstractDenormalizeBench
      */
     public function initSerializer(): void
     {
-        $this->mapper = $this->createDenormalizerMapper(MockArticle::class);
+        $this->mapper = $this->createMapper(MockArticle::class);
     }
 }

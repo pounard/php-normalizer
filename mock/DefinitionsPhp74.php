@@ -193,11 +193,21 @@ class Php74MockTextWithFormat
         return $this->text;
     }
 
+    public function setText(?string $value): void
+    {
+        $this->text = $value;
+    }
+
     private string $format;
 
     public function getFormat(): ?string
     {
         return $this->format;
+    }
+
+    public function setFormat(?string $value): void
+    {
+        $this->format = $value;
     }
 
     public function __construct(?string $text = null, ?string $format = null)
@@ -234,29 +244,14 @@ class Php74MockWithTitle
  */
 class Php74MockWithText extends Php74MockWithTitle
 {
-    /** @var null|Php74MockTextWithFormat */
     private ?Php74MockTextWithFormat $text;
 
-    /** @return null|Php74MockTextWithFormat */
     public function getMarkup(): ?Php74MockTextWithFormat
     {
         return $this->text;
     }
 
-    /**
-     * Fun thing, without the type hint here, because symfony/serializer
-     * attempt to normalize based upon setter injection instead of property
-     * injection, this cannot work and will raise exception.
-     *
-     * This is silent in the benchmarks targetting previous PHP versions
-     * because PHP wasn't raising TypeError exceptions, but now we see them:
-     * Symfony's serializer is very fragile and silently give invalid data.
-     *
-     * As soon as we properly typed setters, Syfmony's normalizer had a more
-     * than 2x performance penalty. It is extremely slow, with or without
-     * metadata cache.
-     */
-    public function setText(?Php74MockTextWithFormat $value): void
+    public function setMarkup(?Php74MockTextWithFormat $value): void
     {
         $this->text = $value;
     }
@@ -354,7 +349,27 @@ final class Php74MockArticle extends Php74MockWithText
 
     private ?UuidInterface $id = null;
 
+    public function getId(): ?UuidInterface
+    {
+        return $this->id;
+    }
+
+    public function setId(?UuidInterface $value): void
+    {
+        $this->id = $value;
+    }
+
     private \DateTimeImmutable $createdAt;
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $value): void
+    {
+        $this->createdAt = $value;
+    }
 
     private ?\DateTimeImmutable $updatedAt;
 

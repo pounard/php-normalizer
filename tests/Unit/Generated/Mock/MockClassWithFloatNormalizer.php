@@ -55,12 +55,7 @@ final class MockClassWithFloatNormalizer
  */
 MockClassWithFloatNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithFloat $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('float');
-            $ret['float'] = (null === $object->float ? null : (float)$object->float);
-        } finally {
-            $context->leave();
-        }
+        $ret['float'] = (null === $object->float ? null : (float)$object->float);
 
     },
     null, MockClassWithFloat::class
@@ -71,15 +66,10 @@ MockClassWithFloatNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithFloatNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithFloat $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('float');
-            if (!isset($input['float'])) {
-                $context->nullValueError('float');
-            } else {
-                $instance->float = RuntimeHelper::toFloat($input['float'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['float'])) {
+            $context->nullValueError('float');
+        } else {
+            $instance->float = RuntimeHelper::toFloat($input['float'], $context);
         }
 
     },

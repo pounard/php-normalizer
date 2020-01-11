@@ -56,20 +56,15 @@ final class MockClassWithDateArrayNormalizer
  */
 MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithDateArray $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('dateArray');
-            $ret['dateArray'] = [];
-            if ($object->dateArray) {
-                foreach ($object->dateArray as $index => $value) {
-                    if (null === $value) {
-                        $ret['dateArray'][$index] = null;
-                    } else {
-                        $ret['dateArray'][$index] = $value->format('Y-m-d\\TH:i:sP');
-                    }
+        $ret['dateArray'] = [];
+        if ($object->dateArray) {
+            foreach ($object->dateArray as $index => $value) {
+                if (null === $value) {
+                    $ret['dateArray'][$index] = null;
+                } else {
+                    $ret['dateArray'][$index] = $value->format('Y-m-d\\TH:i:sP');
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },
@@ -81,29 +76,24 @@ MockClassWithDateArrayNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithDateArrayNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithDateArray $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('dateArray');
-            if (isset($input['dateArray'])) {
-                if (!\is_iterable($input['dateArray'])) {
-                    $input['dateArray'] = (array)$input['dateArray'];
-                }
-                if ($input['dateArray']) {
-                    $instance->dateArray = [];
-                    foreach ($input['dateArray'] as $index => $value) {
-                        if (null === $value) {
-                            $context->nullValueError('DateTime');
-                            $instance->dateArray[$index] = null;
-                        } else {
-                            $instance->dateArray[$index] = ($value instanceof DateTime
-                                ? $value
-                                : RuntimeHelper::toDate($value, $context)
-                            );
-                        }
+        if (isset($input['dateArray'])) {
+            if (!\is_iterable($input['dateArray'])) {
+                $input['dateArray'] = (array)$input['dateArray'];
+            }
+            if ($input['dateArray']) {
+                $instance->dateArray = [];
+                foreach ($input['dateArray'] as $index => $value) {
+                    if (null === $value) {
+                        $context->nullValueError('DateTime');
+                        $instance->dateArray[$index] = null;
+                    } else {
+                        $instance->dateArray[$index] = ($value instanceof DateTime
+                            ? $value
+                            : RuntimeHelper::toDate($value, $context)
+                        );
                     }
                 }
             }
-        } finally {
-            $context->leave();
         }
 
     },

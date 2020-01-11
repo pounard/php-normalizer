@@ -55,12 +55,7 @@ final class Php74MockWithTitleNormalizer
  */
 Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, Php74MockWithTitle $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('title');
-            $ret['title'] = (null === $object->title ? null : (string)$object->title);
-        } finally {
-            $context->leave();
-        }
+        $ret['title'] = (null === $object->title ? null : (string)$object->title);
 
     },
     null, Php74MockWithTitle::class
@@ -71,15 +66,10 @@ Php74MockWithTitleNormalizer::$normalizer0 = \Closure::bind(
  */
 Php74MockWithTitleNormalizer::$denormalizer0 = \Closure::bind(
     static function (Php74MockWithTitle $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('title');
-            if (!isset($input['title'])) {
-                $context->nullValueError('string');
-            } else {
-                $instance->title = RuntimeHelper::toString($input['title'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['title'])) {
+            $context->nullValueError('string');
+        } else {
+            $instance->title = RuntimeHelper::toString($input['title'], $context);
         }
 
     },

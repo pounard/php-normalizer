@@ -14,8 +14,6 @@ return array (
     1 => '/var/www/playing-with-normalization/mock/Generated/MockArticleNormalizer.php',
     2 => 
     array (
-      0 => 'MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat',
-      1 => 'MakinaCorpus\\Normalizer\\Mock\\Generated\\MockTextWithFormatNormalizer',
     ),
   ),
   'MakinaCorpus\\Normalizer\\Mock\\MockTextWithFormat' => 

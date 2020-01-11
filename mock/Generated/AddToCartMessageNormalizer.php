@@ -58,26 +58,11 @@ final class AddToCartMessageNormalizer
 AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, AddToCartMessage $object, Context $context, ?callable $normalizer = null): void {
 
-        try {
-            $context->enter('orderId');
-            $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
-        } finally {
-            $context->leave();
-        }
+        $ret['orderId'] = (null === $object->orderId ? null : $object->orderId->__toString());
 
-        try {
-            $context->enter('productId');
-            $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
-        } finally {
-            $context->leave();
-        }
+        $ret['productId'] = (null === $object->productId ? null : (int)$object->productId);
 
-        try {
-            $context->enter('amount');
-            $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
-        } finally {
-            $context->leave();
-        }
+        $ret['amount'] = (null === $object->amount ? null : (float)$object->amount);
 
     },
     null, AddToCartMessage::class
@@ -89,36 +74,21 @@ AddToCartMessageNormalizer::$normalizer0 = \Closure::bind(
 AddToCartMessageNormalizer::$denormalizer0 = \Closure::bind(
     static function (AddToCartMessage $instance, array $input, Context $context, ?callable $denormalizer = null): void {
 
-        try {
-            $context->enter('orderId');
-            $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
-                ? $input['orderId']
-                : Uuid::fromString($input['orderId'])
-            ) : null;
-        } finally {
-            $context->leave();
+        $instance->orderId = isset($input['orderId']) ? ($input['orderId'] instanceof UuidInterface
+            ? $input['orderId']
+            : Uuid::fromString($input['orderId'])
+        ) : null;
+
+        if (!isset($input['productId'])) {
+            $context->nullValueError('int');
+        } else {
+            $instance->productId = RuntimeHelper::toInt($input['productId'], $context);
         }
 
-        try {
-            $context->enter('productId');
-            if (!isset($input['productId'])) {
-                $context->nullValueError('int');
-            } else {
-                $instance->productId = RuntimeHelper::toInt($input['productId'], $context);
-            }
-        } finally {
-            $context->leave();
-        }
-
-        try {
-            $context->enter('amount');
-            if (!isset($input['amount'])) {
-                $context->nullValueError('float');
-            } else {
-                $instance->amount = RuntimeHelper::toFloat($input['amount'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['amount'])) {
+            $context->nullValueError('float');
+        } else {
+            $instance->amount = RuntimeHelper::toFloat($input['amount'], $context);
         }
 
     },

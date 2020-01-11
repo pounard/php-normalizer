@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\Normalizer\Benchmarks\Denormalization;
 
-use PhpBench\Benchmark\Metadata\Annotations\Iterations;
-use MakinaCorpus\Normalizer\Mock\ObjectGenerator;
+use MakinaCorpus\Normalizer\Benchmarks\WithStupidDisplayTrait;
 use MakinaCorpus\Normalizer\Mock\MockArticle;
+use MakinaCorpus\Normalizer\Mock\ObjectGenerator;
 
 /**
  * @BeforeMethods({"initSerializer", "initData"})
@@ -16,6 +16,8 @@ use MakinaCorpus\Normalizer\Mock\MockArticle;
  */
 abstract class AbstractDenormalizeBench
 {
+    use WithStupidDisplayTrait;
+
     /** @var mixed[] */
     private $data;
 

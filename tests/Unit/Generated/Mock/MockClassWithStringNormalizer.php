@@ -55,12 +55,7 @@ final class MockClassWithStringNormalizer
  */
 MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithString $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('string');
-            $ret['string'] = (null === $object->string ? null : (string)$object->string);
-        } finally {
-            $context->leave();
-        }
+        $ret['string'] = (null === $object->string ? null : (string)$object->string);
 
     },
     null, MockClassWithString::class
@@ -71,15 +66,10 @@ MockClassWithStringNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithStringNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithString $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('string');
-            if (!isset($input['string'])) {
-                $context->nullValueError('string');
-            } else {
-                $instance->string = RuntimeHelper::toString($input['string'], $context);
-            }
-        } finally {
-            $context->leave();
+        if (!isset($input['string'])) {
+            $context->nullValueError('string');
+        } else {
+            $instance->string = RuntimeHelper::toString($input['string'], $context);
         }
 
     },

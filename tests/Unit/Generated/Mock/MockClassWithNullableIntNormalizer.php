@@ -55,12 +55,7 @@ final class MockClassWithNullableIntNormalizer
  */
 MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
     static function (array &$ret, MockClassWithNullableInt $object, Context $context, ?callable $normalizer = null): void {
-        try {
-            $context->enter('nullableInt');
-            $ret['nullableInt'] = (null === $object->nullableInt ? null : (int)$object->nullableInt);
-        } finally {
-            $context->leave();
-        }
+        $ret['nullableInt'] = (null === $object->nullableInt ? null : (int)$object->nullableInt);
 
     },
     null, MockClassWithNullableInt::class
@@ -71,12 +66,7 @@ MockClassWithNullableIntNormalizer::$normalizer0 = \Closure::bind(
  */
 MockClassWithNullableIntNormalizer::$denormalizer0 = \Closure::bind(
     static function (MockClassWithNullableInt $instance, array $input, Context $context, ?callable $denormalizer = null): void {
-        try {
-            $context->enter('nullableInt');
-            $instance->nullableInt = isset($input['nullableInt']) ? RuntimeHelper::toInt($input['nullableInt'], $context) : null;
-        } finally {
-            $context->leave();
-        }
+        $instance->nullableInt = isset($input['nullableInt']) ? RuntimeHelper::toInt($input['nullableInt'], $context) : null;
 
     },
     null, MockClassWithNullableInt::class
