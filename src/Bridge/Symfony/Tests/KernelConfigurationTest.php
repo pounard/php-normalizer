@@ -62,13 +62,13 @@ class KernelConfigurationTest extends TestCase
         $config = $this->getMinimalConfig();
         $extension->load([$config], $container = $this->getContainer());
 
-        $container->getDefinition('php_normalizer.normalizer')->setPublic(true);
+        $container->getDefinition('php_normalizer')->setPublic(true);
         $container->getDefinition('php_normalizer.type_definition_map')->setPublic(true);
         $container->addCompilerPass(new NormalizerPass());
 
         $container->compile();
 
-        $definition = $container->getDefinition('php_normalizer.normalizer');
+        $definition = $container->getDefinition('php_normalizer');
         self::assertCount(3, $definition->getArgument(0));
 
         $definition = $container->getDefinition('php_normalizer.type_definition_map');

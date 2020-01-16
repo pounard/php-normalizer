@@ -5,9 +5,20 @@ services:
         class: MakinaCorpus\Normalizer\TypeDefinitionMapChain
         arguments: [[]]
 
-    php_normalizer.normalizer:
+    MakinaCorpus\Normalizer\TypeDefinitionMap:
+        alias: php_normalizer.type_definition_map
+
+    php_normalizer:
         public: false
-        class: MakinaCorpus\Normalizer\Normalizer
+        class: MakinaCorpus\Normalizer\DefaultNormalizer
+        arguments: [~, '@php_normalizer.custom.chain']
+
+    MakinaCorpus\Normalizer\DefaultNormalizer:
+        alias: php_normalizer
+
+    php_normalizer.custom.chain:
+        public: false
+        class: MakinaCorpus\Normalizer\Normalizer\CustomNormalizerChain
         arguments: [[]]
 
     php_normalizer.context_factory:
@@ -15,9 +26,12 @@ services:
         class: MakinaCorpus\Normalizer\ContextFactory
         arguments: ['@php_normalizer.type_definition_map']
 
+    MakinaCorpus\Normalizer\ContextFactory:
+        alias: php_normalizer.context_factory
+
     php_normalizer.symfony_normalizer_proxy:
         public: false
-        class: MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer
-        arguments: ['@php_normalizer.context_factory', '@php_normalizer.normalizer']
+        class: MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer\NormalizerProxy
+        arguments: ['@php_normalizer.context_factory', '@php_normalizer']
         # Before core one, but leave user's with no priority override us.
         tags: [{name: 'serializer.normalizer', priority: -10}]

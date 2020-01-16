@@ -22,13 +22,6 @@ final class PhpNormalizerExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $loader->load('core.yaml');
-        $loader->load('normalizer.yaml');
-
-        /*
-        if (\in_array(WebProfilerBundle::class, $container->getParameter('kernel.bundles'))) {
-            $loader->load('profiler.yml');
-        }
-         */
 
         $this->registerDefinitionFiles($container, $config);
     }
@@ -36,7 +29,7 @@ final class PhpNormalizerExtension extends Extension
     /**
      * Register custom application-defined type configuration files.
      */
-    private function registerDefinitionFiles(ContainerBuilder $container, array $config)
+    private function registerDefinitionFiles(ContainerBuilder $container, array $config): void
     {
         if (empty($config['definition_files'])) {
             return;

@@ -2,7 +2,6 @@
 
 namespace MakinaCorpus\Normalizer\Bridge\Symfony\Serializer\Normalizer;
 
-use const Functional\Functional\true;
 use MakinaCorpus\Normalizer\ContextFactory;
 use MakinaCorpus\Normalizer\Normalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;

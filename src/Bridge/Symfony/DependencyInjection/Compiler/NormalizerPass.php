@@ -15,7 +15,7 @@ class NormalizerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $normalizerService;
+    private $normalizerChainService;
     private $normalizerTag;
     private $typeDefinitionMapService;
     private $typeDefinitionMapTag;
@@ -24,12 +24,12 @@ class NormalizerPass implements CompilerPassInterface
      * Default constructor
      */
     public function __construct(
-        string $normalizerService = 'php_normalizer.normalizer',
+        string $normalizerChainService = 'php_normalizer',
         string $normalizerTag = 'php_normalizer.normalizer',
         string $typeDefinitionMapService = 'php_normalizer.type_definition_map',
         string $typeDefinitionMapTag = 'php_normalizer.type_definition_map')
     {
-        $this->normalizerService = $normalizerService;
+        $this->normalizerChainService = $normalizerChainService;
         $this->normalizerTag = $normalizerTag;
         $this->typeDefinitionMapService = $typeDefinitionMapService;
         $this->typeDefinitionMapTag = $typeDefinitionMapTag;
@@ -40,11 +40,11 @@ class NormalizerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition($this->normalizerService)) {
+        if ($container->hasDefinition($this->normalizerChainService)) {
             if ($normalizers = $this->findAndSortTaggedServices($this->normalizerTag, $container)) {
                 $container
-                    ->getDefinition($this->normalizerService)
-                    ->replaceArgument(0, $normalizers)
+                    ->getDefinition($this->normalizerChainService)
+                    ->replaceArgument(1, $normalizers)
                 ;
             }
         }

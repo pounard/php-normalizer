@@ -51,22 +51,22 @@
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9",
+        "jane-php/automapper": "^5.2",
+        "jms/serializer": "^3.4",
+        "makinacorpus/goat": "^1.0.1",
         "phpbench/phpbench": "^1.0",
         "phpunit/phpunit": "^7",
         "ramsey/uuid": "^4.0",
         "symfony/cache": "^4.3 || ^5.0",
+        "symfony/config": "^4.3 || ^5.0",
         "symfony/dependency-injection": "^4.3 || ^5.0",
+        "symfony/http-kernel": "^4.3 || ^5.0",
         "symfony/property-access": "^4.3 || ^5.0",
         "symfony/serializer": "^4.4 || ^5.0",
-        "symfony/yaml": "^4.3 || ^5.0",
-        "symfony/config": "^4.3 || ^5.0",
-        "symfony/http-kernel": "^4.3 || ^5.0",
-        "jms/serializer": "^3.4",
-        "jane-php/automapper": "^5.2"
+        "symfony/yaml": "^4.3 || ^5.0"
     },
     "suggest": {
         "ramsey/uuid": "For UUID database column type support",
-        "symfony/property-info": "For docblock based object type introspection",
         "symfony/serializer": "This normalizer can be used as a replacement for symfony normalizer"
     }
 }
